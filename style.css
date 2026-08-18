@@ -1653,3 +1653,41 @@ button {
     }
 
 }
+/* =====================================================
+   FOOTER CREDIT
+===================================================== */
+
+.footer-credit {
+    text-align: right;
+}
+
+.footer-credit p:first-child {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.footer-credit p:first-child strong {
+    color: #ffffff;
+}
+
+.footer-credit p {
+    margin-bottom: 4px;
+}
+
+.footer-brand strong {
+    font-size: 22px;
+    letter-spacing: 1px;
+}
+
+
+/* Mobile Footer */
+
+@media (max-width: 700px) {
+
+    .footer-credit {
+        text-align: left;
+    }
+
+}
