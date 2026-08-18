@@ -1,12 +1,12 @@
 /* =====================================================
-   CARE
-   PHASE 2
-   SUPABASE CIVIC ISSUE REPORTING
+   C.A.R.E.
+   Civic Action and Reporting Engine
+   Phase 2 — Supabase
 ===================================================== */
 
 
 /* =====================================================
-   SUPABASE CONFIGURATION
+   SUPABASE
 ===================================================== */
 
 const SUPABASE_URL =
@@ -23,7 +23,7 @@ const supabaseClient =
 
 
 /* =====================================================
-   PAGE NAVIGATION
+   NAVIGATION
 ===================================================== */
 
 function showPage(page) {
@@ -41,100 +41,92 @@ function showPage(page) {
     };
 
 
-    Object.values(pages).forEach(id => {
+    Object.values(pages).forEach(
+        id => {
 
-        const element =
-            document.getElementById(id);
+            const element =
+                document.getElementById(id);
 
-        if (element) {
+            if (element) {
 
-            element.classList.remove(
-                "active-page"
-            );
+                element.classList.remove(
+                    "active-page"
+                );
+
+            }
 
         }
+    );
 
-    });
 
-
-    const selected =
+    const selectedPage =
         document.getElementById(
             pages[page]
         );
 
 
-    if (selected) {
+    if (selectedPage) {
 
-        selected.classList.add(
+        selectedPage.classList.add(
             "active-page"
         );
 
     }
 
 
-    updateNavigation(page);
-
-
-    window.scrollTo({
-
-        top: 0,
-
-        behavior: "smooth"
-
-    });
-
-
-    if (page === "reports") {
-
-        loadReports();
-
-    }
-
-}
-
-
-/* =====================================================
-   NAVIGATION
-===================================================== */
-
-function updateNavigation(page) {
-
     document
         .querySelectorAll(".nav-link")
-        .forEach(button => {
+        .forEach(link => {
 
-            button.classList.remove(
+            link.classList.remove(
                 "active"
             );
 
         });
 
 
-    const links = {
-
-        home: 0,
-
-        reports: 1,
-
-        about: 2
-
-    };
+    const navLinks =
+        document.querySelectorAll(
+            ".nav-link"
+        );
 
 
-    if (links[page] !== undefined) {
+    if (page === "home" && navLinks[0]) {
 
-        const navLinks =
-            document.querySelectorAll(
-                ".nav-link"
-            );
+        navLinks[0].classList.add(
+            "active"
+        );
 
-        if (navLinks[links[page]]) {
+    }
 
-            navLinks[
-                links[page]
-            ].classList.add("active");
 
-        }
+    if (page === "reports" && navLinks[1]) {
+
+        navLinks[1].classList.add(
+            "active"
+        );
+
+    }
+
+
+    if (page === "about" && navLinks[2]) {
+
+        navLinks[2].classList.add(
+            "active"
+        );
+
+    }
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+
+    if (page === "reports") {
+
+        loadReports();
 
     }
 
@@ -150,33 +142,29 @@ function startReport(category) {
     showPage("report");
 
 
-    setTimeout(() => {
-
-        const categorySelect =
-            document.getElementById(
-                "category"
-            );
+    const categorySelect =
+        document.getElementById(
+            "category"
+        );
 
 
-        if (categorySelect) {
+    if (categorySelect) {
 
-            categorySelect.value =
-                category;
+        categorySelect.value =
+            category;
 
-        }
-
-    }, 100);
+    }
 
 }
 
 
 /* =====================================================
-   GPS LOCATION
+   LOCATION
 ===================================================== */
 
 function getLocation() {
 
-    const text =
+    const locationText =
         document.getElementById(
             "locationText"
         );
@@ -184,11 +172,11 @@ function getLocation() {
 
     if (!navigator.geolocation) {
 
-        text.textContent =
-            "Geolocation is not supported.";
+        locationText.textContent =
+            "GPS is not supported by this browser.";
 
         showToast(
-            "Your browser does not support GPS."
+            "GPS is not supported."
         );
 
         return;
@@ -196,13 +184,13 @@ function getLocation() {
     }
 
 
-    text.textContent =
+    locationText.textContent =
         "Detecting your location...";
 
 
     navigator.geolocation.getCurrentPosition(
 
-        function(position) {
+        position => {
 
             const latitude =
                 position.coords.latitude;
@@ -223,23 +211,23 @@ function getLocation() {
                 longitude;
 
 
-            text.textContent =
+            locationText.textContent =
                 `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
 
 
             showToast(
-                "Location detected successfully."
+                "Location detected."
             );
 
         },
 
-        function(error) {
+        error => {
 
             console.error(error);
 
 
-            text.textContent =
-                "Location permission was not granted.";
+            locationText.textContent =
+                "Location permission denied.";
 
 
             showToast(
@@ -264,7 +252,7 @@ function getLocation() {
 
 
 /* =====================================================
-   GENERATE REPORT ID
+   REPORT ID
 ===================================================== */
 
 function generateReportId() {
@@ -275,16 +263,20 @@ function generateReportId() {
             Math.random() * 900000
         );
 
-    return "CARE-" + number;
+
+    return `CARE-${number}`;
 
 }
 
 
 /* =====================================================
-   UPLOAD IMAGE
+   IMAGE UPLOAD
 ===================================================== */
 
-async function uploadImage(file, reportId) {
+async function uploadImage(
+    file,
+    reportId
+) {
 
     if (!file) {
 
@@ -300,12 +292,8 @@ async function uploadImage(file, reportId) {
             .toLowerCase();
 
 
-    const fileName =
-        `${reportId}-${Date.now()}.${extension}`;
-
-
-    const filePath =
-        `reports/${fileName}`;
+    const path =
+        `reports/${reportId}-${Date.now()}.${extension}`;
 
 
     const {
@@ -315,24 +303,12 @@ async function uploadImage(file, reportId) {
             .storage
             .from("issue-images")
             .upload(
-                filePath,
-                file,
-                {
-
-                    cacheControl: "3600",
-
-                    upsert: false
-
-                }
+                path,
+                file
             );
 
 
     if (error) {
-
-        console.error(
-            "Image upload error:",
-            error
-        );
 
         throw error;
 
@@ -346,7 +322,7 @@ async function uploadImage(file, reportId) {
             .storage
             .from("issue-images")
             .getPublicUrl(
-                filePath
+                path
             );
 
 
@@ -398,14 +374,10 @@ async function submitIssue(event) {
         imageInput.files[0];
 
 
-    /* -----------------------------
-       VALIDATION
-    ----------------------------- */
-
     if (!category) {
 
         showToast(
-            "Please select an issue category."
+            "Please select a category."
         );
 
         return;
@@ -427,7 +399,7 @@ async function submitIssue(event) {
     if (!latitude || !longitude) {
 
         showToast(
-            "Please detect your location first."
+            "Please detect the issue location."
         );
 
         return;
@@ -435,48 +407,35 @@ async function submitIssue(event) {
     }
 
 
-    /* -----------------------------
-       BUTTON
-    ----------------------------- */
-
-    const submitButton =
+    const button =
         document.querySelector(
             "#issueForm button[type='submit']"
         );
 
 
     const originalText =
-        submitButton.textContent;
+        button.textContent;
 
 
-    submitButton.disabled = true;
+    button.disabled = true;
 
-    submitButton.textContent =
+    button.textContent =
         "Submitting...";
 
 
     try {
 
-        /* -------------------------
-           CREATE REPORT ID
-        ------------------------- */
-
         const reportId =
             generateReportId();
 
-
-        /* -------------------------
-           UPLOAD IMAGE
-        ------------------------- */
 
         let imageUrl = null;
 
 
         if (imageFile) {
 
-            showToast(
-                "Uploading photo..."
-            );
+            button.textContent =
+                "Uploading photo...";
 
 
             imageUrl =
@@ -488,9 +447,9 @@ async function submitIssue(event) {
         }
 
 
-        /* -------------------------
-           INSERT DATABASE RECORD
-        ------------------------- */
+        button.textContent =
+            "Saving report...";
+
 
         const {
             error
@@ -509,14 +468,10 @@ async function submitIssue(event) {
                         description,
 
                     latitude:
-                        parseFloat(
-                            latitude
-                        ),
+                        Number(latitude),
 
                     longitude:
-                        parseFloat(
-                            longitude
-                        ),
+                        Number(longitude),
 
                     image_url:
                         imageUrl,
@@ -532,19 +487,12 @@ async function submitIssue(event) {
 
         if (error) {
 
-            console.error(
-                "Database error:",
-                error
-            );
+            console.error(error);
 
             throw error;
 
         }
 
-
-        /* -------------------------
-           SUCCESS
-        ------------------------- */
 
         document
             .getElementById(
@@ -574,29 +522,36 @@ async function submitIssue(event) {
         );
 
 
-        setTimeout(() => {
+        setTimeout(
+            () => {
 
-            showPage("reports");
+                showPage(
+                    "reports"
+                );
 
-        }, 1200);
+            },
+            1000
+        );
 
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "CARE submission error:",
+            error
+        );
 
 
         showToast(
-            "Unable to submit report. Please try again."
+            "Report could not be submitted."
         );
 
 
     } finally {
 
-        submitButton.disabled =
-            false;
+        button.disabled = false;
 
-        submitButton.textContent =
+        button.textContent =
             originalText;
 
     }
@@ -605,7 +560,7 @@ async function submitIssue(event) {
 
 
 /* =====================================================
-   LOAD REPORTS FROM SUPABASE
+   LOAD REPORTS
 ===================================================== */
 
 async function loadReports() {
@@ -625,19 +580,19 @@ async function loadReports() {
 
     container.innerHTML = `
 
-        <div class="issue-card">
+        <div class="empty-state">
 
-            <div class="issue-content">
-
-                <h3>
-                    Loading reports...
-                </h3>
-
-                <p>
-                    Please wait.
-                </p>
-
+            <div>
+                ⏳
             </div>
+
+            <h3>
+                Loading reports...
+            </h3>
+
+            <p>
+                Please wait.
+            </p>
 
         </div>
 
@@ -645,11 +600,8 @@ async function loadReports() {
 
 
     const {
-
         data,
-
         error
-
     } =
         await supabaseClient
             .from("issues")
@@ -664,27 +616,24 @@ async function loadReports() {
 
     if (error) {
 
-        console.error(
-            "Loading reports error:",
-            error
-        );
+        console.error(error);
 
 
         container.innerHTML = `
 
-            <div class="issue-card">
+            <div class="empty-state">
 
-                <div class="issue-content">
-
-                    <h3>
-                        Unable to load reports
-                    </h3>
-
-                    <p>
-                        Please refresh the page.
-                    </p>
-
+                <div>
+                    ⚠️
                 </div>
+
+                <h3>
+                    Unable to load reports
+                </h3>
+
+                <p>
+                    Please try again.
+                </p>
 
             </div>
 
@@ -695,12 +644,28 @@ async function loadReports() {
     }
 
 
-    renderReports(data || []);
+    renderReports(
+        data || []
+    );
 
 
     updateStatistics(
         data || []
     );
+
+
+    const heroCount =
+        document.getElementById(
+            "heroReportCount"
+        );
+
+
+    if (heroCount) {
+
+        heroCount.textContent =
+            data.length;
+
+    }
 
 }
 
@@ -709,7 +674,9 @@ async function loadReports() {
    RENDER REPORTS
 ===================================================== */
 
-function renderReports(reports) {
+function renderReports(
+    reports
+) {
 
     const container =
         document.getElementById(
@@ -724,27 +691,24 @@ function renderReports(reports) {
     }
 
 
-    container.innerHTML = "";
-
-
     if (!reports.length) {
 
         container.innerHTML = `
 
-            <div class="issue-card">
+            <div class="empty-state">
 
-                <div class="issue-content">
-
-                    <h3>
-                        No reports yet
-                    </h3>
-
-                    <p>
-                        Be the first citizen
-                        to report a civic issue.
-                    </p>
-
+                <div>
+                    📍
                 </div>
+
+                <h3>
+                    No reports yet
+                </h3>
+
+                <p>
+                    Be the first citizen to report
+                    a civic issue through C.A.R.E.
+                </p>
 
             </div>
 
@@ -755,117 +719,110 @@ function renderReports(reports) {
     }
 
 
-    reports.forEach(report => {
-
-        const card =
-            document.createElement(
-                "div"
-            );
+    container.innerHTML = "";
 
 
-        card.className =
-            "issue-card";
+    reports.forEach(
+        report => {
+
+            const card =
+                document.createElement(
+                    "article"
+                );
 
 
-        const imageHTML =
-            report.image_url
+            card.className =
+                "issue-card";
 
-                ? `
-                    <div class="issue-image">
-                        <img
-                            src="${escapeHTML(
-                                report.image_url
-                            )}"
-                            alt="Reported civic issue"
-                            style="
-                                width:100%;
-                                height:100%;
-                                object-fit:cover;
-                                border-radius:inherit;
-                            "
-                        >
-                    </div>
-                `
 
-                : `
-                    <div class="issue-image">
-                        ${getCategoryIcon(
+            const icon =
+                getCategoryIcon(
+                    report.category
+                );
+
+
+            const image =
+                report.image_url
+
+                    ? `
+                        <div class="issue-image">
+
+                            <img
+                                src="${escapeHTML(
+                                    report.image_url
+                                )}"
+                                alt="Civic issue photo"
+                                style="
+                                    width:100%;
+                                    height:100%;
+                                    object-fit:cover;
+                                "
+                            >
+
+                        </div>
+                    `
+
+                    : `
+                        <div class="issue-image">
+                            ${icon}
+                        </div>
+                    `;
+
+
+            card.innerHTML = `
+
+                ${image}
+
+                <div class="issue-content">
+
+                    <h3>
+                        ${escapeHTML(
                             report.category
                         )}
-                    </div>
-                `;
+                    </h3>
 
-
-        card.innerHTML = `
-
-            ${imageHTML}
-
-            <div class="issue-content">
-
-                <h3>
-                    ${escapeHTML(
-                        report.category
-                    )}
-                </h3>
-
-                <p>
-                    ${escapeHTML(
-                        report.description
-                    )}
-                </p>
-
-                <p>
-                    <strong>
+                    <p>
                         ${escapeHTML(
-                            report.issue_code
+                            report.description
                         )}
-                    </strong>
-                </p>
+                    </p>
 
-                <span class="status">
-                    ${escapeHTML(
-                        report.status
-                    )}
-                </span>
+                    <p>
+                        <strong>
+                            ${escapeHTML(
+                                report.issue_code
+                            )}
+                        </strong>
+                    </p>
 
-                ${
-                    report.latitude &&
-                    report.longitude
+                    <span class="status">
+                        ${escapeHTML(
+                            report.status
+                        )}
+                    </span>
 
-                        ? `
-                            <p>
-                                📍
-                                ${Number(
-                                    report.latitude
-                                ).toFixed(5)},
-                                ${Number(
-                                    report.longitude
-                                ).toFixed(5)}
-                            </p>
-                        `
+                </div>
 
-                        : ""
-                }
-
-            </div>
-
-        `;
+            `;
 
 
-        container.appendChild(
-            card
-        );
+            container.appendChild(
+                card
+            );
 
-    });
+        }
+    );
 
 }
 
 
 /* =====================================================
-   CATEGORY ICON
+   ICONS
 ===================================================== */
 
-function getCategoryIcon(category) {
+function getCategoryIcon(
+    category
+) {
 
     const icons = {
 
@@ -896,7 +853,9 @@ function getCategoryIcon(category) {
    STATISTICS
 ===================================================== */
 
-function updateStatistics(reports) {
+function updateStatistics(
+    reports
+) {
 
     const total =
         reports.length;
@@ -904,24 +863,24 @@ function updateStatistics(reports) {
 
     const verified =
         reports.filter(
-            report =>
-                report.status ===
+            r =>
+                r.status ===
                 "Verified"
         ).length;
 
 
     const progress =
         reports.filter(
-            report =>
-                report.status ===
+            r =>
+                r.status ===
                 "In Progress"
         ).length;
 
 
     const resolved =
         reports.filter(
-            report =>
-                report.status ===
+            r =>
+                r.status ===
                 "Resolved"
         ).length;
 
@@ -981,6 +940,20 @@ function updateStatistics(reports) {
 
     }
 
+
+    const heroCount =
+        document.getElementById(
+            "heroReportCount"
+        );
+
+
+    if (heroCount) {
+
+        heroCount.textContent =
+            total;
+
+    }
+
 }
 
 
@@ -988,7 +961,9 @@ function updateStatistics(reports) {
    TOAST
 ===================================================== */
 
-function showToast(message) {
+function showToast(
+    message
+) {
 
     const toast =
         document.getElementById(
@@ -996,20 +971,20 @@ function showToast(message) {
         );
 
 
-    const toastMessage =
+    const messageElement =
         document.getElementById(
             "toastMessage"
         );
 
 
-    if (!toast || !toastMessage) {
+    if (!toast || !messageElement) {
 
         return;
 
     }
 
 
-    toastMessage.textContent =
+    messageElement.textContent =
         message;
 
 
@@ -1018,22 +993,27 @@ function showToast(message) {
     );
 
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        toast.classList.remove(
-            "show"
-        );
+            toast.classList.remove(
+                "show"
+            );
 
-    }, 3000);
+        },
+        3000
+    );
 
 }
 
 
 /* =====================================================
-   SECURITY
+   ESCAPE HTML
 ===================================================== */
 
-function escapeHTML(value) {
+function escapeHTML(
+    value
+) {
 
     return String(value)
 
@@ -1066,12 +1046,12 @@ function escapeHTML(value) {
 
 
 /* =====================================================
-   FORM EVENT
+   INITIALIZATION
 ===================================================== */
 
 document.addEventListener(
     "DOMContentLoaded",
-    function() {
+    () => {
 
         const form =
             document.getElementById(
