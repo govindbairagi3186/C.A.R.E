@@ -53,37 +53,40 @@
 
     <!-- Main CSS -->
     <link
-        .admin-access {
-    text-align: center;
-    margin: 25px 0 10px;
-}
-
-.admin-access a {
-    display: inline-block;
-    padding: 11px 18px;
-    border-radius: 10px;
-    background: #eff6ff;
-    color: #0b5ed7;
-    border: 1px solid #bfdbfe;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 700;
-    transition: 0.2s ease;
-}
-
-.admin-access a:hover {
-    background: #dbeafe;
-    transform: translateY(-1px);
-}
         rel="stylesheet"
         href="style.css"
     >
+
+    <!-- Small admin button styles -->
+    <style>
+        .admin-access {
+            text-align: center;
+            margin: 25px 0 10px;
+        }
+
+        .admin-access a {
+            display: inline-block;
+            padding: 11px 18px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #0b5ed7;
+            border: 1px solid #bfdbfe;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            transition: 0.2s ease;
+        }
+
+        .admin-access a:hover {
+            background: #dbeafe;
+            transform: translateY(-1px);
+        }
+    </style>
 
 </head>
 
 
 <body>
-
 
 <!-- =====================================================
      HEADER
@@ -108,7 +111,7 @@
                 <strong>C.A.R.E.</strong>
 
                 <span>
-                    Civic Action & Reporting Engine
+                    Civic Action &amp; Reporting Engine
                 </span>
 
             </div>
@@ -119,6 +122,7 @@
         <nav class="nav">
 
             <button
+                type="button"
                 class="nav-link active"
                 onclick="showPage('home')"
             >
@@ -126,6 +130,7 @@
             </button>
 
             <button
+                type="button"
                 class="nav-link"
                 onclick="showPage('reports')"
             >
@@ -133,6 +138,7 @@
             </button>
 
             <button
+                type="button"
                 class="nav-link"
                 onclick="showPage('about')"
             >
@@ -143,6 +149,7 @@
 
 
         <button
+            type="button"
             class="nav-report-button"
             onclick="showPage('report')"
         >
@@ -152,7 +159,6 @@
     </div>
 
 </header>
-
 
 
 <!-- =====================================================
@@ -179,33 +185,26 @@
 
                 <div class="badge">
                     🌍 Powered by SANSKRITI UNIVERSITY
-
                 </div>
 
                 <h1>
-
                     Report Civic Issues.
-
                     <span>
                         Make Your City Better.
                     </span>
-
                 </h1>
 
-
                 <p class="hero-description">
-
                     C.A.R.E. makes it simple for citizens
                     to report potholes, garbage, damaged roads,
                     drainage problems, broken streetlights and
                     other civic issues.
-
                 </p>
-
 
                 <div class="hero-buttons">
 
                     <button
+                        type="button"
                         class="primary-button"
                         onclick="showPage('report')"
                     >
@@ -213,6 +212,7 @@
                     </button>
 
                     <button
+                        type="button"
                         class="secondary-button"
                         onclick="showPage('reports')"
                     >
@@ -276,7 +276,6 @@
                         </span>
                     </div>
 
-
                     <div>
                         <strong>
                             📍
@@ -286,7 +285,6 @@
                             Location Based
                         </span>
                     </div>
-
 
                     <div>
                         <strong>
@@ -305,7 +303,6 @@
         </div>
 
     </div>
-
 
 
     <!-- ISSUE CATEGORIES -->
@@ -338,12 +335,11 @@
 
             <div class="category-grid">
 
-
                 <button
+                    type="button"
                     class="category-card"
                     onclick="startReport('Pothole')"
                 >
-
                     <div class="category-icon">
                         🕳️
                     </div>
@@ -355,15 +351,14 @@
                     <p>
                         Damaged roads and potholes
                     </p>
-
                 </button>
 
 
                 <button
+                    type="button"
                     class="category-card"
                     onclick="startReport('Garbage')"
                 >
-
                     <div class="category-icon">
                         🗑️
                     </div>
@@ -375,15 +370,14 @@
                     <p>
                         Waste and overflowing bins
                     </p>
-
                 </button>
 
 
                 <button
+                    type="button"
                     class="category-card"
                     onclick="startReport('Streetlight')"
                 >
-
                     <div class="category-icon">
                         💡
                     </div>
@@ -395,15 +389,14 @@
                     <p>
                         Broken or non-working lights
                     </p>
-
                 </button>
 
 
                 <button
+                    type="button"
                     class="category-card"
                     onclick="startReport('Drainage')"
                 >
-
                     <div class="category-icon">
                         🌊
                     </div>
@@ -415,15 +408,14 @@
                     <p>
                         Blocked drains and flooding
                     </p>
-
                 </button>
 
 
                 <button
+                    type="button"
                     class="category-card"
                     onclick="startReport('Road Damage')"
                 >
-
                     <div class="category-icon">
                         🚧
                     </div>
@@ -435,15 +427,14 @@
                     <p>
                         Broken or unsafe roads
                     </p>
-
                 </button>
 
 
                 <button
+                    type="button"
                     class="category-card"
                     onclick="startReport('Other')"
                 >
-
                     <div class="category-icon">
                         📍
                     </div>
@@ -455,16 +446,13 @@
                     <p>
                         Any other civic issue
                     </p>
-
                 </button>
-
 
             </div>
 
         </div>
 
     </section>
-
 
 
     <!-- HOW IT WORKS -->
@@ -487,7 +475,6 @@
 
 
             <div class="steps">
-
 
                 <div class="step">
 
@@ -554,16 +541,13 @@
 
                 </div>
 
-
             </div>
 
         </div>
 
     </section>
 
-
 </section>
-
 
 
 <!-- =====================================================
@@ -599,7 +583,6 @@
             id="issueForm"
             class="report-form"
         >
-
 
             <!-- CATEGORY -->
 
@@ -647,7 +630,6 @@
             </div>
 
 
-
             <!-- DESCRIPTION -->
 
             <div class="form-group">
@@ -671,7 +653,6 @@
             </div>
 
 
-
             <!-- IMAGE -->
 
             <div class="form-group">
@@ -692,7 +673,6 @@
                 </small>
 
             </div>
-
 
 
             <!-- LOCATION -->
@@ -734,7 +714,6 @@
             >
 
 
-
             <!-- SUBMIT -->
 
             <button
@@ -744,13 +723,11 @@
                 🚀 Submit Report
             </button>
 
-
         </form>
 
     </div>
 
 </section>
-
 
 
 <!-- =====================================================
@@ -784,7 +761,6 @@
         <!-- STATISTICS -->
 
         <div class="statistics">
-
 
             <div class="stat-card">
 
@@ -837,9 +813,7 @@
 
             </div>
 
-
         </div>
-
 
 
         <!-- REPORTS -->
@@ -872,7 +846,6 @@
 </section>
 
 
-
 <!-- =====================================================
      ABOUT PAGE
 ===================================================== -->
@@ -903,7 +876,6 @@
 
 
         <div class="about-grid">
-
 
             <div class="about-card">
 
@@ -961,7 +933,6 @@
 
             </div>
 
-
         </div>
 
 
@@ -993,7 +964,6 @@
 </main>
 
 
-
 <!-- =====================================================
      TOAST
 ===================================================== -->
@@ -1008,7 +978,6 @@
     </span>
 
 </div>
-
 
 
 <!-- =====================================================
@@ -1031,16 +1000,25 @@
 
         </div>
 
-<div class="admin-access">
-    <a href="admin.html">
-        🛡️ Sign in to manage civic reports
-    </a>
-</div>
+
+        <!-- ADMIN ACCESS -->
+
+        <div class="admin-access">
+
+            <a href="admin.html">
+                🛡️ Sign in to manage civic reports
+            </a>
+
+        </div>
+
+
         <div class="footer-credit">
 
             <p>
                 MADE WITH ❤️ BY
-                <strong>GOVIND VAISHNAV 🧿</strong>
+                <strong>
+                    GOVIND VAISHNAV 🧿
+                </strong>
                 &amp; TEAM 💗
             </p>
 
@@ -1059,8 +1037,9 @@
 </footer>
 
 
-
-<!-- Main JavaScript -->
+<!-- =====================================================
+     MAIN JAVASCRIPT
+===================================================== -->
 
 <script src="app.js"></script>
 
