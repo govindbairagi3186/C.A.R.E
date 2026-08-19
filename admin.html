@@ -11,7 +11,7 @@
     >
 
     <title>
-        C.A.R.E. Admin Dashboard
+        C.A.R.E. Admin
     </title>
 
     <meta
@@ -39,351 +39,1257 @@
         src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     ></script>
 
-    <style>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<style>
 
-        body {
-            font-family: Inter, sans-serif;
-            background: #f8fafc;
-            color: #0f172a;
-        }
+/* =====================================================
+   RESET
+===================================================== */
 
-        .topbar {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 16px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 20;
-        }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
 
-        .brand-icon {
-            width: 42px;
-            height: 42px;
-            background: #0b5ed7;
-            color: white;
-            border-radius: 12px;
-            display: grid;
-            place-items: center;
-            font-weight: 800;
-            font-size: 21px;
-        }
+body {
 
-        .brand strong {
-            font-size: 20px;
-        }
+    font-family:
+        "Inter",
+        sans-serif;
 
-        .brand small {
-            display: block;
-            color: #64748b;
-            font-size: 10px;
-        }
+    background:
+        #f8fafc;
 
-        .admin-badge {
-            background: #eff6ff;
-            color: #0b5ed7;
-            padding: 8px 13px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-        }
+    color:
+        #0f172a;
 
-        .container {
-            width: min(1250px, calc(100% - 40px));
-            margin: auto;
-        }
+}
 
-        .dashboard {
-            padding: 40px 0;
-        }
 
-        .heading {
-            margin-bottom: 30px;
-        }
+/* =====================================================
+   LOGIN
+===================================================== */
 
-        .heading span {
-            color: #0b5ed7;
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 1.3px;
-        }
+.login-page {
 
-        .heading h1 {
-            font-size: 38px;
-            margin: 5px 0;
-        }
+    min-height:
+        100vh;
 
-        .heading p {
-            color: #64748b;
-        }
+    display:
+        grid;
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 30px;
-        }
+    place-items:
+        center;
 
-        .stat {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 22px;
-        }
+    padding:
+        20px;
 
-        .stat-icon {
-            font-size: 25px;
-            margin-bottom: 12px;
-        }
+    background:
+        linear-gradient(
+            135deg,
+            #eff6ff,
+            #f8fafc
+        );
 
-        .stat strong {
-            display: block;
-            font-size: 30px;
-        }
+}
 
-        .stat span {
-            color: #64748b;
-            font-size: 13px;
-        }
 
-        .toolbar {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 15px;
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
+.login-card {
 
-        .toolbar input,
-        .toolbar select {
-            padding: 11px 13px;
-            border: 1px solid #cbd5e1;
-            border-radius: 9px;
-            outline: none;
-        }
+    width:
+        min(
+            430px,
+            100%
+        );
 
-        .toolbar input {
-            flex: 1;
-            min-width: 220px;
-        }
+    background:
+        white;
 
-        .refresh {
-            background: #0b5ed7;
-            color: white;
-            border: none;
-            padding: 11px 17px;
-            border-radius: 9px;
-            font-weight: 700;
-            cursor: pointer;
-        }
+    border:
+        1px solid #e2e8f0;
 
-        .reports {
-            display: grid;
-            gap: 18px;
-        }
+    border-radius:
+        24px;
 
-        .report {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 18px;
-            overflow: hidden;
-            display: grid;
-            grid-template-columns: 190px 1fr;
-        }
+    padding:
+        35px;
 
-        .report-image {
-            min-height: 190px;
-            background: #eff6ff;
-            display: grid;
-            place-items: center;
-            font-size: 55px;
-        }
+    box-shadow:
+        0 25px 70px
+        rgba(
+            15,
+            23,
+            42,
+            0.12
+        );
 
-        .report-image img {
-            width: 100%;
-            height: 100%;
-            min-height: 190px;
-            object-fit: cover;
-        }
+}
 
-        .report-content {
-            padding: 22px;
-        }
 
-        .report-header {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            margin-bottom: 8px;
-        }
+.login-logo {
 
-        .report-header h2 {
-            font-size: 20px;
-        }
+    width:
+        58px;
 
-        .report-code {
-            color: #64748b;
-            font-size: 12px;
-            margin-bottom: 12px;
-        }
+    height:
+        58px;
 
-        .description {
-            color: #475569;
-            margin-bottom: 15px;
-        }
+    display:
+        grid;
 
-        .details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 18px;
-        }
+    place-items:
+        center;
 
-        .detail {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 7px 10px;
-            font-size: 12px;
-        }
+    background:
+        #0b5ed7;
 
-        .actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+    color:
+        white;
 
-        .actions select {
-            padding: 9px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-        }
+    border-radius:
+        16px;
 
-        .map-button {
-            text-decoration: none;
-            background: #0f172a;
-            color: white;
-            padding: 9px 13px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-        }
+    font-size:
+        27px;
 
-        .save-button {
-            border: none;
-            background: #16a34a;
-            color: white;
-            padding: 9px 13px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-        }
+    font-weight:
+        800;
 
-        .status {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 800;
-        }
+    margin-bottom:
+        20px;
 
-        .reported {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
+}
 
-        .verified {
-            background: #fef3c7;
-            color: #92400e;
-        }
 
-        .progress {
-            background: #ede9fe;
-            color: #6d28d9;
-        }
+.login-card h1 {
 
-        .resolved {
-            background: #dcfce7;
-            color: #166534;
-        }
+    font-size:
+        28px;
 
-        .empty {
-            background: white;
-            border: 1px dashed #cbd5e1;
-            border-radius: 16px;
-            padding: 60px;
-            text-align: center;
-            color: #64748b;
-        }
+    margin-bottom:
+        6px;
 
-        .empty div {
-            font-size: 45px;
-            margin-bottom: 10px;
-        }
+}
 
-        .error {
-            background: #fef2f2;
-            color: #b91c1c;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
 
-        @media(max-width: 850px) {
+.login-card > p {
 
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
+    color:
+        #64748b;
 
-            .report {
-                grid-template-columns: 1fr;
-            }
+    font-size:
+        14px;
 
-            .report-image {
-                min-height: 220px;
-            }
+    margin-bottom:
+        25px;
 
-        }
+}
 
-        @media(max-width: 550px) {
 
-            .stats {
-                grid-template-columns: 1fr;
-            }
+.form-group {
 
-            .topbar {
-                padding: 14px 18px;
-            }
+    margin-bottom:
+        18px;
 
-            .container {
-                width: min(100% - 24px, 1250px);
-            }
+}
 
-        }
 
-    </style>
+.form-group label {
+
+    display:
+        block;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
+    margin-bottom:
+        7px;
+
+}
+
+
+.form-group input {
+
+    width:
+        100%;
+
+    padding:
+        13px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius:
+        10px;
+
+    outline:
+        none;
+
+}
+
+
+.form-group input:focus {
+
+    border-color:
+        #0b5ed7;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            11,
+            94,
+            215,
+            0.1
+        );
+
+}
+
+
+.login-button {
+
+    width:
+        100%;
+
+    border:
+        none;
+
+    padding:
+        14px;
+
+    border-radius:
+        10px;
+
+    background:
+        #0b5ed7;
+
+    color:
+        white;
+
+    font-weight:
+        800;
+
+    cursor:
+        pointer;
+
+}
+
+
+.login-button:disabled {
+
+    opacity:
+        0.6;
+
+    cursor:
+        wait;
+
+}
+
+
+.login-error {
+
+    display:
+        none;
+
+    background:
+        #fef2f2;
+
+    color:
+        #b91c1c;
+
+    border:
+        1px solid #fecaca;
+
+    padding:
+        12px;
+
+    border-radius:
+        10px;
+
+    font-size:
+        13px;
+
+    margin-bottom:
+        18px;
+
+}
+
+
+.login-footer {
+
+    text-align:
+        center;
+
+    color:
+        #94a3b8;
+
+    font-size:
+        11px;
+
+    margin-top:
+        25px;
+
+}
+
+
+/* =====================================================
+   ADMIN APP
+===================================================== */
+
+#adminApp {
+
+    display:
+        none;
+
+}
+
+
+.topbar {
+
+    background:
+        white;
+
+    border-bottom:
+        1px solid #e2e8f0;
+
+    padding:
+        15px 30px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+    position:
+        sticky;
+
+    top:
+        0;
+
+    z-index:
+        100;
+
+}
+
+
+.brand {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+
+}
+
+
+.brand-icon {
+
+    width:
+        43px;
+
+    height:
+        43px;
+
+    display:
+        grid;
+
+    place-items:
+        center;
+
+    background:
+        #0b5ed7;
+
+    color:
+        white;
+
+    border-radius:
+        12px;
+
+    font-weight:
+        800;
+
+    font-size:
+        21px;
+
+}
+
+
+.brand strong {
+
+    font-size:
+        20px;
+
+}
+
+
+.brand small {
+
+    display:
+        block;
+
+    color:
+        #64748b;
+
+    font-size:
+        10px;
+
+}
+
+
+.topbar-right {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+
+}
+
+
+.admin-badge {
+
+    background:
+        #eff6ff;
+
+    color:
+        #0b5ed7;
+
+    padding:
+        8px 12px;
+
+    border-radius:
+        999px;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+}
+
+
+.logout-button {
+
+    border:
+        none;
+
+    background:
+        #f1f5f9;
+
+    color:
+        #334155;
+
+    padding:
+        9px 13px;
+
+    border-radius:
+        8px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+}
+
+
+.container {
+
+    width:
+        min(
+            1250px,
+            calc(100% - 40px)
+        );
+
+    margin:
+        auto;
+
+}
+
+
+.dashboard {
+
+    padding:
+        40px 0;
+
+}
+
+
+.heading {
+
+    margin-bottom:
+        30px;
+
+}
+
+
+.heading span {
+
+    color:
+        #0b5ed7;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        1.3px;
+
+}
+
+
+.heading h1 {
+
+    font-size:
+        38px;
+
+    margin:
+        5px 0;
+
+}
+
+
+.heading p {
+
+    color:
+        #64748b;
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.stats {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            1fr
+        );
+
+    gap:
+        16px;
+
+    margin-bottom:
+        30px;
+
+}
+
+
+.stat {
+
+    background:
+        white;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius:
+        16px;
+
+    padding:
+        22px;
+
+}
+
+
+.stat-icon {
+
+    font-size:
+        25px;
+
+    margin-bottom:
+        10px;
+
+}
+
+
+.stat strong {
+
+    display:
+        block;
+
+    font-size:
+        30px;
+
+}
+
+
+.stat span {
+
+    color:
+        #64748b;
+
+    font-size:
+        13px;
+
+}
+
+
+/* =====================================================
+   TOOLBAR
+===================================================== */
+
+.toolbar {
+
+    background:
+        white;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius:
+        16px;
+
+    padding:
+        15px;
+
+    display:
+        flex;
+
+    gap:
+        12px;
+
+    flex-wrap:
+        wrap;
+
+    margin-bottom:
+        20px;
+
+}
+
+
+.toolbar input,
+.toolbar select {
+
+    padding:
+        11px 13px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius:
+        9px;
+
+    outline:
+        none;
+
+}
+
+
+.toolbar input {
+
+    flex:
+        1;
+
+    min-width:
+        220px;
+
+}
+
+
+.refresh {
+
+    border:
+        none;
+
+    background:
+        #0b5ed7;
+
+    color:
+        white;
+
+    padding:
+        11px 17px;
+
+    border-radius:
+        9px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+}
+
+
+/* =====================================================
+   REPORTS
+===================================================== */
+
+.reports {
+
+    display:
+        grid;
+
+    gap:
+        18px;
+
+}
+
+
+.report {
+
+    background:
+        white;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius:
+        18px;
+
+    overflow:
+        hidden;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        190px 1fr;
+
+}
+
+
+.report-image {
+
+    min-height:
+        190px;
+
+    background:
+        #eff6ff;
+
+    display:
+        grid;
+
+    place-items:
+        center;
+
+    font-size:
+        55px;
+
+}
+
+
+.report-image img {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    min-height:
+        190px;
+
+    object-fit:
+        cover;
+
+}
+
+
+.report-content {
+
+    padding:
+        22px;
+
+}
+
+
+.report-header {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    gap:
+        15px;
+
+    margin-bottom:
+        7px;
+
+}
+
+
+.report-header h2 {
+
+    font-size:
+        20px;
+
+}
+
+
+.report-code {
+
+    color:
+        #64748b;
+
+    font-size:
+        12px;
+
+    margin-bottom:
+        12px;
+
+}
+
+
+.description {
+
+    color:
+        #475569;
+
+    margin-bottom:
+        15px;
+
+}
+
+
+.details {
+
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        8px;
+
+    margin-bottom:
+        18px;
+
+}
+
+
+.detail {
+
+    background:
+        #f8fafc;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius:
+        8px;
+
+    padding:
+        7px 10px;
+
+    font-size:
+        12px;
+
+}
+
+
+.actions {
+
+    display:
+        flex;
+
+    gap:
+        9px;
+
+    flex-wrap:
+        wrap;
+
+}
+
+
+.actions select {
+
+    padding:
+        9px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius:
+        8px;
+
+}
+
+
+.map-button {
+
+    text-decoration:
+        none;
+
+    background:
+        #0f172a;
+
+    color:
+        white;
+
+    padding:
+        9px 13px;
+
+    border-radius:
+        8px;
+
+    font-size:
+        12px;
+
+    font-weight:
+        700;
+
+}
+
+
+.save-button {
+
+    border:
+        none;
+
+    background:
+        #16a34a;
+
+    color:
+        white;
+
+    padding:
+        9px 13px;
+
+    border-radius:
+        8px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+}
+
+
+.status {
+
+    display:
+        inline-block;
+
+    padding:
+        6px 10px;
+
+    border-radius:
+        999px;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+}
+
+
+.reported {
+
+    background:
+        #dbeafe;
+
+    color:
+        #1d4ed8;
+
+}
+
+
+.verified {
+
+    background:
+        #fef3c7;
+
+    color:
+        #92400e;
+
+}
+
+
+.progress {
+
+    background:
+        #ede9fe;
+
+    color:
+        #6d28d9;
+
+}
+
+
+.resolved {
+
+    background:
+        #dcfce7;
+
+    color:
+        #166534;
+
+}
+
+
+.empty {
+
+    background:
+        white;
+
+    border:
+        1px dashed #cbd5e1;
+
+    border-radius:
+        16px;
+
+    padding:
+        60px;
+
+    text-align:
+        center;
+
+    color:
+        #64748b;
+
+}
+
+
+.empty div {
+
+    font-size:
+        45px;
+
+    margin-bottom:
+        10px;
+
+}
+
+
+.error {
+
+    background:
+        #fef2f2;
+
+    color:
+        #b91c1c;
+
+    border:
+        1px solid #fecaca;
+
+    padding:
+        14px;
+
+    border-radius:
+        10px;
+
+    margin-bottom:
+        20px;
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width: 850px) {
+
+    .stats {
+
+        grid-template-columns:
+            repeat(
+                2,
+                1fr
+            );
+
+    }
+
+
+    .report {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .report-image {
+
+        min-height:
+            220px;
+
+    }
+
+}
+
+
+@media(max-width: 550px) {
+
+    .stats {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .topbar {
+
+        padding:
+            14px 18px;
+
+    }
+
+
+    .container {
+
+        width:
+            min(
+                100% - 24px,
+                1250px
+            );
+
+    }
+
+
+    .admin-badge {
+
+        display:
+            none;
+
+    }
+
+}
+
+</style>
 
 </head>
 
 
 <body>
+
+
+<!-- =====================================================
+     LOGIN PAGE
+===================================================== -->
+
+<section
+    id="loginPage"
+    class="login-page"
+>
+
+    <div class="login-card">
+
+        <div class="login-logo">
+            C
+        </div>
+
+        <h1>
+            C.A.R.E. Admin
+        </h1>
+
+        <p>
+            Sign in to manage civic issue reports.
+        </p>
+
+
+        <div
+            id="loginError"
+            class="login-error"
+        ></div>
+
+
+        <form
+            id="loginForm"
+        >
+
+            <div class="form-group">
+
+                <label>
+                    Admin Email
+                </label>
+
+                <input
+                    id="email"
+                    type="email"
+                    placeholder="Enter admin email"
+                    autocomplete="email"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Password
+                </label>
+
+                <input
+                    id="password"
+                    type="password"
+                    placeholder="Enter password"
+                    autocomplete="current-password"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                id="loginButton"
+                class="login-button"
+                type="submit"
+            >
+                🔐 Sign In
+            </button>
+
+        </form>
+
+
+        <div class="login-footer">
+
+            C.A.R.E. — Civic Action and Reporting Engine
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     ADMIN APPLICATION
+===================================================== -->
+
+<section id="adminApp">
 
 
 <header class="topbar">
@@ -408,8 +1314,20 @@
 
     </div>
 
-    <div class="admin-badge">
-        🛡️ ADMIN DASHBOARD
+
+    <div class="topbar-right">
+
+        <div class="admin-badge">
+            🛡️ ADMIN
+        </div>
+
+        <button
+            class="logout-button"
+            onclick="logout()"
+        >
+            Logout
+        </button>
+
     </div>
 
 </header>
@@ -431,14 +1349,15 @@
             </h1>
 
             <p>
-                Monitor and manage citizen-reported
-                civic issues.
+                Monitor, verify and resolve
+                citizen-reported issues.
             </p>
 
         </div>
 
 
         <div class="stats">
+
 
             <div class="stat">
 
@@ -507,6 +1426,7 @@
 
             </div>
 
+
         </div>
 
 
@@ -518,6 +1438,7 @@
                 placeholder="Search reports..."
                 oninput="filterReports()"
             >
+
 
             <select
                 id="categoryFilter"
@@ -619,15 +1540,25 @@
 </main>
 
 
+</section>
+
+
+
 <script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
 
 const SUPABASE_URL =
     "https://wcocovvkzxgxqbscyuuj.supabase.co";
 
+
 const SUPABASE_KEY =
     "sb_publishable_DaY-2qm2HWCUuLfhaXwFFg_Eg05_MX3";
 
-const client =
+
+const supabaseClient =
     window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY
@@ -637,93 +1568,330 @@ const client =
 let allReports = [];
 
 
-async function loadReports() {
+/* =====================================================
+   LOGIN
+===================================================== */
 
-    const container =
-        document.getElementById("reports");
+document
+    .getElementById("loginForm")
+    .addEventListener(
+        "submit",
+        login
+    );
+
+
+async function login(event) {
+
+    event.preventDefault();
+
+
+    const email =
+        document
+            .getElementById("email")
+            .value
+            .trim();
+
+
+    const password =
+        document
+            .getElementById("password")
+            .value;
+
+
+    const button =
+        document
+            .getElementById("loginButton");
+
 
     const errorBox =
-        document.getElementById("errorBox");
+        document
+            .getElementById("loginError");
 
-    errorBox.innerHTML = "";
 
-    container.innerHTML = `
-        <div class="empty">
-            <div>⏳</div>
-            Loading reports...
-        </div>
-    `;
+    errorBox.style.display =
+        "none";
+
+
+    button.disabled =
+        true;
+
+
+    button.textContent =
+        "Signing in...";
 
 
     const {
         data,
         error
-    } = await client
-        .from("issues")
-        .select("*")
-        .order(
-            "created_at",
-            {
-                ascending: false
-            }
-        );
+    } =
+        await supabaseClient
+            .auth
+            .signInWithPassword({
+                email,
+                password
+            });
+
+
+    button.disabled =
+        false;
+
+
+    button.textContent =
+        "🔐 Sign In";
 
 
     if (error) {
 
         console.error(error);
 
-        errorBox.innerHTML = `
-            <div class="error">
-                ⚠️ Could not load reports.
-                ${escapeHTML(error.message)}
-            </div>
-        `;
 
-        container.innerHTML = "";
+        errorBox.textContent =
+            error.message;
+
+
+        errorBox.style.display =
+            "block";
+
 
         return;
 
     }
 
 
-    allReports = data || [];
+    if (data.session) {
 
-    updateStats(allReports);
+        showAdmin();
 
-    renderReports(allReports);
+    }
+
+}
+
+
+/* =====================================================
+   CHECK EXISTING SESSION
+===================================================== */
+
+async function checkSession() {
+
+    const {
+        data
+    } =
+        await supabaseClient
+            .auth
+            .getSession();
+
+
+    if (
+        data &&
+        data.session
+    ) {
+
+        showAdmin();
+
+    }
 
 }
 
 
-function updateStats(reports) {
+/* =====================================================
+   SHOW ADMIN
+===================================================== */
 
-    document.getElementById("total")
-        .textContent = reports.length;
+function showAdmin() {
+
+    document
+        .getElementById("loginPage")
+        .style.display =
+        "none";
 
 
-    document.getElementById("potholes")
+    document
+        .getElementById("adminApp")
+        .style.display =
+        "block";
+
+
+    loadReports();
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+async function logout() {
+
+    await supabaseClient
+        .auth
+        .signOut();
+
+
+    document
+        .getElementById("adminApp")
+        .style.display =
+        "none";
+
+
+    document
+        .getElementById("loginPage")
+        .style.display =
+        "grid";
+
+
+    document
+        .getElementById("password")
+        .value =
+        "";
+
+}
+
+
+/* =====================================================
+   LOAD REPORTS
+===================================================== */
+
+async function loadReports() {
+
+    const container =
+        document.getElementById(
+            "reports"
+        );
+
+
+    const errorBox =
+        document.getElementById(
+            "errorBox"
+        );
+
+
+    container.innerHTML = `
+
+        <div class="empty">
+
+            <div>
+                ⏳
+            </div>
+
+            Loading reports...
+
+        </div>
+
+    `;
+
+
+    errorBox.innerHTML =
+        "";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("issues")
+            .select("*")
+            .order(
+                "created_at",
+                {
+                    ascending:
+                        false
+                }
+            );
+
+
+    if (error) {
+
+        console.error(error);
+
+
+        errorBox.innerHTML = `
+
+            <div class="error">
+
+                ⚠️
+                ${escapeHTML(
+                    error.message
+                )}
+
+            </div>
+
+        `;
+
+
+        container.innerHTML =
+            "";
+
+        return;
+
+    }
+
+
+    allReports =
+        data || [];
+
+
+    updateStats(
+        allReports
+    );
+
+
+    renderReports(
+        allReports
+    );
+
+}
+
+
+/* =====================================================
+   STATISTICS
+===================================================== */
+
+function updateStats(
+    reports
+) {
+
+    document
+        .getElementById("total")
+        .textContent =
+        reports.length;
+
+
+    document
+        .getElementById("potholes")
         .textContent =
         reports.filter(
-            r => r.category === "Pothole"
+            report =>
+                report.category ===
+                "Pothole"
         ).length;
 
 
-    document.getElementById("garbage")
+    document
+        .getElementById("garbage")
         .textContent =
         reports.filter(
-            r => r.category === "Garbage"
+            report =>
+                report.category ===
+                "Garbage"
         ).length;
 
 
-    document.getElementById("resolved")
+    document
+        .getElementById("resolved")
         .textContent =
         reports.filter(
-            r => r.status === "Resolved"
+            report =>
+                report.status ===
+                "Resolved"
         ).length;
 
 }
 
+
+/* =====================================================
+   FILTER
+===================================================== */
 
 function filterReports() {
 
@@ -736,13 +1904,17 @@ function filterReports() {
 
     const category =
         document
-            .getElementById("categoryFilter")
+            .getElementById(
+                "categoryFilter"
+            )
             .value;
 
 
     const status =
         document
-            .getElementById("statusFilter")
+            .getElementById(
+                "statusFilter"
+            )
             .value;
 
 
@@ -760,20 +1932,24 @@ function filterReports() {
 
                 return (
 
-                    text.includes(search)
+                    text.includes(
+                        search
+                    )
 
                     &&
 
                     (
                         !category ||
-                        report.category === category
+                        report.category ===
+                        category
                     )
 
                     &&
 
                     (
                         !status ||
-                        report.status === status
+                        report.status ===
+                        status
                     )
 
                 );
@@ -782,27 +1958,47 @@ function filterReports() {
         );
 
 
-    renderReports(filtered);
+    renderReports(
+        filtered
+    );
 
 }
 
 
-function renderReports(reports) {
+/* =====================================================
+   RENDER
+===================================================== */
+
+function renderReports(
+    reports
+) {
 
     const container =
-        document.getElementById("reports");
+        document.getElementById(
+            "reports"
+        );
 
 
     if (!reports.length) {
 
         container.innerHTML = `
+
             <div class="empty">
-                <div>📍</div>
-                <strong>No reports found</strong>
+
+                <div>
+                    📍
+                </div>
+
+                <strong>
+                    No reports found
+                </strong>
+
                 <p>
                     Citizen reports will appear here.
                 </p>
+
             </div>
+
         `;
 
         return;
@@ -811,54 +2007,82 @@ function renderReports(reports) {
 
 
     container.innerHTML =
-        reports.map(
-            report => createReportHTML(report)
-        ).join("");
+        reports
+            .map(
+                createReportHTML
+            )
+            .join("");
 
 }
 
 
-function createReportHTML(report) {
+/* =====================================================
+   REPORT CARD
+===================================================== */
+
+function createReportHTML(
+    report
+) {
 
     const icon =
-        getIcon(report.category);
+        getIcon(
+            report.category
+        );
 
 
     const statusClass =
-        getStatusClass(report.status);
+        getStatusClass(
+            report.status
+        );
 
 
-    const imageHTML =
+    let imageHTML;
+
+
+    if (
         report.image_url
+    ) {
 
-        ?
+        imageHTML = `
 
-        `
-        <div class="report-image">
+            <div class="report-image">
 
-            <img
-                src="${escapeHTML(report.image_url)}"
-                alt="Reported civic issue"
-            >
+                <img
+                    src="${escapeHTML(
+                        report.image_url
+                    )}"
+                    alt="Civic issue"
+                >
 
-        </div>
-        `
+            </div>
 
-        :
-
-        `
-        <div class="report-image">
-            ${icon}
-        </div>
         `;
+
+    } else {
+
+        imageHTML = `
+
+            <div class="report-image">
+
+                ${icon}
+
+            </div>
+
+        `;
+
+    }
 
 
     const mapsURL =
-        `https://www.google.com/maps?q=${encodeURIComponent(
-            report.latitude
-        )},${encodeURIComponent(
-            report.longitude
-        )}`;
+        `https://www.google.com/maps?q=${
+            encodeURIComponent(
+                report.latitude
+            )
+        },${
+            encodeURIComponent(
+                report.longitude
+            )
+        }`;
 
 
     return `
@@ -867,22 +2091,31 @@ function createReportHTML(report) {
 
             ${imageHTML}
 
+
             <div class="report-content">
+
 
                 <div class="report-header">
 
                     <h2>
+
                         ${escapeHTML(
-                            report.category || "Issue"
+                            report.category ||
+                            "Issue"
                         )}
+
                     </h2>
+
 
                     <span
                         class="status ${statusClass}"
                     >
+
                         ${escapeHTML(
-                            report.status || "Reported"
+                            report.status ||
+                            "Reported"
                         )}
+
                     </span>
 
                 </div>
@@ -891,10 +2124,14 @@ function createReportHTML(report) {
                 <div class="report-code">
 
                     Report ID:
+
                     <strong>
+
                         ${escapeHTML(
-                            report.issue_code || "N/A"
+                            report.issue_code ||
+                            "N/A"
                         )}
+
                     </strong>
 
                 </div>
@@ -903,7 +2140,8 @@ function createReportHTML(report) {
                 <p class="description">
 
                     ${escapeHTML(
-                        report.description || ""
+                        report.description ||
+                        ""
                     )}
 
                 </p>
@@ -912,24 +2150,46 @@ function createReportHTML(report) {
                 <div class="details">
 
                     <span class="detail">
-                        📍 ${escapeHTML(
-                            String(report.latitude || "N/A")
-                        )},
+
+                        📍
+
                         ${escapeHTML(
-                            String(report.longitude || "N/A")
+                            String(
+                                report.latitude ||
+                                "N/A"
+                            )
+                        )},
+
+                        ${escapeHTML(
+                            String(
+                                report.longitude ||
+                                "N/A"
+                            )
                         )}
+
                     </span>
 
-                    <span class="detail">
-                        ⚡ ${escapeHTML(
-                            report.priority || "Medium"
-                        )}
-                    </span>
 
                     <span class="detail">
-                        🕒 ${formatDate(
+
+                        ⚡
+
+                        ${escapeHTML(
+                            report.priority ||
+                            "Medium"
+                        )}
+
+                    </span>
+
+
+                    <span class="detail">
+
+                        🕒
+
+                        ${formatDate(
                             report.created_at
                         )}
+
                     </span>
 
                 </div>
@@ -937,44 +2197,72 @@ function createReportHTML(report) {
 
                 <div class="actions">
 
+
                     <a
                         class="map-button"
                         href="${mapsURL}"
                         target="_blank"
                         rel="noopener"
                     >
+
                         📍 Open Map
+
                     </a>
 
 
                     <select
-                        id="status-${escapeHTML(report.id)}"
+                        id="status-${escapeHTML(
+                            report.id
+                        )}"
                     >
 
                         <option
                             value="Reported"
-                            ${report.status === "Reported" ? "selected" : ""}
+                            ${
+                                report.status ===
+                                "Reported"
+                                ? "selected"
+                                : ""
+                            }
                         >
                             Reported
                         </option>
 
+
                         <option
                             value="Verified"
-                            ${report.status === "Verified" ? "selected" : ""}
+                            ${
+                                report.status ===
+                                "Verified"
+                                ? "selected"
+                                : ""
+                            }
                         >
                             Verified
                         </option>
 
+
                         <option
                             value="In Progress"
-                            ${report.status === "In Progress" ? "selected" : ""}
+                            ${
+                                report.status ===
+                                "In Progress"
+                                ? "selected"
+                                : ""
+                            }
                         >
                             In Progress
                         </option>
 
+
                         <option
                             value="Resolved"
-                            ${report.status === "Resolved" ? "selected" : ""}
+                            ${
+                                report.status ===
+                                "Resolved"
+                                ? "selected"
+                                : ""
+                            }
                         >
                             Resolved
                         </option>
@@ -984,10 +2272,17 @@ function createReportHTML(report) {
 
                     <button
                         class="save-button"
-                        onclick="updateStatus('${escapeJS(report.id)}')"
+                        onclick="updateStatus(
+                            '${escapeJS(
+                                report.id
+                            )}'
+                        )"
                     >
+
                         Save Status
+
                     </button>
+
 
                 </div>
 
@@ -1000,7 +2295,13 @@ function createReportHTML(report) {
 }
 
 
-async function updateStatus(id) {
+/* =====================================================
+   UPDATE STATUS
+===================================================== */
+
+async function updateStatus(
+    id
+) {
 
     const select =
         document.getElementById(
@@ -1021,25 +2322,29 @@ async function updateStatus(id) {
 
     const {
         error
-    } = await client
-        .from("issues")
-        .update({
-            status: newStatus
-        })
-        .eq(
-            "id",
-            id
-        );
+    } =
+        await supabaseClient
+            .from("issues")
+            .update({
+                status:
+                    newStatus
+            })
+            .eq(
+                "id",
+                id
+            );
 
 
     if (error) {
 
+        console.error(error);
+
+
         alert(
-            "Could not update status: " +
+            "Could not update status:\n\n" +
             error.message
         );
 
-        console.error(error);
 
         return;
 
@@ -1047,105 +2352,183 @@ async function updateStatus(id) {
 
 
     alert(
-        "Status updated successfully."
+        "✅ Status updated successfully."
     );
 
 
-    await loadReports();
+    loadReports();
 
 }
 
 
-function getIcon(category) {
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function getIcon(
+    category
+) {
 
     const icons = {
 
-        "Pothole": "🕳️",
+        "Pothole":
+            "🕳️",
 
-        "Garbage": "🗑️",
+        "Garbage":
+            "🗑️",
 
-        "Streetlight": "💡",
+        "Streetlight":
+            "💡",
 
-        "Drainage": "🌊",
+        "Drainage":
+            "🌊",
 
-        "Road Damage": "🚧",
+        "Road Damage":
+            "🚧",
 
-        "Other": "📍"
+        "Other":
+            "📍"
 
     };
 
 
-    return icons[category] || "📍";
+    return (
+        icons[category] ||
+        "📍"
+    );
 
 }
 
 
-function getStatusClass(status) {
+function getStatusClass(
+    status
+) {
 
-    if (status === "Verified") {
+    if (
+        status ===
+        "Verified"
+    ) {
+
         return "verified";
+
     }
 
-    if (status === "In Progress") {
+
+    if (
+        status ===
+        "In Progress"
+    ) {
+
         return "progress";
+
     }
 
-    if (status === "Resolved") {
+
+    if (
+        status ===
+        "Resolved"
+    ) {
+
         return "resolved";
+
     }
+
 
     return "reported";
 
 }
 
 
-function formatDate(date) {
+function formatDate(
+    date
+) {
 
     if (!date) {
+
         return "Unknown";
+
     }
 
 
-    return new Date(date)
-        .toLocaleString(
-            "en-IN",
-            {
-                dateStyle: "medium",
-                timeStyle: "short"
-            }
+    return new Date(
+        date
+    ).toLocaleString(
+        "en-IN",
+        {
+            dateStyle:
+                "medium",
+
+            timeStyle:
+                "short"
+        }
+    );
+
+}
+
+
+function escapeHTML(
+    value
+) {
+
+    return String(value)
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
         );
 
 }
 
 
-function escapeHTML(value) {
+function escapeJS(
+    value
+) {
 
     return String(value)
 
-        .replaceAll("&", "&amp;")
+        .replaceAll(
+            "\\",
+            "\\\\"
+        )
 
-        .replaceAll("<", "&lt;")
+        .replaceAll(
+            "'",
+            "\\'"
+        )
 
-        .replaceAll(">", "&gt;")
-
-        .replaceAll('"', "&quot;")
-
-        .replaceAll("'", "&#039;");
+        .replaceAll(
+            '"',
+            '\\"'
+        );
 
 }
 
 
-function escapeJS(value) {
+/* =====================================================
+   START
+===================================================== */
 
-    return String(value)
-        .replaceAll("\\", "\\\\")
-        .replaceAll("'", "\\'")
-        .replaceAll('"', '\\"');
-
-}
-
-
-loadReports();
+checkSession();
 
 </script>
 
