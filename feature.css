@@ -1,0 +1,677 @@
+/* =====================================================
+   C.A.R.E. FEATURE PACK
+   Civic Action and Reporting Engine
+===================================================== */
+
+:root {
+    --care-blue: #0b5ed7;
+    --care-dark: #10233f;
+    --care-muted: #64748b;
+    --care-bg: #f7faff;
+    --care-border: #dbe5f0;
+    --care-green: #16a34a;
+    --care-orange: #f59e0b;
+    --care-red: #dc2626;
+}
+
+body.care-lock {
+    overflow: hidden;
+}
+
+/* =====================================================
+   CITIZEN CARD
+===================================================== */
+
+.care-citizen-card {
+    width: min(1100px, calc(100% - 32px));
+    margin: 24px auto;
+    padding: 22px 24px;
+
+    border: 1px solid var(--care-border);
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fbff,
+            #eef6ff
+        );
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+
+    box-shadow: 0 8px 30px rgba(20, 60, 100, 0.06);
+}
+
+.care-citizen-card strong {
+    display: block;
+    color: var(--care-dark);
+    font-size: 18px;
+    margin: 4px 0;
+}
+
+.care-citizen-card p {
+    margin: 0;
+    color: var(--care-muted);
+}
+
+.care-citizen-card code {
+    background: white;
+    padding: 4px 8px;
+    border-radius: 7px;
+}
+
+.care-card-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* =====================================================
+   BUTTON
+===================================================== */
+
+.care-btn {
+    border: 1px solid #cbd8e8;
+    background: white;
+    color: var(--care-dark);
+
+    padding: 10px 14px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-weight: 700;
+
+    transition: 0.2s ease;
+}
+
+.care-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(20, 50, 90, 0.08);
+}
+
+.care-btn.primary {
+    background: var(--care-blue);
+    border-color: var(--care-blue);
+    color: white;
+}
+
+/* =====================================================
+   LABEL
+===================================================== */
+
+.care-kicker {
+    color: var(--care-blue);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+/* =====================================================
+   FEATURE PANEL
+===================================================== */
+
+#careFeaturePanel {
+    position: fixed;
+    inset: 0;
+
+    z-index: 99999;
+
+    display: none;
+}
+
+#careFeaturePanel.open {
+    display: block;
+}
+
+.care-backdrop {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(8, 25, 45, 0.55);
+
+    backdrop-filter: blur(4px);
+}
+
+.care-panel {
+    position: absolute;
+
+    right: 0;
+    top: 0;
+
+    height: 100%;
+
+    width: min(760px, 100%);
+
+    background: white;
+
+    box-shadow: -20px 0 60px rgba(0, 0, 0, 0.18);
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* =====================================================
+   PANEL HEADER
+===================================================== */
+
+.care-panel-head {
+    padding: 22px 26px;
+
+    border-bottom: 1px solid var(--care-border);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+.care-panel-head h2 {
+    margin: 4px 0 0;
+
+    color: var(--care-dark);
+}
+
+.care-close {
+    border: 0;
+
+    background: #eef3f8;
+
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+
+    font-size: 28px;
+
+    cursor: pointer;
+}
+
+/* =====================================================
+   PANEL BODY
+===================================================== */
+
+.care-panel-body {
+    padding: 24px;
+
+    overflow: auto;
+
+    background: var(--care-bg);
+}
+
+/* =====================================================
+   STATISTICS
+===================================================== */
+
+.care-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.care-stats div {
+    background: white;
+
+    border: 1px solid var(--care-border);
+
+    border-radius: 15px;
+
+    padding: 17px;
+}
+
+.care-stats strong {
+    display: block;
+
+    font-size: 26px;
+
+    color: var(--care-dark);
+}
+
+.care-stats span {
+    color: var(--care-muted);
+
+    font-size: 12px;
+}
+
+/* =====================================================
+   CITIZEN ID
+===================================================== */
+
+.care-citizen-id {
+    background: var(--care-dark);
+
+    color: white;
+
+    padding: 15px 18px;
+
+    border-radius: 14px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+.care-citizen-id strong {
+    background: white;
+
+    color: var(--care-dark);
+
+    padding: 5px 9px;
+
+    border-radius: 7px;
+}
+
+/* =====================================================
+   REPORT LIST
+===================================================== */
+
+.care-report-list {
+    display: grid;
+
+    gap: 14px;
+}
+
+.care-report-card {
+    background: white;
+
+    border: 1px solid var(--care-border);
+
+    border-radius: 16px;
+
+    padding: 18px;
+}
+
+.care-report-top {
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    align-items: flex-start;
+}
+
+.care-report-top h3 {
+    margin: 6px 0;
+
+    color: var(--care-dark);
+}
+
+.care-report-id {
+    color: var(--care-muted);
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.06em;
+}
+
+.care-report-card p {
+    color: #475569;
+
+    line-height: 1.55;
+}
+
+/* =====================================================
+   REPORT META
+===================================================== */
+
+.care-meta {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin: 12px 0 15px;
+}
+
+.care-meta span {
+    background: #f1f5f9;
+
+    border-radius: 999px;
+
+    padding: 7px 10px;
+
+    font-size: 12px;
+
+    color: #475569;
+}
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.care-status {
+    padding: 7px 10px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+.status-reported {
+    background: #e8f0ff;
+    color: #2454a6;
+}
+
+.status-verified {
+    background: #ecfdf3;
+    color: #087443;
+}
+
+.status-assigned {
+    background: #fff7df;
+    color: #916300;
+}
+
+.status-in-progress {
+    background: #fff0e1;
+    color: #b45309;
+}
+
+.status-resolved {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-rejected {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.care-empty {
+    background: white;
+
+    border: 1px dashed #b8c7d9;
+
+    border-radius: 16px;
+
+    padding: 35px;
+
+    text-align: center;
+
+    color: var(--care-muted);
+}
+
+/* =====================================================
+   DETAIL GRID
+===================================================== */
+
+.care-detail-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 12px;
+}
+
+.care-detail-grid div {
+    background: white;
+
+    border: 1px solid var(--care-border);
+
+    border-radius: 12px;
+
+    padding: 14px;
+}
+
+.care-detail-grid span {
+    display: block;
+
+    color: var(--care-muted);
+
+    font-size: 11px;
+
+    text-transform: uppercase;
+}
+
+.care-detail-grid strong {
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--care-dark);
+}
+
+/* =====================================================
+   DESCRIPTION
+===================================================== */
+
+.care-description,
+.care-proof {
+    background: white;
+
+    border: 1px solid var(--care-border);
+
+    padding: 15px;
+
+    border-radius: 13px;
+}
+
+/* =====================================================
+   TIMELINE
+===================================================== */
+
+.care-timeline {
+    margin: 22px 0;
+}
+
+.care-timeline-item {
+    display: flex;
+
+    gap: 13px;
+
+    position: relative;
+
+    padding-bottom: 22px;
+}
+
+.care-timeline-item:not(:last-child)::after {
+    content: "";
+
+    position: absolute;
+
+    left: 14px;
+
+    top: 31px;
+
+    bottom: 0;
+
+    width: 2px;
+
+    background: #dbe5f0;
+}
+
+.care-dot {
+    z-index: 1;
+
+    width: 30px;
+
+    height: 30px;
+
+    border-radius: 50%;
+
+    background: #e8f0ff;
+
+    color: var(--care-blue);
+
+    display: grid;
+
+    place-items: center;
+
+    font-weight: 800;
+}
+
+.care-timeline-item.current .care-dot {
+    background: var(--care-blue);
+
+    color: white;
+}
+
+.care-timeline-item strong {
+    color: var(--care-dark);
+
+    display: block;
+}
+
+.care-timeline-item span {
+    color: var(--care-muted);
+
+    font-size: 11px;
+}
+
+.care-timeline-item p {
+    margin: 5px 0;
+
+    color: #475569;
+}
+
+/* =====================================================
+   MAP
+===================================================== */
+
+.care-map-toolbar {
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    align-items: center;
+
+    margin-bottom: 12px;
+
+    color: var(--care-muted);
+}
+
+.care-map {
+    height: 500px;
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--care-border);
+
+    background: #e8eef5;
+}
+
+.care-map-note {
+    font-size: 11px;
+
+    color: var(--care-muted);
+}
+
+/* =====================================================
+   MAP POPUP
+===================================================== */
+
+.care-popup strong,
+.care-popup span,
+.care-popup small {
+    display: block;
+
+    margin-bottom: 5px;
+}
+
+.care-popup span {
+    color: #475569;
+
+    font-size: 12px;
+}
+
+.care-popup small {
+    color: #94a3b8;
+}
+
+.care-popup button {
+    border: 0;
+
+    background: var(--care-blue);
+
+    color: white;
+
+    border-radius: 7px;
+
+    padding: 7px 10px;
+
+    cursor: pointer;
+}
+
+/* =====================================================
+   ADMIN LINK
+===================================================== */
+
+.care-admin-shortcut {
+    display: inline-block;
+
+    margin: 8px;
+
+    padding: 9px 13px;
+
+    border-radius: 9px;
+
+    background: var(--care-dark);
+
+    color: white;
+
+    text-decoration: none;
+
+    font-weight: 700;
+
+    font-size: 13px;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 700px) {
+
+    .care-citizen-card {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .care-panel-body {
+        padding: 16px;
+    }
+
+    .care-stats {
+        grid-template-columns:
+            1fr 1fr 1fr;
+    }
+
+    .care-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .care-map {
+        height: 420px;
+    }
+
+}
