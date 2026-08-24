@@ -10,1183 +10,663 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        C.A.R.E. Admin
-    </title>
+    <title>C.A.R.E. Admin</title>
 
     <meta
         name="theme-color"
         content="#0b5ed7"
     >
 
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
+    <style>
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
+        body {
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
 
+            background: #f5f7fb;
+            color: #172033;
+        }
 
-<style>
+        /* =========================
+           LOGIN
+        ========================= */
 
-/* =====================================================
-   RESET
-===================================================== */
+        #loginPage {
+            min-height: 100vh;
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
+            padding: 20px;
 
-body {
+            background:
+                linear-gradient(
+                    135deg,
+                    #eaf3ff,
+                    #ffffff
+                );
+        }
 
-    font-family:
-        "Inter",
-        sans-serif;
+        .login-card {
+            width: 100%;
+            max-width: 420px;
 
-    background:
-        #f8fafc;
+            background: #ffffff;
 
-    color:
-        #0f172a;
+            padding: 35px;
 
-}
+            border-radius: 22px;
 
+            box-shadow:
+                0 20px 60px
+                rgba(0, 0, 0, 0.10);
+        }
 
-/* =====================================================
-   LOGIN
-===================================================== */
+        .logo {
+            width: 60px;
+            height: 60px;
 
-.login-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-    min-height:
-        100vh;
+            background: #0b5ed7;
 
-    display:
-        grid;
+            color: white;
 
-    place-items:
-        center;
+            border-radius: 16px;
 
-    padding:
-        20px;
+            font-size: 28px;
+            font-weight: 800;
 
-    background:
-        linear-gradient(
-            135deg,
-            #eff6ff,
-            #f8fafc
-        );
+            margin-bottom: 20px;
+        }
 
-}
+        .login-card h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
 
+        .login-card p {
+            color: #667085;
+            margin-bottom: 25px;
+        }
 
-.login-card {
+        .form-group {
+            margin-bottom: 18px;
+        }
 
-    width:
-        min(
-            430px,
-            100%
-        );
+        .form-group label {
+            display: block;
 
-    background:
-        white;
+            margin-bottom: 7px;
 
-    border:
-        1px solid #e2e8f0;
+            font-size: 14px;
+            font-weight: 700;
+        }
 
-    border-radius:
-        24px;
+        .form-group input {
+            width: 100%;
 
-    padding:
-        35px;
+            padding: 13px 14px;
 
-    box-shadow:
-        0 25px 70px
-        rgba(
-            15,
-            23,
-            42,
-            0.12
-        );
+            border:
+                1px solid #d0d5dd;
 
-}
+            border-radius: 10px;
 
+            font-size: 15px;
 
-.login-logo {
+            outline: none;
+        }
 
-    width:
-        58px;
+        .form-group input:focus {
+            border-color: #0b5ed7;
 
-    height:
-        58px;
+            box-shadow:
+                0 0 0 3px
+                rgba(11, 94, 215, 0.10);
+        }
 
-    display:
-        grid;
+        #loginButton {
+            width: 100%;
 
-    place-items:
-        center;
+            padding: 14px;
 
-    background:
-        #0b5ed7;
+            border: none;
 
-    color:
-        white;
+            border-radius: 10px;
 
-    border-radius:
-        16px;
+            background: #0b5ed7;
 
-    font-size:
-        27px;
+            color: white;
 
-    font-weight:
-        800;
+            font-size: 15px;
+            font-weight: 700;
 
-    margin-bottom:
-        20px;
+            cursor: pointer;
+        }
 
-}
+        #loginButton:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
 
+        #loginError {
+            display: none;
 
-.login-card h1 {
+            padding: 12px;
 
-    font-size:
-        28px;
+            margin-bottom: 18px;
 
-    margin-bottom:
-        6px;
+            border-radius: 10px;
 
-}
+            background: #fff1f2;
 
+            border:
+                1px solid #fecdd3;
 
-.login-card > p {
+            color: #be123c;
 
-    color:
-        #64748b;
+            font-size: 13px;
+        }
 
-    font-size:
-        14px;
+        /* =========================
+           ADMIN
+        ========================= */
 
-    margin-bottom:
-        25px;
+        #adminApp {
+            display: none;
+        }
 
-}
+        .topbar {
+            background: white;
 
+            border-bottom:
+                1px solid #e5e7eb;
 
-.form-group {
+            padding: 15px 25px;
 
-    margin-bottom:
-        18px;
+            display: flex;
 
-}
+            justify-content:
+                space-between;
 
+            align-items: center;
+        }
 
-.form-group label {
+        .brand {
+            display: flex;
 
-    display:
-        block;
+            align-items: center;
 
-    font-size:
-        13px;
+            gap: 12px;
+        }
 
-    font-weight:
-        700;
+        .brand-logo {
+            width: 44px;
+            height: 44px;
 
-    margin-bottom:
-        7px;
+            display: flex;
 
-}
+            align-items: center;
+            justify-content: center;
 
+            background: #0b5ed7;
 
-.form-group input {
+            color: white;
 
-    width:
-        100%;
+            border-radius: 12px;
 
-    padding:
-        13px;
+            font-weight: 800;
+            font-size: 20px;
+        }
 
-    border:
-        1px solid #cbd5e1;
+        .brand-title {
+            font-size: 20px;
+            font-weight: 800;
+        }
 
-    border-radius:
-        10px;
+        .brand-subtitle {
+            color: #667085;
+            font-size: 11px;
+        }
 
-    outline:
-        none;
+        .logout-button {
+            border: none;
 
-}
+            background: #eef2f7;
 
+            padding: 10px 15px;
 
-.form-group input:focus {
+            border-radius: 9px;
 
-    border-color:
-        #0b5ed7;
+            font-weight: 700;
 
-    box-shadow:
-        0 0 0 3px
-        rgba(
-            11,
-            94,
-            215,
-            0.1
-        );
+            cursor: pointer;
+        }
 
-}
+        .container {
+            width:
+                min(
+                    1200px,
+                    calc(100% - 30px)
+                );
 
+            margin: auto;
+        }
 
-.login-button {
+        .dashboard {
+            padding: 35px 0;
+        }
 
-    width:
-        100%;
+        .dashboard-title {
+            margin-bottom: 25px;
+        }
 
-    border:
-        none;
+        .dashboard-title small {
+            color: #0b5ed7;
 
-    padding:
-        14px;
+            font-weight: 800;
 
-    border-radius:
-        10px;
+            letter-spacing: 1px;
+        }
 
-    background:
-        #0b5ed7;
+        .dashboard-title h1 {
+            margin: 5px 0;
 
-    color:
-        white;
+            font-size: 36px;
+        }
 
-    font-weight:
-        800;
+        .dashboard-title p {
+            color: #667085;
+        }
 
-    cursor:
-        pointer;
+        /* =========================
+           STATS
+        ========================= */
 
-}
+        .stats {
+            display: grid;
 
+            grid-template-columns:
+                repeat(4, 1fr);
 
-.login-button:disabled {
+            gap: 15px;
 
-    opacity:
-        0.6;
+            margin-bottom: 25px;
+        }
 
-    cursor:
-        wait;
+        .stat {
+            background: white;
 
-}
+            padding: 20px;
 
+            border:
+                1px solid #e5e7eb;
 
-.login-error {
+            border-radius: 15px;
+        }
 
-    display:
-        none;
+        .stat-icon {
+            font-size: 25px;
 
-    background:
-        #fef2f2;
+            margin-bottom: 10px;
+        }
 
-    color:
-        #b91c1c;
+        .stat-number {
+            display: block;
 
-    border:
-        1px solid #fecaca;
+            font-size: 30px;
 
-    padding:
-        12px;
+            font-weight: 800;
+        }
 
-    border-radius:
-        10px;
+        .stat-label {
+            color: #667085;
 
-    font-size:
-        13px;
+            font-size: 13px;
+        }
 
-    margin-bottom:
-        18px;
+        /* =========================
+           FILTERS
+        ========================= */
 
-}
+        .toolbar {
+            background: white;
 
+            padding: 15px;
 
-.login-footer {
+            border:
+                1px solid #e5e7eb;
 
-    text-align:
-        center;
+            border-radius: 15px;
 
-    color:
-        #94a3b8;
+            display: flex;
 
-    font-size:
-        11px;
+            gap: 10px;
 
-    margin-top:
-        25px;
+            flex-wrap: wrap;
 
-}
+            margin-bottom: 20px;
+        }
 
+        .toolbar input,
+        .toolbar select {
+            padding: 11px;
 
-/* =====================================================
-   ADMIN APP
-===================================================== */
+            border:
+                1px solid #d0d5dd;
 
-#adminApp {
+            border-radius: 9px;
 
-    display:
-        none;
+            outline: none;
+        }
 
-}
+        .toolbar input {
+            flex: 1;
 
+            min-width: 220px;
+        }
 
-.topbar {
+        .refresh-button {
+            border: none;
 
-    background:
-        white;
+            background: #0b5ed7;
 
-    border-bottom:
-        1px solid #e2e8f0;
+            color: white;
 
-    padding:
-        15px 30px;
+            padding: 11px 18px;
 
-    display:
-        flex;
+            border-radius: 9px;
 
-    align-items:
-        center;
+            font-weight: 700;
 
-    justify-content:
-        space-between;
+            cursor: pointer;
+        }
 
-    gap:
-        20px;
+        /* =========================
+           REPORTS
+        ========================= */
 
-    position:
-        sticky;
+        #reports {
+            display: grid;
 
-    top:
-        0;
+            gap: 18px;
+        }
 
-    z-index:
-        100;
+        .report {
+            background: white;
 
-}
+            border:
+                1px solid #e5e7eb;
 
+            border-radius: 17px;
 
-.brand {
+            overflow: hidden;
 
-    display:
-        flex;
+            display: grid;
 
-    align-items:
-        center;
+            grid-template-columns:
+                200px 1fr;
+        }
 
-    gap:
-        12px;
+        .report-image {
+            min-height: 200px;
 
-}
+            background: #edf4ff;
 
+            display: flex;
 
-.brand-icon {
+            align-items: center;
+            justify-content: center;
 
-    width:
-        43px;
+            font-size: 50px;
+        }
 
-    height:
-        43px;
+        .report-image img {
+            width: 100%;
+            height: 100%;
 
-    display:
-        grid;
+            min-height: 200px;
 
-    place-items:
-        center;
+            object-fit: cover;
+        }
 
-    background:
-        #0b5ed7;
+        .report-content {
+            padding: 22px;
+        }
 
-    color:
-        white;
+        .report-top {
+            display: flex;
 
-    border-radius:
-        12px;
+            justify-content:
+                space-between;
 
-    font-weight:
-        800;
+            gap: 15px;
 
-    font-size:
-        21px;
+            margin-bottom: 8px;
+        }
 
-}
+        .report-top h2 {
+            font-size: 20px;
+        }
 
+        .report-id {
+            color: #667085;
 
-.brand strong {
+            font-size: 12px;
 
-    font-size:
-        20px;
+            margin-bottom: 12px;
+        }
 
-}
+        .description {
+            color: #475467;
 
+            line-height: 1.5;
 
-.brand small {
+            margin-bottom: 15px;
+        }
 
-    display:
-        block;
+        .details {
+            display: flex;
 
-    color:
-        #64748b;
+            flex-wrap: wrap;
 
-    font-size:
-        10px;
+            gap: 8px;
 
-}
+            margin-bottom: 17px;
+        }
 
+        .detail {
+            padding: 7px 10px;
 
-.topbar-right {
+            background: #f8fafc;
 
-    display:
-        flex;
+            border:
+                1px solid #e5e7eb;
 
-    align-items:
-        center;
+            border-radius: 8px;
 
-    gap:
-        12px;
+            font-size: 12px;
+        }
 
-}
+        .actions {
+            display: flex;
 
+            flex-wrap: wrap;
 
-.admin-badge {
+            gap: 9px;
+        }
 
-    background:
-        #eff6ff;
+        .actions select {
+            padding: 9px;
 
-    color:
-        #0b5ed7;
+            border:
+                1px solid #d0d5dd;
 
-    padding:
-        8px 12px;
+            border-radius: 8px;
+        }
 
-    border-radius:
-        999px;
+        .save-button {
+            border: none;
 
-    font-size:
-        11px;
+            background: #16a34a;
 
-    font-weight:
-        800;
+            color: white;
 
-}
+            padding: 9px 14px;
 
+            border-radius: 8px;
 
-.logout-button {
+            font-weight: 700;
 
-    border:
-        none;
+            cursor: pointer;
+        }
 
-    background:
-        #f1f5f9;
+        .map-button {
+            display: inline-block;
 
-    color:
-        #334155;
+            text-decoration: none;
 
-    padding:
-        9px 13px;
+            background: #111827;
 
-    border-radius:
-        8px;
+            color: white;
 
-    font-weight:
-        700;
+            padding: 9px 14px;
 
-    cursor:
-        pointer;
+            border-radius: 8px;
 
-}
+            font-size: 12px;
 
+            font-weight: 700;
+        }
 
-.container {
+        /* =========================
+           STATUS
+        ========================= */
 
-    width:
-        min(
-            1250px,
-            calc(100% - 40px)
-        );
+        .status {
+            display: inline-block;
 
-    margin:
-        auto;
+            padding: 6px 10px;
 
-}
+            border-radius: 999px;
 
+            font-size: 11px;
 
-.dashboard {
+            font-weight: 800;
+        }
 
-    padding:
-        40px 0;
+        .reported {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
 
-}
+        .verified {
+            background: #fef3c7;
+            color: #92400e;
+        }
 
+        .progress {
+            background: #ede9fe;
+            color: #6d28d9;
+        }
 
-.heading {
+        .resolved {
+            background: #dcfce7;
+            color: #166534;
+        }
 
-    margin-bottom:
-        30px;
+        /* =========================
+           EMPTY / ERROR
+        ========================= */
 
-}
+        .empty {
+            background: white;
 
+            padding: 60px 20px;
 
-.heading span {
+            text-align: center;
 
-    color:
-        #0b5ed7;
+            border:
+                1px dashed #cbd5e1;
 
-    font-size:
-        12px;
+            border-radius: 15px;
 
-    font-weight:
-        800;
+            color: #667085;
+        }
 
-    letter-spacing:
-        1.3px;
+        .empty-icon {
+            font-size: 45px;
 
-}
+            margin-bottom: 10px;
+        }
 
+        .error {
+            background: #fff1f2;
 
-.heading h1 {
+            border:
+                1px solid #fecdd3;
 
-    font-size:
-        38px;
+            color: #be123c;
 
-    margin:
-        5px 0;
+            padding: 15px;
 
-}
+            border-radius: 10px;
 
+            margin-bottom: 20px;
+        }
 
-.heading p {
+        /* =========================
+           MOBILE
+        ========================= */
 
-    color:
-        #64748b;
+        @media(max-width: 850px) {
 
-}
+            .stats {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
 
+            .report {
+                grid-template-columns: 1fr;
+            }
 
-/* =====================================================
-   STATS
-===================================================== */
+        }
 
-.stats {
+        @media(max-width: 550px) {
 
-    display:
-        grid;
+            .stats {
+                grid-template-columns: 1fr;
+            }
 
-    grid-template-columns:
-        repeat(
-            4,
-            1fr
-        );
+            .topbar {
+                padding: 13px 15px;
+            }
 
-    gap:
-        16px;
+            .dashboard-title h1 {
+                font-size: 28px;
+            }
 
-    margin-bottom:
-        30px;
+            .brand-subtitle {
+                display: none;
+            }
 
-}
+        }
 
-
-.stat {
-
-    background:
-        white;
-
-    border:
-        1px solid #e2e8f0;
-
-    border-radius:
-        16px;
-
-    padding:
-        22px;
-
-}
-
-
-.stat-icon {
-
-    font-size:
-        25px;
-
-    margin-bottom:
-        10px;
-
-}
-
-
-.stat strong {
-
-    display:
-        block;
-
-    font-size:
-        30px;
-
-}
-
-
-.stat span {
-
-    color:
-        #64748b;
-
-    font-size:
-        13px;
-
-}
-
-
-/* =====================================================
-   TOOLBAR
-===================================================== */
-
-.toolbar {
-
-    background:
-        white;
-
-    border:
-        1px solid #e2e8f0;
-
-    border-radius:
-        16px;
-
-    padding:
-        15px;
-
-    display:
-        flex;
-
-    gap:
-        12px;
-
-    flex-wrap:
-        wrap;
-
-    margin-bottom:
-        20px;
-
-}
-
-
-.toolbar input,
-.toolbar select {
-
-    padding:
-        11px 13px;
-
-    border:
-        1px solid #cbd5e1;
-
-    border-radius:
-        9px;
-
-    outline:
-        none;
-
-}
-
-
-.toolbar input {
-
-    flex:
-        1;
-
-    min-width:
-        220px;
-
-}
-
-
-.refresh {
-
-    border:
-        none;
-
-    background:
-        #0b5ed7;
-
-    color:
-        white;
-
-    padding:
-        11px 17px;
-
-    border-radius:
-        9px;
-
-    font-weight:
-        700;
-
-    cursor:
-        pointer;
-
-}
-
-
-/* =====================================================
-   REPORTS
-===================================================== */
-
-.reports {
-
-    display:
-        grid;
-
-    gap:
-        18px;
-
-}
-
-
-.report {
-
-    background:
-        white;
-
-    border:
-        1px solid #e2e8f0;
-
-    border-radius:
-        18px;
-
-    overflow:
-        hidden;
-
-    display:
-        grid;
-
-    grid-template-columns:
-        190px 1fr;
-
-}
-
-
-.report-image {
-
-    min-height:
-        190px;
-
-    background:
-        #eff6ff;
-
-    display:
-        grid;
-
-    place-items:
-        center;
-
-    font-size:
-        55px;
-
-}
-
-
-.report-image img {
-
-    width:
-        100%;
-
-    height:
-        100%;
-
-    min-height:
-        190px;
-
-    object-fit:
-        cover;
-
-}
-
-
-.report-content {
-
-    padding:
-        22px;
-
-}
-
-
-.report-header {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    gap:
-        15px;
-
-    margin-bottom:
-        7px;
-
-}
-
-
-.report-header h2 {
-
-    font-size:
-        20px;
-
-}
-
-
-.report-code {
-
-    color:
-        #64748b;
-
-    font-size:
-        12px;
-
-    margin-bottom:
-        12px;
-
-}
-
-
-.description {
-
-    color:
-        #475569;
-
-    margin-bottom:
-        15px;
-
-}
-
-
-.details {
-
-    display:
-        flex;
-
-    flex-wrap:
-        wrap;
-
-    gap:
-        8px;
-
-    margin-bottom:
-        18px;
-
-}
-
-
-.detail {
-
-    background:
-        #f8fafc;
-
-    border:
-        1px solid #e2e8f0;
-
-    border-radius:
-        8px;
-
-    padding:
-        7px 10px;
-
-    font-size:
-        12px;
-
-}
-
-
-.actions {
-
-    display:
-        flex;
-
-    gap:
-        9px;
-
-    flex-wrap:
-        wrap;
-
-}
-
-
-.actions select {
-
-    padding:
-        9px;
-
-    border:
-        1px solid #cbd5e1;
-
-    border-radius:
-        8px;
-
-}
-
-
-.map-button {
-
-    text-decoration:
-        none;
-
-    background:
-        #0f172a;
-
-    color:
-        white;
-
-    padding:
-        9px 13px;
-
-    border-radius:
-        8px;
-
-    font-size:
-        12px;
-
-    font-weight:
-        700;
-
-}
-
-
-.save-button {
-
-    border:
-        none;
-
-    background:
-        #16a34a;
-
-    color:
-        white;
-
-    padding:
-        9px 13px;
-
-    border-radius:
-        8px;
-
-    font-weight:
-        700;
-
-    cursor:
-        pointer;
-
-}
-
-
-.status {
-
-    display:
-        inline-block;
-
-    padding:
-        6px 10px;
-
-    border-radius:
-        999px;
-
-    font-size:
-        11px;
-
-    font-weight:
-        800;
-
-}
-
-
-.reported {
-
-    background:
-        #dbeafe;
-
-    color:
-        #1d4ed8;
-
-}
-
-
-.verified {
-
-    background:
-        #fef3c7;
-
-    color:
-        #92400e;
-
-}
-
-
-.progress {
-
-    background:
-        #ede9fe;
-
-    color:
-        #6d28d9;
-
-}
-
-
-.resolved {
-
-    background:
-        #dcfce7;
-
-    color:
-        #166534;
-
-}
-
-
-.empty {
-
-    background:
-        white;
-
-    border:
-        1px dashed #cbd5e1;
-
-    border-radius:
-        16px;
-
-    padding:
-        60px;
-
-    text-align:
-        center;
-
-    color:
-        #64748b;
-
-}
-
-
-.empty div {
-
-    font-size:
-        45px;
-
-    margin-bottom:
-        10px;
-
-}
-
-
-.error {
-
-    background:
-        #fef2f2;
-
-    color:
-        #b91c1c;
-
-    border:
-        1px solid #fecaca;
-
-    padding:
-        14px;
-
-    border-radius:
-        10px;
-
-    margin-bottom:
-        20px;
-
-}
-
-
-/* =====================================================
-   RESPONSIVE
-===================================================== */
-
-@media(max-width: 850px) {
-
-    .stats {
-
-        grid-template-columns:
-            repeat(
-                2,
-                1fr
-            );
-
-    }
-
-
-    .report {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .report-image {
-
-        min-height:
-            220px;
-
-    }
-
-}
-
-
-@media(max-width: 550px) {
-
-    .stats {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .topbar {
-
-        padding:
-            14px 18px;
-
-    }
-
-
-    .container {
-
-        width:
-            min(
-                100% - 24px,
-                1250px
-            );
-
-    }
-
-
-    .admin-badge {
-
-        display:
-            none;
-
-    }
-
-}
-
-</style>
+    </style>
 
 </head>
 
@@ -1198,14 +678,11 @@ body {
      LOGIN PAGE
 ===================================================== -->
 
-<section
-    id="loginPage"
-    class="login-page"
->
+<section id="loginPage">
 
     <div class="login-card">
 
-        <div class="login-logo">
+        <div class="logo">
             C
         </div>
 
@@ -1214,31 +691,26 @@ body {
         </h1>
 
         <p>
-            Sign in to manage civic issue reports.
+            Sign in to manage civic reports.
         </p>
 
 
-        <div
-            id="loginError"
-            class="login-error"
-        ></div>
+        <div id="loginError"></div>
 
 
-        <form
-            id="loginForm"
-        >
+        <form id="loginForm">
 
             <div class="form-group">
 
-                <label>
+                <label for="email">
                     Admin Email
                 </label>
 
                 <input
-                    id="govindbairagi3186@gmail.com"
+                    id="email"
                     type="email"
                     placeholder="Enter admin email"
-                    autocomplete="email"
+                    autocomplete="username"
                     required
                 >
 
@@ -1247,12 +719,12 @@ body {
 
             <div class="form-group">
 
-                <label>
+                <label for="password">
                     Password
                 </label>
 
                 <input
-                    id="Iamvishuvaishnav@5911@"
+                    id="password"
                     type="password"
                     placeholder="Enter password"
                     autocomplete="current-password"
@@ -1264,7 +736,6 @@ body {
 
             <button
                 id="loginButton"
-                class="login-button"
                 type="submit"
             >
                 🔐 Sign In
@@ -1272,17 +743,9 @@ body {
 
         </form>
 
-
-        <div class="login-footer">
-
-            C.A.R.E. — Civic Action and Reporting Engine
-
-        </div>
-
     </div>
 
 </section>
-
 
 
 <!-- =====================================================
@@ -1292,256 +755,245 @@ body {
 <section id="adminApp">
 
 
-<header class="topbar">
+    <header class="topbar">
 
-    <div class="brand">
+        <div class="brand">
 
-        <div class="brand-icon">
-            C
+            <div class="brand-logo">
+                C
+            </div>
+
+            <div>
+
+                <div class="brand-title">
+                    C.A.R.E.
+                </div>
+
+                <div class="brand-subtitle">
+                    Civic Action and Reporting Engine
+                </div>
+
+            </div>
+
         </div>
 
-        <div>
-
-            <strong>
-                C.A.R.E.
-            </strong>
-
-            <small>
-                Civic Action and Reporting Engine
-            </small>
-
-        </div>
-
-    </div>
-
-
-    <div class="topbar-right">
-
-        <div class="admin-badge">
-            🛡️ ADMIN
-        </div>
 
         <button
             class="logout-button"
-            onclick="logout()"
+            id="logoutButton"
         >
             Logout
         </button>
 
-    </div>
-
-</header>
+    </header>
 
 
-<main class="dashboard">
+    <main class="dashboard">
 
-    <div class="container">
+        <div class="container">
 
 
-        <div class="heading">
+            <div class="dashboard-title">
 
-            <span>
-                CIVIC MANAGEMENT
-            </span>
+                <small>
+                    CIVIC MANAGEMENT
+                </small>
 
-            <h1>
-                Issue Dashboard
-            </h1>
+                <h1>
+                    Issue Dashboard
+                </h1>
 
-            <p>
-                Monitor, verify and resolve
-                citizen-reported issues.
-            </p>
+                <p>
+                    Monitor and manage citizen-reported civic issues.
+                </p>
+
+            </div>
+
+
+            <!-- STATS -->
+
+            <div class="stats">
+
+                <div class="stat">
+
+                    <div class="stat-icon">
+                        📊
+                    </div>
+
+                    <span
+                        id="total"
+                        class="stat-number"
+                    >
+                        0
+                    </span>
+
+                    <span class="stat-label">
+                        Total Reports
+                    </span>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-icon">
+                        🕳️
+                    </div>
+
+                    <span
+                        id="potholes"
+                        class="stat-number"
+                    >
+                        0
+                    </span>
+
+                    <span class="stat-label">
+                        Potholes
+                    </span>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-icon">
+                        🗑️
+                    </div>
+
+                    <span
+                        id="garbage"
+                        class="stat-number"
+                    >
+                        0
+                    </span>
+
+                    <span class="stat-label">
+                        Garbage
+                    </span>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-icon">
+                        ✅
+                    </div>
+
+                    <span
+                        id="resolved"
+                        class="stat-number"
+                    >
+                        0
+                    </span>
+
+                    <span class="stat-label">
+                        Resolved
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILTERS -->
+
+            <div class="toolbar">
+
+                <input
+                    id="search"
+                    type="search"
+                    placeholder="Search reports..."
+                >
+
+
+                <select id="categoryFilter">
+
+                    <option value="">
+                        All Categories
+                    </option>
+
+                    <option value="Pothole">
+                        Potholes
+                    </option>
+
+                    <option value="Garbage">
+                        Garbage
+                    </option>
+
+                    <option value="Street Light">
+                        Street Lights
+                    </option>
+
+                    <option value="Drainage">
+                        Drainage
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+
+                <select id="statusFilter">
+
+                    <option value="">
+                        All Status
+                    </option>
+
+                    <option value="Reported">
+                        Reported
+                    </option>
+
+                    <option value="Verified">
+                        Verified
+                    </option>
+
+                    <option value="In Progress">
+                        In Progress
+                    </option>
+
+                    <option value="Resolved">
+                        Resolved
+                    </option>
+
+                </select>
+
+
+                <button
+                    class="refresh-button"
+                    id="refreshButton"
+                >
+                    🔄 Refresh
+                </button>
+
+            </div>
+
+
+            <div id="errorBox"></div>
+
+
+            <div id="reports">
+
+                <div class="empty">
+
+                    <div class="empty-icon">
+                        ⏳
+                    </div>
+
+                    Loading reports...
+
+                </div>
+
+            </div>
+
 
         </div>
 
-
-        <div class="stats">
-
-
-            <div class="stat">
-
-                <div class="stat-icon">
-                    📊
-                </div>
-
-                <strong id="total">
-                    0
-                </strong>
-
-                <span>
-                    Total Reports
-                </span>
-
-            </div>
-
-
-            <div class="stat">
-
-                <div class="stat-icon">
-                    🕳️
-                </div>
-
-                <strong id="potholes">
-                    0
-                </strong>
-
-                <span>
-                    Potholes
-                </span>
-
-            </div>
-
-
-            <div class="stat">
-
-                <div class="stat-icon">
-                    🗑️
-                </div>
-
-                <strong id="garbage">
-                    0
-                </strong>
-
-                <span>
-                    Garbage
-                </span>
-
-            </div>
-
-
-            <div class="stat">
-
-                <div class="stat-icon">
-                    ✅
-                </div>
-
-                <strong id="resolved">
-                    0
-                </strong>
-
-                <span>
-                    Resolved
-                </span>
-
-            </div>
-
-
-        </div>
-
-
-        <div class="toolbar">
-
-            <input
-                id="search"
-                type="search"
-                placeholder="Search reports..."
-                oninput="filterReports()"
-            >
-
-
-            <select
-                id="categoryFilter"
-                onchange="filterReports()"
-            >
-
-                <option value="">
-                    All Categories
-                </option>
-
-                <option value="Pothole">
-                    Potholes
-                </option>
-
-                <option value="Garbage">
-                    Garbage
-                </option>
-
-                <option value="Streetlight">
-                    Streetlights
-                </option>
-
-                <option value="Drainage">
-                    Drainage
-                </option>
-
-                <option value="Road Damage">
-                    Road Damage
-                </option>
-
-                <option value="Other">
-                    Other
-                </option>
-
-            </select>
-
-
-            <select
-                id="statusFilter"
-                onchange="filterReports()"
-            >
-
-                <option value="">
-                    All Statuses
-                </option>
-
-                <option value="Reported">
-                    Reported
-                </option>
-
-                <option value="Verified">
-                    Verified
-                </option>
-
-                <option value="In Progress">
-                    In Progress
-                </option>
-
-                <option value="Resolved">
-                    Resolved
-                </option>
-
-            </select>
-
-
-            <button
-                class="refresh"
-                onclick="loadReports()"
-            >
-                ↻ Refresh
-            </button>
-
-        </div>
-
-
-        <div id="errorBox"></div>
-
-
-        <div
-            id="reports"
-            class="reports"
-        >
-
-            <div class="empty">
-
-                <div>
-                    ⏳
-                </div>
-
-                Loading reports...
-
-            </div>
-
-        </div>
-
-
-    </div>
-
-</main>
-
+    </main>
 
 </section>
-
 
 
 <script>
@@ -1554,8 +1006,22 @@ const SUPABASE_URL =
     "https://wcocovvkzxgxqbscyuuj.supabase.co";
 
 
+/*
+   IMPORTANT:
+
+   Put ONLY your Supabase PUBLISHABLE/ANON key here.
+
+   NEVER put:
+   - admin password
+   - service_role key
+   - secret key
+
+   The admin password is handled by
+   Supabase Authentication.
+*/
+
 const SUPABASE_KEY =
-    "sb_publishable_DaY-2qm2HWCUuLfhaXwFFg_Eg05_MX3";
+    "YOUR_SUPABASE_PUBLISHABLE_KEY";
 
 
 const supabaseClient =
@@ -1569,56 +1035,178 @@ let allReports = [];
 
 
 /* =====================================================
+   ELEMENTS
+===================================================== */
+
+const loginPage =
+    document.getElementById("loginPage");
+
+const adminApp =
+    document.getElementById("adminApp");
+
+const loginForm =
+    document.getElementById("loginForm");
+
+const loginButton =
+    document.getElementById("loginButton");
+
+const loginError =
+    document.getElementById("loginError");
+
+const logoutButton =
+    document.getElementById("logoutButton");
+
+const reportsContainer =
+    document.getElementById("reports");
+
+const errorBox =
+    document.getElementById("errorBox");
+
+
+/* =====================================================
    LOGIN
 ===================================================== */
 
-document
-    .getElementById("loginForm")
-    .addEventListener(
-        "submit",
-        login
-    );
+loginForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
 
 
-async function login(event) {
-
-    event.preventDefault();
-
-
-    const email =
-        document
-            .getElementById("email")
-            .value
-            .trim();
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim();
 
 
-    const password =
-        document
-            .getElementById("password")
-            .value;
+        const password =
+            document
+                .getElementById("password")
+                .value;
 
 
-    const button =
-        document
-            .getElementById("loginButton");
+        loginError.style.display =
+            "none";
+
+        loginError.textContent =
+            "";
 
 
-    const errorBox =
-        document
-            .getElementById("loginError");
+        loginButton.disabled =
+            true;
+
+        loginButton.textContent =
+            "Signing in...";
 
 
-    errorBox.style.display =
+        try {
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .auth
+                    .signInWithPassword({
+
+                        email: email,
+
+                        password: password
+
+                    });
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            if (
+                !data ||
+                !data.session
+            ) {
+
+                throw new Error(
+                    "Login failed."
+                );
+
+            }
+
+
+            showAdmin();
+
+
+        } catch (error) {
+
+            console.error(
+                "Login error:",
+                error
+            );
+
+
+            loginError.textContent =
+                error.message ||
+                "Invalid email or password.";
+
+
+            loginError.style.display =
+                "block";
+
+
+        } finally {
+
+            loginButton.disabled =
+                false;
+
+            loginButton.textContent =
+                "🔐 Sign In";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   SHOW ADMIN
+===================================================== */
+
+function showAdmin() {
+
+    loginPage.style.display =
         "none";
 
+    adminApp.style.display =
+        "block";
 
-    button.disabled =
-        true;
+    loadReports();
+
+}
 
 
-    button.textContent =
-        "Signing in...";
+/* =====================================================
+   LOGOUT
+===================================================== */
 
+logoutButton.addEventListener(
+    "click",
+    async function() {
+
+        await supabaseClient
+            .auth
+            .signOut();
+
+    }
+);
+
+
+/* =====================================================
+   SESSION CHECK
+===================================================== */
+
+async function checkSession() {
 
     const {
         data,
@@ -1626,59 +1214,19 @@ async function login(event) {
     } =
         await supabaseClient
             .auth
-            .signInWithPassword({
-                email,
-                password
-            });
-
-
-    button.disabled =
-        false;
-
-
-    button.textContent =
-        "🔐 Sign In";
+            .getSession();
 
 
     if (error) {
 
-        console.error(error);
-
-
-        errorBox.textContent =
-            error.message;
-
-
-        errorBox.style.display =
-            "block";
-
+        console.error(
+            "Session error:",
+            error
+        );
 
         return;
 
     }
-
-
-    if (data.session) {
-
-        showAdmin();
-
-    }
-
-}
-
-
-/* =====================================================
-   CHECK EXISTING SESSION
-===================================================== */
-
-async function checkSession() {
-
-    const {
-        data
-    } =
-        await supabaseClient
-            .auth
-            .getSession();
 
 
     if (
@@ -1694,57 +1242,38 @@ async function checkSession() {
 
 
 /* =====================================================
-   SHOW ADMIN
+   AUTH STATE
 ===================================================== */
 
-function showAdmin() {
+supabaseClient
+    .auth
+    .onAuthStateChange(
+        function(event, session) {
 
-    document
-        .getElementById("loginPage")
-        .style.display =
-        "none";
+            if (
+                event === "SIGNED_IN" &&
+                session
+            ) {
 
+                showAdmin();
 
-    document
-        .getElementById("adminApp")
-        .style.display =
-        "block";
-
-
-    loadReports();
-
-}
+            }
 
 
-/* =====================================================
-   LOGOUT
-===================================================== */
+            if (
+                event === "SIGNED_OUT"
+            ) {
 
-async function logout() {
+                adminApp.style.display =
+                    "none";
 
-    await supabaseClient
-        .auth
-        .signOut();
+                loginPage.style.display =
+                    "flex";
 
+            }
 
-    document
-        .getElementById("adminApp")
-        .style.display =
-        "none";
-
-
-    document
-        .getElementById("loginPage")
-        .style.display =
-        "grid";
-
-
-    document
-        .getElementById("password")
-        .value =
-        "";
-
-}
+        }
+    );
 
 
 /* =====================================================
@@ -1753,30 +1282,13 @@ async function logout() {
 
 async function loadReports() {
 
-    const container =
-        document.getElementById(
-            "reports"
-        );
-
-
-    const errorBox =
-        document.getElementById(
-            "errorBox"
-        );
-
-
-    container.innerHTML = `
-
+    reportsContainer.innerHTML = `
         <div class="empty">
-
-            <div>
+            <div class="empty-icon">
                 ⏳
             </div>
-
             Loading reports...
-
         </div>
-
     `;
 
 
@@ -1784,67 +1296,69 @@ async function loadReports() {
         "";
 
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .from("issues")
-            .select("*")
-            .order(
-                "created_at",
-                {
-                    ascending:
-                        false
-                }
-            );
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("issues")
+                .select("*")
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                );
 
 
-    if (error) {
+        if (error) {
+            throw error;
+        }
 
-        console.error(error);
+
+        allReports =
+            data || [];
+
+
+        updateStats(
+            allReports
+        );
+
+
+        renderReports(
+            allReports
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Reports error:",
+            error
+        );
 
 
         errorBox.innerHTML = `
-
             <div class="error">
-
-                ⚠️
-                ${escapeHTML(
+                ⚠️ ${escapeHTML(
                     error.message
                 )}
-
             </div>
-
         `;
 
 
-        container.innerHTML =
+        reportsContainer.innerHTML =
             "";
 
-        return;
-
     }
-
-
-    allReports =
-        data || [];
-
-
-    updateStats(
-        allReports
-    );
-
-
-    renderReports(
-        allReports
-    );
 
 }
 
 
 /* =====================================================
-   STATISTICS
+   UPDATE STATS
 ===================================================== */
 
 function updateStats(
@@ -1862,8 +1376,10 @@ function updateStats(
         .textContent =
         reports.filter(
             report =>
-                report.category ===
-                "Pothole"
+                String(
+                    report.category || ""
+                ).toLowerCase()
+                === "pothole"
         ).length;
 
 
@@ -1872,8 +1388,10 @@ function updateStats(
         .textContent =
         reports.filter(
             report =>
-                report.category ===
-                "Garbage"
+                String(
+                    report.category || ""
+                ).toLowerCase()
+                === "garbage"
         ).length;
 
 
@@ -1882,39 +1400,447 @@ function updateStats(
         .textContent =
         reports.filter(
             report =>
-                report.status ===
-                "Resolved"
+                String(
+                    report.status || ""
+                ).toLowerCase()
+                === "resolved"
         ).length;
 
 }
 
 
 /* =====================================================
-   FILTER
+   RENDER REPORTS
 ===================================================== */
 
-function filterReports() {
+function renderReports(
+    reports
+) {
+
+    if (!reports.length) {
+
+        reportsContainer.innerHTML = `
+            <div class="empty">
+
+                <div class="empty-icon">
+                    📭
+                </div>
+
+                <strong>
+                    No reports found
+                </strong>
+
+                <p>
+                    There are no civic reports matching your filters.
+                </p>
+
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    reportsContainer.innerHTML =
+        reports
+            .map(
+                report =>
+                    createReportHTML(
+                        report
+                    )
+            )
+            .join("");
+
+}
+
+
+/* =====================================================
+   REPORT HTML
+===================================================== */
+
+function createReportHTML(
+    report
+) {
+
+    const title =
+        report.title ||
+        report.category ||
+        "Civic Issue";
+
+
+    const description =
+        report.description ||
+        "No description provided.";
+
+
+    const category =
+        report.category ||
+        "Other";
+
+
+    const status =
+        report.status ||
+        "Reported";
+
+
+    const location =
+        report.location ||
+        report.address ||
+        "Location unavailable";
+
+
+    const id =
+        report.id ||
+        "N/A";
+
+
+    const image =
+        report.image_url ||
+        report.photo_url ||
+        report.image;
+
+
+    const safeTitle =
+        escapeHTML(title);
+
+
+    const safeDescription =
+        escapeHTML(description);
+
+
+    const safeCategory =
+        escapeHTML(category);
+
+
+    const safeStatus =
+        escapeHTML(status);
+
+
+    const safeLocation =
+        escapeHTML(location);
+
+
+    const safeId =
+        escapeHTML(id);
+
+
+    const imageHTML =
+        image
+            ? `
+                <img
+                    src="${escapeHTML(image)}"
+                    alt="Reported civic issue"
+                    loading="lazy"
+                >
+              `
+            : "📍";
+
+
+    const statusClass =
+        status
+            .toLowerCase()
+            .replace(
+                /\s+/g,
+                "-"
+            );
+
+
+    const mapURL =
+        report.latitude &&
+        report.longitude
+
+            ? `https://www.google.com/maps?q=${encodeURIComponent(
+                report.latitude
+            )},${encodeURIComponent(
+                report.longitude
+            )}`
+
+            : null;
+
+
+    return `
+
+        <article
+            class="report"
+            data-id="${safeId}"
+        >
+
+            <div class="report-image">
+                ${imageHTML}
+            </div>
+
+
+            <div class="report-content">
+
+                <div class="report-top">
+
+                    <h2>
+                        ${safeTitle}
+                    </h2>
+
+                    <span
+                        class="status ${statusClass}"
+                    >
+                        ${safeStatus}
+                    </span>
+
+                </div>
+
+
+                <div class="report-id">
+                    Report ID: ${safeId}
+                </div>
+
+
+                <div class="description">
+                    ${safeDescription}
+                </div>
+
+
+                <div class="details">
+
+                    <span class="detail">
+                        📂 ${safeCategory}
+                    </span>
+
+                    <span class="detail">
+                        📍 ${safeLocation}
+                    </span>
+
+                </div>
+
+
+                <div class="actions">
+
+                    <select
+                        onchange="changeStatus(
+                            '${escapeAttribute(id)}',
+                            this.value
+                        )"
+                    >
+
+                        <option
+                            value="Reported"
+                            ${status === "Reported"
+                                ? "selected"
+                                : ""}
+                        >
+                            Reported
+                        </option>
+
+                        <option
+                            value="Verified"
+                            ${status === "Verified"
+                                ? "selected"
+                                : ""}
+                        >
+                            Verified
+                        </option>
+
+                        <option
+                            value="In Progress"
+                            ${status === "In Progress"
+                                ? "selected"
+                                : ""}
+                        >
+                            In Progress
+                        </option>
+
+                        <option
+                            value="Resolved"
+                            ${status === "Resolved"
+                                ? "selected"
+                                : ""}
+                        >
+                            Resolved
+                        </option>
+
+                    </select>
+
+
+                    <button
+                        class="save-button"
+                        onclick="saveStatus(
+                            '${escapeAttribute(id)}'
+                        )"
+                    >
+                        💾 Save
+                    </button>
+
+
+                    ${
+                        mapURL
+                            ? `
+                                <a
+                                    class="map-button"
+                                    href="${mapURL}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    🗺️ View Map
+                                </a>
+                              `
+                            : ""
+                    }
+
+                </div>
+
+            </div>
+
+        </article>
+
+    `;
+
+}
+
+
+/* =====================================================
+   TEMPORARY STATUS STORAGE
+===================================================== */
+
+const pendingStatuses = {};
+
+
+function changeStatus(
+    id,
+    status
+) {
+
+    pendingStatuses[id] =
+        status;
+
+}
+
+
+/* =====================================================
+   SAVE STATUS
+===================================================== */
+
+async function saveStatus(
+    id
+) {
+
+    const status =
+        pendingStatuses[id];
+
+
+    if (!status) {
+
+        alert(
+            "Please select a status first."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("issues")
+                .update({
+                    status: status
+                })
+                .eq(
+                    "id",
+                    id
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        delete pendingStatuses[id];
+
+
+        await loadReports();
+
+
+        alert(
+            "Report status updated successfully."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Status update error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to update status."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+document
+    .getElementById("search")
+    .addEventListener(
+        "input",
+        applyFilters
+    );
+
+
+document
+    .getElementById("categoryFilter")
+    .addEventListener(
+        "change",
+        applyFilters
+    );
+
+
+document
+    .getElementById("statusFilter")
+    .addEventListener(
+        "change",
+        applyFilters
+    );
+
+
+document
+    .getElementById("refreshButton")
+    .addEventListener(
+        "click",
+        loadReports
+    );
+
+
+function applyFilters() {
 
     const search =
         document
             .getElementById("search")
             .value
-            .toLowerCase();
+            .toLowerCase()
+            .trim();
 
 
     const category =
         document
-            .getElementById(
-                "categoryFilter"
-            )
+            .getElementById("categoryFilter")
             .value;
 
 
     const status =
         document
-            .getElementById(
-                "statusFilter"
-            )
+            .getElementById("statusFilter")
             .value;
 
 
@@ -1922,34 +1848,34 @@ function filterReports() {
         allReports.filter(
             report => {
 
-                const text =
-                    `
-                    ${report.issue_code || ""}
-                    ${report.category || ""}
+                const text = `
+                    ${report.title || ""}
                     ${report.description || ""}
-                    `.toLowerCase();
+                    ${report.category || ""}
+                    ${report.location || ""}
+                    ${report.id || ""}
+                `.toLowerCase();
 
 
                 return (
 
-                    text.includes(
-                        search
+                    (
+                        !search ||
+                        text.includes(search)
                     )
 
                     &&
 
                     (
                         !category ||
-                        report.category ===
-                        category
+                        report.category === category
                     )
 
                     &&
 
                     (
                         !status ||
-                        report.status ===
-                        status
+                        report.status === status
                     )
 
                 );
@@ -1966,559 +1892,54 @@ function filterReports() {
 
 
 /* =====================================================
-   RENDER
+   SECURITY HELPERS
 ===================================================== */
-
-function renderReports(
-    reports
-) {
-
-    const container =
-        document.getElementById(
-            "reports"
-        );
-
-
-    if (!reports.length) {
-
-        container.innerHTML = `
-
-            <div class="empty">
-
-                <div>
-                    📍
-                </div>
-
-                <strong>
-                    No reports found
-                </strong>
-
-                <p>
-                    Citizen reports will appear here.
-                </p>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    container.innerHTML =
-        reports
-            .map(
-                createReportHTML
-            )
-            .join("");
-
-}
-
-
-/* =====================================================
-   REPORT CARD
-===================================================== */
-
-function createReportHTML(
-    report
-) {
-
-    const icon =
-        getIcon(
-            report.category
-        );
-
-
-    const statusClass =
-        getStatusClass(
-            report.status
-        );
-
-
-    let imageHTML;
-
-
-    if (
-        report.image_url
-    ) {
-
-        imageHTML = `
-
-            <div class="report-image">
-
-                <img
-                    src="${escapeHTML(
-                        report.image_url
-                    )}"
-                    alt="Civic issue"
-                >
-
-            </div>
-
-        `;
-
-    } else {
-
-        imageHTML = `
-
-            <div class="report-image">
-
-                ${icon}
-
-            </div>
-
-        `;
-
-    }
-
-
-    const mapsURL =
-        `https://www.google.com/maps?q=${
-            encodeURIComponent(
-                report.latitude
-            )
-        },${
-            encodeURIComponent(
-                report.longitude
-            )
-        }`;
-
-
-    return `
-
-        <article class="report">
-
-            ${imageHTML}
-
-
-            <div class="report-content">
-
-
-                <div class="report-header">
-
-                    <h2>
-
-                        ${escapeHTML(
-                            report.category ||
-                            "Issue"
-                        )}
-
-                    </h2>
-
-
-                    <span
-                        class="status ${statusClass}"
-                    >
-
-                        ${escapeHTML(
-                            report.status ||
-                            "Reported"
-                        )}
-
-                    </span>
-
-                </div>
-
-
-                <div class="report-code">
-
-                    Report ID:
-
-                    <strong>
-
-                        ${escapeHTML(
-                            report.issue_code ||
-                            "N/A"
-                        )}
-
-                    </strong>
-
-                </div>
-
-
-                <p class="description">
-
-                    ${escapeHTML(
-                        report.description ||
-                        ""
-                    )}
-
-                </p>
-
-
-                <div class="details">
-
-                    <span class="detail">
-
-                        📍
-
-                        ${escapeHTML(
-                            String(
-                                report.latitude ||
-                                "N/A"
-                            )
-                        )},
-
-                        ${escapeHTML(
-                            String(
-                                report.longitude ||
-                                "N/A"
-                            )
-                        )}
-
-                    </span>
-
-
-                    <span class="detail">
-
-                        ⚡
-
-                        ${escapeHTML(
-                            report.priority ||
-                            "Medium"
-                        )}
-
-                    </span>
-
-
-                    <span class="detail">
-
-                        🕒
-
-                        ${formatDate(
-                            report.created_at
-                        )}
-
-                    </span>
-
-                </div>
-
-
-                <div class="actions">
-
-
-                    <a
-                        class="map-button"
-                        href="${mapsURL}"
-                        target="_blank"
-                        rel="noopener"
-                    >
-
-                        📍 Open Map
-
-                    </a>
-
-
-                    <select
-                        id="status-${escapeHTML(
-                            report.id
-                        )}"
-                    >
-
-                        <option
-                            value="Reported"
-                            ${
-                                report.status ===
-                                "Reported"
-                                ? "selected"
-                                : ""
-                            }
-                        >
-                            Reported
-                        </option>
-
-
-                        <option
-                            value="Verified"
-                            ${
-                                report.status ===
-                                "Verified"
-                                ? "selected"
-                                : ""
-                            }
-                        >
-                            Verified
-                        </option>
-
-
-                        <option
-                            value="In Progress"
-                            ${
-                                report.status ===
-                                "In Progress"
-                                ? "selected"
-                                : ""
-                            }
-                        >
-                            In Progress
-                        </option>
-
-
-                        <option
-                            value="Resolved"
-                            ${
-                                report.status ===
-                                "Resolved"
-                                ? "selected"
-                                : ""
-                            }
-                        >
-                            Resolved
-                        </option>
-
-                    </select>
-
-
-                    <button
-                        class="save-button"
-                        onclick="updateStatus(
-                            '${escapeJS(
-                                report.id
-                            )}'
-                        )"
-                    >
-
-                        Save Status
-
-                    </button>
-
-
-                </div>
-
-            </div>
-
-        </article>
-
-    `;
-
-}
-
-
-/* =====================================================
-   UPDATE STATUS
-===================================================== */
-
-async function updateStatus(
-    id
-) {
-
-    const select =
-        document.getElementById(
-            `status-${id}`
-        );
-
-
-    if (!select) {
-
-        return;
-
-    }
-
-
-    const newStatus =
-        select.value;
-
-
-    const {
-        error
-    } =
-        await supabaseClient
-            .from("issues")
-            .update({
-                status:
-                    newStatus
-            })
-            .eq(
-                "id",
-                id
-            );
-
-
-    if (error) {
-
-        console.error(error);
-
-
-        alert(
-            "Could not update status:\n\n" +
-            error.message
-        );
-
-
-        return;
-
-    }
-
-
-    alert(
-        "✅ Status updated successfully."
-    );
-
-
-    loadReports();
-
-}
-
-
-/* =====================================================
-   HELPERS
-===================================================== */
-
-function getIcon(
-    category
-) {
-
-    const icons = {
-
-        "Pothole":
-            "🕳️",
-
-        "Garbage":
-            "🗑️",
-
-        "Streetlight":
-            "💡",
-
-        "Drainage":
-            "🌊",
-
-        "Road Damage":
-            "🚧",
-
-        "Other":
-            "📍"
-
-    };
-
-
-    return (
-        icons[category] ||
-        "📍"
-    );
-
-}
-
-
-function getStatusClass(
-    status
-) {
-
-    if (
-        status ===
-        "Verified"
-    ) {
-
-        return "verified";
-
-    }
-
-
-    if (
-        status ===
-        "In Progress"
-    ) {
-
-        return "progress";
-
-    }
-
-
-    if (
-        status ===
-        "Resolved"
-    ) {
-
-        return "resolved";
-
-    }
-
-
-    return "reported";
-
-}
-
-
-function formatDate(
-    date
-) {
-
-    if (!date) {
-
-        return "Unknown";
-
-    }
-
-
-    return new Date(
-        date
-    ).toLocaleString(
-        "en-IN",
-        {
-            dateStyle:
-                "medium",
-
-            timeStyle:
-                "short"
-        }
-    );
-
-}
-
 
 function escapeHTML(
     value
 ) {
 
-    return String(value)
-
-        .replaceAll(
-            "&",
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
             "&amp;"
         )
-
-        .replaceAll(
-            "<",
+        .replace(
+            /</g,
             "&lt;"
         )
-
-        .replaceAll(
-            ">",
+        .replace(
+            />/g,
             "&gt;"
         )
-
-        .replaceAll(
-            '"',
+        .replace(
+            /"/g,
             "&quot;"
         )
-
-        .replaceAll(
-            "'",
+        .replace(
+            /'/g,
             "&#039;"
         );
 
 }
 
 
-function escapeJS(
+function escapeAttribute(
     value
 ) {
 
-    return String(value)
-
-        .replaceAll(
-            "\\",
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /\\/g,
             "\\\\"
         )
-
-        .replaceAll(
-            "'",
+        .replace(
+            /'/g,
             "\\'"
-        )
-
-        .replaceAll(
-            '"',
-            '\\"'
         );
 
 }
