@@ -1,7 +1,7 @@
 /* =====================================================
    C.A.R.E.
    Civic Action and Reporting Engine
-   Phase 2 — Supabase
+   Citizen Reporting System
 ===================================================== */
 
 
@@ -12,8 +12,21 @@
 const SUPABASE_URL =
     "https://wcocovvkzxgxqbscyuuj.supabase.co";
 
+
+/*
+    IMPORTANT:
+
+    Use ONLY your Supabase Publishable key here.
+
+    NEVER put:
+    - admin password
+    - service_role key
+    - secret key
+*/
+
 const SUPABASE_KEY =
     "sb_publishable_DaY-2qm2HWCUuLfhaXwFFg_Eg05_MX3";
+
 
 const supabaseClient =
     window.supabase.createClient(
@@ -91,7 +104,10 @@ function showPage(page) {
         );
 
 
-    if (page === "home" && navLinks[0]) {
+    if (
+        page === "home" &&
+        navLinks[0]
+    ) {
 
         navLinks[0].classList.add(
             "active"
@@ -100,7 +116,10 @@ function showPage(page) {
     }
 
 
-    if (page === "reports" && navLinks[1]) {
+    if (
+        page === "reports" &&
+        navLinks[1]
+    ) {
 
         navLinks[1].classList.add(
             "active"
@@ -109,7 +128,10 @@ function showPage(page) {
     }
 
 
-    if (page === "about" && navLinks[2]) {
+    if (
+        page === "about" &&
+        navLinks[2]
+    ) {
 
         navLinks[2].classList.add(
             "active"
@@ -124,7 +146,9 @@ function showPage(page) {
     });
 
 
-    if (page === "reports") {
+    if (
+        page === "reports"
+    ) {
 
         loadReports();
 
@@ -155,6 +179,260 @@ function startReport(category) {
 
     }
 
+
+    addCitizenFields();
+
+}
+
+
+/* =====================================================
+   CITIZEN DETAILS FORM
+===================================================== */
+
+function addCitizenFields() {
+
+    const issueForm =
+        document.getElementById(
+            "issueForm"
+        );
+
+
+    if (!issueForm) {
+
+        return;
+
+    }
+
+
+    if (
+        document.getElementById(
+            "citizenDetails"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const section =
+        document.createElement(
+            "div"
+        );
+
+
+    section.id =
+        "citizenDetails";
+
+
+    section.innerHTML = `
+
+        <div
+            style="
+                margin:25px 0 18px;
+                padding:20px;
+                border-radius:16px;
+                background:#f8fafc;
+                border:1px solid #e2e8f0;
+            "
+        >
+
+            <h3
+                style="
+                    margin-bottom:6px;
+                    font-size:19px;
+                "
+            >
+                👤 Your Details
+            </h3>
+
+            <p
+                style="
+                    color:#64748b;
+                    font-size:13px;
+                    margin-bottom:18px;
+                "
+            >
+                These details help C.A.R.E. authorities
+                contact you about your report.
+            </p>
+
+
+            <div
+                style="
+                    display:grid;
+                    grid-template-columns:
+                        repeat(
+                            auto-fit,
+                            minmax(220px,1fr)
+                        );
+                    gap:15px;
+                "
+            >
+
+                <div>
+
+                    <label
+                        for="citizenName"
+                        style="
+                            display:block;
+                            font-weight:700;
+                            font-size:13px;
+                            margin-bottom:6px;
+                        "
+                    >
+                        Full Name *
+                    </label>
+
+                    <input
+                        id="citizenName"
+                        type="text"
+                        maxlength="100"
+                        autocomplete="name"
+                        placeholder="Enter your full name"
+                        required
+                        style="
+                            width:100%;
+                            padding:12px;
+                            border:
+                                1px solid #cbd5e1;
+                            border-radius:9px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label
+                        for="citizenMobile"
+                        style="
+                            display:block;
+                            font-weight:700;
+                            font-size:13px;
+                            margin-bottom:6px;
+                        "
+                    >
+                        Mobile Number *
+                    </label>
+
+                    <input
+                        id="citizenMobile"
+                        type="tel"
+                        inputmode="numeric"
+                        maxlength="10"
+                        pattern="[0-9]{10}"
+                        autocomplete="tel"
+                        placeholder="10-digit mobile number"
+                        required
+                        style="
+                            width:100%;
+                            padding:12px;
+                            border:
+                                1px solid #cbd5e1;
+                            border-radius:9px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label
+                        for="citizenEmail"
+                        style="
+                            display:block;
+                            font-weight:700;
+                            font-size:13px;
+                            margin-bottom:6px;
+                        "
+                    >
+                        Gmail / Email *
+                    </label>
+
+                    <input
+                        id="citizenEmail"
+                        type="email"
+                        maxlength="150"
+                        autocomplete="email"
+                        placeholder="example@gmail.com"
+                        required
+                        style="
+                            width:100%;
+                            padding:12px;
+                            border:
+                                1px solid #cbd5e1;
+                            border-radius:9px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label
+                        for="citizenAddress"
+                        style="
+                            display:block;
+                            font-weight:700;
+                            font-size:13px;
+                            margin-bottom:6px;
+                        "
+                    >
+                        Address / Landmark *
+                    </label>
+
+                    <input
+                        id="citizenAddress"
+                        type="text"
+                        maxlength="250"
+                        autocomplete="street-address"
+                        placeholder="Area, street, landmark"
+                        required
+                        style="
+                            width:100%;
+                            padding:12px;
+                            border:
+                                1px solid #cbd5e1;
+                            border-radius:9px;
+                        "
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    const description =
+        document.getElementById(
+            "description"
+        );
+
+
+    if (
+        description &&
+        description.parentElement
+    ) {
+
+        description.parentElement.before(
+            section
+        );
+
+    } else {
+
+        issueForm.prepend(
+            section
+        );
+
+    }
+
 }
 
 
@@ -170,7 +448,16 @@ function getLocation() {
         );
 
 
-    if (!navigator.geolocation) {
+    if (!locationText) {
+
+        return;
+
+    }
+
+
+    if (
+        !navigator.geolocation
+    ) {
 
         locationText.textContent =
             "GPS is not supported by this browser.";
@@ -199,16 +486,32 @@ function getLocation() {
                 position.coords.longitude;
 
 
-            document.getElementById(
-                "latitude"
-            ).value =
-                latitude;
+            const latitudeInput =
+                document.getElementById(
+                    "latitude"
+                );
 
 
-            document.getElementById(
-                "longitude"
-            ).value =
-                longitude;
+            const longitudeInput =
+                document.getElementById(
+                    "longitude"
+                );
+
+
+            if (latitudeInput) {
+
+                latitudeInput.value =
+                    latitude;
+
+            }
+
+
+            if (longitudeInput) {
+
+                longitudeInput.value =
+                    longitude;
+
+            }
 
 
             locationText.textContent =
@@ -221,9 +524,13 @@ function getLocation() {
 
         },
 
+
         error => {
 
-            console.error(error);
+            console.error(
+                "Location error:",
+                error
+            );
 
 
             locationText.textContent =
@@ -235,6 +542,7 @@ function getLocation() {
             );
 
         },
+
 
         {
 
@@ -332,36 +640,80 @@ async function uploadImage(
 
 
 /* =====================================================
+   VALIDATE MOBILE
+===================================================== */
+
+function validateMobile(
+    mobile
+) {
+
+    return /^[0-9]{10}$/.test(
+        mobile
+    );
+
+}
+
+
+/* =====================================================
    SUBMIT ISSUE
 ===================================================== */
 
-async function submitIssue(event) {
+async function submitIssue(
+    event
+) {
 
     event.preventDefault();
 
 
-    const category =
+    addCitizenFields();
+
+
+    const nameInput =
+        document.getElementById(
+            "citizenName"
+        );
+
+
+    const mobileInput =
+        document.getElementById(
+            "citizenMobile"
+        );
+
+
+    const emailInput =
+        document.getElementById(
+            "citizenEmail"
+        );
+
+
+    const addressInput =
+        document.getElementById(
+            "citizenAddress"
+        );
+
+
+    const categoryInput =
         document.getElementById(
             "category"
-        ).value;
+        );
 
 
-    const description =
+    const descriptionInput =
         document.getElementById(
             "description"
-        ).value.trim();
+        );
 
 
-    const latitude =
+    const latitudeInput =
         document.getElementById(
             "latitude"
-        ).value;
+        );
 
 
-    const longitude =
+    const longitudeInput =
         document.getElementById(
             "longitude"
-        ).value;
+        );
 
 
     const imageInput =
@@ -370,8 +722,115 @@ async function submitIssue(event) {
         );
 
 
+    const name =
+        nameInput
+            ? nameInput.value.trim()
+            : "";
+
+
+    const mobile =
+        mobileInput
+            ? mobileInput.value.trim()
+            : "";
+
+
+    const email =
+        emailInput
+            ? emailInput.value.trim()
+            : "";
+
+
+    const address =
+        addressInput
+            ? addressInput.value.trim()
+            : "";
+
+
+    const category =
+        categoryInput
+            ? categoryInput.value
+            : "";
+
+
+    const description =
+        descriptionInput
+            ? descriptionInput.value.trim()
+            : "";
+
+
+    const latitude =
+        latitudeInput
+            ? latitudeInput.value
+            : "";
+
+
+    const longitude =
+        longitudeInput
+            ? longitudeInput.value
+            : "";
+
+
     const imageFile =
-        imageInput.files[0];
+        imageInput &&
+        imageInput.files
+            ? imageInput.files[0]
+            : null;
+
+
+    /* -------------------------------------------------
+       VALIDATION
+    ------------------------------------------------- */
+
+    if (!name) {
+
+        showToast(
+            "Please enter your name."
+        );
+
+        nameInput?.focus();
+
+        return;
+
+    }
+
+
+    if (!validateMobile(mobile)) {
+
+        showToast(
+            "Please enter a valid 10-digit mobile number."
+        );
+
+        mobileInput?.focus();
+
+        return;
+
+    }
+
+
+    if (!email) {
+
+        showToast(
+            "Please enter your email."
+        );
+
+        emailInput?.focus();
+
+        return;
+
+    }
+
+
+    if (!address) {
+
+        showToast(
+            "Please enter your address or landmark."
+        );
+
+        addressInput?.focus();
+
+        return;
+
+    }
 
 
     if (!category) {
@@ -396,7 +855,10 @@ async function submitIssue(event) {
     }
 
 
-    if (!latitude || !longitude) {
+    if (
+        !latitude ||
+        !longitude
+    ) {
 
         showToast(
             "Please detect the issue location."
@@ -407,6 +869,10 @@ async function submitIssue(event) {
     }
 
 
+    /* -------------------------------------------------
+       SUBMIT BUTTON
+    ------------------------------------------------- */
+
     const button =
         document.querySelector(
             "#issueForm button[type='submit']"
@@ -414,13 +880,20 @@ async function submitIssue(event) {
 
 
     const originalText =
-        button.textContent;
+        button
+            ? button.textContent
+            : "";
 
 
-    button.disabled = true;
+    if (button) {
 
-    button.textContent =
-        "Submitting...";
+        button.disabled =
+            true;
+
+        button.textContent =
+            "Submitting...";
+
+    }
 
 
     try {
@@ -429,13 +902,22 @@ async function submitIssue(event) {
             generateReportId();
 
 
-        let imageUrl = null;
+        let imageUrl =
+            null;
 
+
+        /* -------------------------------------------------
+           IMAGE
+        ------------------------------------------------- */
 
         if (imageFile) {
 
-            button.textContent =
-                "Uploading photo...";
+            if (button) {
+
+                button.textContent =
+                    "Uploading photo...";
+
+            }
 
 
             imageUrl =
@@ -447,8 +929,16 @@ async function submitIssue(event) {
         }
 
 
-        button.textContent =
-            "Saving report...";
+        /* -------------------------------------------------
+           SAVE REPORT
+        ------------------------------------------------- */
+
+        if (button) {
+
+            button.textContent =
+                "Sending to C.A.R.E....";
+
+        }
 
 
         const {
@@ -460,6 +950,18 @@ async function submitIssue(event) {
 
                     issue_code:
                         reportId,
+
+                    citizen_name:
+                        name,
+
+                    citizen_mobile:
+                        mobile,
+
+                    citizen_email:
+                        email,
+
+                    address:
+                        address,
 
                     category:
                         category,
@@ -487,38 +989,57 @@ async function submitIssue(event) {
 
         if (error) {
 
-            console.error(error);
+            console.error(
+                "Supabase error:",
+                error
+            );
 
             throw error;
 
         }
 
 
+        /* -------------------------------------------------
+           SUCCESS
+        ------------------------------------------------- */
+
         document
             .getElementById(
                 "issueForm"
             )
-            .reset();
+            ?.reset();
 
 
-        document.getElementById(
-            "latitude"
-        ).value = "";
+        if (latitudeInput) {
+
+            latitudeInput.value =
+                "";
+
+        }
 
 
-        document.getElementById(
-            "longitude"
-        ).value = "";
+        if (longitudeInput) {
+
+            longitudeInput.value =
+                "";
+
+        }
 
 
-        document.getElementById(
-            "locationText"
-        ).textContent =
-            "Location not captured yet";
+        if (locationTextExists()) {
+
+            document
+                .getElementById(
+                    "locationText"
+                )
+                .textContent =
+                "Location not captured yet";
+
+        }
 
 
         showToast(
-            `Report ${reportId} submitted successfully!`
+            `✅ Report ${reportId} submitted successfully!`
         );
 
 
@@ -530,31 +1051,52 @@ async function submitIssue(event) {
                 );
 
             },
-            1000
+            1200
         );
 
 
     } catch (error) {
 
         console.error(
-            "CARE submission error:",
+            "C.A.R.E. submission error:",
             error
         );
 
 
         showToast(
+            error.message ||
             "Report could not be submitted."
         );
 
 
     } finally {
 
-        button.disabled = false;
+        if (button) {
 
-        button.textContent =
-            originalText;
+            button.disabled =
+                false;
+
+            button.textContent =
+                originalText;
+
+        }
 
     }
+
+}
+
+
+/* =====================================================
+   LOCATION ELEMENT CHECK
+===================================================== */
+
+function locationTextExists() {
+
+    return Boolean(
+        document.getElementById(
+            "locationText"
+        )
+    );
 
 }
 
@@ -599,24 +1141,49 @@ async function loadReports() {
     `;
 
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .from("issues")
-            .select("*")
-            .order(
-                "created_at",
-                {
-                    ascending: false
-                }
-            );
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("issues")
+                .select(
+                    "id,issue_code,category,description,latitude,longitude,image_url,status,priority,department,created_at"
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending:
+                            false
+                    }
+                );
 
 
-    if (error) {
+        if (error) {
 
-        console.error(error);
+            throw error;
+
+        }
+
+
+        renderReports(
+            data || []
+        );
+
+
+        updateStatistics(
+            data || []
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Load reports error:",
+            error
+        );
 
 
         container.innerHTML = `
@@ -638,32 +1205,6 @@ async function loadReports() {
             </div>
 
         `;
-
-        return;
-
-    }
-
-
-    renderReports(
-        data || []
-    );
-
-
-    updateStatistics(
-        data || []
-    );
-
-
-    const heroCount =
-        document.getElementById(
-            "heroReportCount"
-        );
-
-
-    if (heroCount) {
-
-        heroCount.textContent =
-            data.length;
 
     }
 
@@ -698,7 +1239,7 @@ function renderReports(
             <div class="empty-state">
 
                 <div>
-                    📍
+                    📭
                 </div>
 
                 <h3>
@@ -706,8 +1247,7 @@ function renderReports(
                 </h3>
 
                 <p>
-                    Be the first citizen to report
-                    a civic issue through C.A.R.E.
+                    No civic issues have been reported yet.
                 </p>
 
             </div>
@@ -719,7 +1259,8 @@ function renderReports(
     }
 
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
 
     reports.forEach(
@@ -741,17 +1282,18 @@ function renderReports(
                 );
 
 
-            const image =
+            const imageHTML =
                 report.image_url
 
                     ? `
+
                         <div class="issue-image">
 
                             <img
                                 src="${escapeHTML(
                                     report.image_url
                                 )}"
-                                alt="Civic issue photo"
+                                alt="Civic issue"
                                 style="
                                     width:100%;
                                     height:100%;
@@ -760,44 +1302,61 @@ function renderReports(
                             >
 
                         </div>
+
                     `
 
                     : `
+
                         <div class="issue-image">
+
                             ${icon}
+
                         </div>
+
                     `;
 
 
             card.innerHTML = `
 
-                ${image}
+                ${imageHTML}
 
                 <div class="issue-content">
 
                     <h3>
                         ${escapeHTML(
-                            report.category
+                            report.category ||
+                            "Civic Issue"
                         )}
                     </h3>
 
                     <p>
                         ${escapeHTML(
-                            report.description
+                            report.description ||
+                            ""
                         )}
                     </p>
 
                     <p>
                         <strong>
                             ${escapeHTML(
-                                report.issue_code
+                                report.issue_code ||
+                                ""
                             )}
                         </strong>
                     </p>
 
+                    <p>
+                        🏛️
+                        ${escapeHTML(
+                            report.department ||
+                            "Municipal Administration"
+                        )}
+                    </p>
+
                     <span class="status">
                         ${escapeHTML(
-                            report.status
+                            report.status ||
+                            "Reported"
                         )}
                     </span>
 
@@ -817,7 +1376,7 @@ function renderReports(
 
 
 /* =====================================================
-   ICONS
+   CATEGORY ICON
 ===================================================== */
 
 function getCategoryIcon(
@@ -826,17 +1385,26 @@ function getCategoryIcon(
 
     const icons = {
 
-        Pothole: "🕳️",
+        Pothole:
+            "🕳️",
 
-        Garbage: "🗑️",
+        Garbage:
+            "🗑️",
 
-        Streetlight: "💡",
+        Streetlight:
+            "💡",
 
-        Drainage: "🌊",
+        "Street Light":
+            "💡",
 
-        "Road Damage": "🚧",
+        Drainage:
+            "🌊",
 
-        Other: "📍"
+        "Road Damage":
+            "🚧",
+
+        Other:
+            "📍"
 
     };
 
@@ -863,24 +1431,24 @@ function updateStatistics(
 
     const verified =
         reports.filter(
-            r =>
-                r.status ===
+            report =>
+                report.status ===
                 "Verified"
         ).length;
 
 
     const progress =
         reports.filter(
-            r =>
-                r.status ===
+            report =>
+                report.status ===
                 "In Progress"
         ).length;
 
 
     const resolved =
         reports.filter(
-            r =>
-                r.status ===
+            report =>
+                report.status ===
                 "Resolved"
         ).length;
 
@@ -977,7 +1545,12 @@ function showToast(
         );
 
 
-    if (!toast || !messageElement) {
+    if (
+        !toast ||
+        !messageElement
+    ) {
+
+        alert(message);
 
         return;
 
@@ -1001,7 +1574,7 @@ function showToast(
             );
 
         },
-        3000
+        3500
     );
 
 }
@@ -1015,7 +1588,9 @@ function escapeHTML(
     value
 ) {
 
-    return String(value)
+    return String(
+        value ?? ""
+    )
 
         .replaceAll(
             "&",
@@ -1046,30 +1621,30 @@ function escapeHTML(
 
 
 /* =====================================================
-   INITIALIZATION
+   INITIALIZE
 ===================================================== */
 
 document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        const form =
+        addCitizenFields();
+
+
+        const issueForm =
             document.getElementById(
                 "issueForm"
             );
 
 
-        if (form) {
+        if (issueForm) {
 
-            form.addEventListener(
+            issueForm.addEventListener(
                 "submit",
                 submitIssue
             );
 
         }
-
-
-        loadReports();
 
     }
 );
