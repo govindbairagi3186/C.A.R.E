@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>C.A.R.E. Admin</title>
+
+    <meta
+        name="theme-color"
+        content="#0b5ed7"
+    >
+
+    <!-- Font Awesome Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f5f7fb;
+            color: #172033;
+        }
+
+        /* =========================
+           LOGIN
+        ========================= */
+
+        #loginPage {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eaf3ff,
+                    #ffffff
+                );
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+
+            background: #ffffff;
+
+            padding: 35px;
+
+            border-radius: 22px;
+
+            box-shadow:
+                0 20px 60px
+                rgba(0, 0, 0, 0.10);
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #0b5ed7;
+
+            color: white;
+
+            border-radius: 16px;
+
+            font-size: 28px;
+            font-weight: 800;
+
+            margin-bottom: 20px;
+        }
+
+        .login-card h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .login-card p {
+            color: #667085;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .form-group input {
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border:
+                1px solid #d0d5dd;
+
+            border-radius: 10px;
+
+            font-size: 15px;
+
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #0b5ed7;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(11, 94, 215, 0.10);
+        }
+
+        #loginButton {
+            width: 100%;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #0b5ed7;
+
+            color: white;
+
+            font-size: 15px;
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        #loginButton:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        #loginError {
+            display: none;
+
+            padding: 12px;
+
+            margin-bottom: 18px;
+
+            border-radius: 10px;
+
+            background: #fff1f2;
+
+            border:
+                1px solid #fecdd3;
+
+            color: #be123c;
+
+            font-size: 13px;
+        }
+
+        /* =========================
+           ADMIN
+        ========================= */
+
+        #adminApp {
+            display: none;
+        }
+
+        .topbar {
+            background: white;
+
+            border-bottom:
+                1px solid #e5e7eb;
+
+            padding: 15px 25px;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            background: #0b5ed7;
+
+            color: white;
+
+            border-radius: 12px;
+
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .brand-title {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand-subtitle {
+            color: #667085;
+            font-size: 11px;
+        }
+
+        .logout-button {
+            border: none;
+
+            background: #eef2f7;
+
+            padding: 10px 15px;
+
+            border-radius: 9px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        .container {
+            width:
+                min(
+                    1200px,
+                    calc(100% - 30px)
+                );
+
+            margin: auto;
+        }
+
+        .dashboard {
+            padding: 35px 0;
+        }
+
+        .dashboard-title {
+            margin-bottom: 25px;
+        }
+
+        .dashboard-title small {
+            color: #0b5ed7;
+
+            font-weight: 800;
+
+            letter-spacing: 1px;
+        }
+
+        .dashboard-title h1 {
+            margin: 5px 0;
+
+            font-size: 36px;
+        }
+
+        .dashboard-title p {
+            color: #667085;
+        }
+
+        /* =========================
+           STATS
+        ========================= */
+
+        .stats {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            background: white;
+
+            padding: 20px;
+
+            border:
+                1px solid #e5e7eb;
+
+            border-radius: 15px;
+        }
+
+        .stat-icon {
+            font-size: 25px;
+
+            margin-bottom: 10px;
+        }
+
+        .stat-number {
+            display: block;
+
+            font-size: 30px;
+
+            font-weight: 800;
+        }
+
+        .stat-label {
+            color: #667085;
+
+            font-size: 13px;
+        }
+
+        /* =========================
+           FILTERS
+        ========================= */
+
+        .toolbar {
+            background: white;
+
+            padding: 15px;
+
+            border:
+                1px solid #e5e7eb;
+
+            border-radius: 15px;
+
+            display: flex;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+
+            margin-bottom: 20px;
+        }
+
+        .toolbar input,
+        .toolbar select {
+            padding: 11px;
+
+            border:
+                1px solid #d0d5dd;
+
+            border-radius: 9px;
+
+            outline: none;
+        }
+
+        .toolbar input {
+            flex: 1;
+
+            min-width: 220px;
+        }
+
+        .refresh-button {
+            border: none;
+
+            background: #0b5ed7;
+
+            color: white;
+
+            padding: 11px 18px;
+
+            border-radius: 9px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        /* =========================
+           REPORTS
+        ========================= */
+
+        #reports {
+            display: grid;
+
+            gap: 18px;
+        }
+
+        .report {
+            background: white;
+
+            border:
+                1px solid #e5e7eb;
+
+            border-radius: 17px;
+
+            overflow: hidden;
+
+            display: grid;
+
+            grid-template-columns:
+                200px 1fr;
+        }
+
+        .report-image {
+            min-height: 200px;
+
+            background: #edf4ff;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 50px;
+        }
+
+        .report-image img {
+            width: 100%;
+            height: 100%;
+
+            min-height: 200px;
+
+            object-fit: cover;
+        }
+
+        .report-content {
+            padding: 22px;
+        }
+
+        .report-top {
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            gap: 15px;
+
+            margin-bottom: 8px;
+        }
+
+        .report-top h2 {
+            font-size: 20px;
+        }
+
+        .report-id {
+            color: #667085;
+
+            font-size: 12px;
+
+            margin-bottom: 12px;
+        }
+
+        .description {
+            color: #475467;
+
+            line-height: 1.5;
+
+            margin-bottom: 15px;
+        }
+
+        .details {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+            margin-bottom: 17px;
+        }
+
+        .detail {
+            padding: 7px 10px;
+
+            background: #f8fafc;
+
+            border:
+                1px solid #e5e7eb;
+
+            border-radius: 8px;
+
+            font-size: 12px;
+        }
+
+        .actions {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 9px;
+        }
+
+        .actions select {
+            padding: 9px;
+
+            border:
+                1px solid #d0d5dd;
+
+            border-radius: 8px;
+        }
+
+        .save-button {
+            border: none;
+
+            background: #16a34a;
+
+            color: white;
+
+            padding: 9px 14px;
+
+            border-radius: 8px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        .map-button {
+            display: inline-block;
+
+            text-decoration: none;
+
+            background: #111827;
+
+            color: white;
+
+            padding: 9px 14px;
+
+            border-radius: 8px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status {
+            display: inline-block;
+
+            padding: 6px 10px;
+
+            border-radius: 999px;
+
+            font-size: 11px;
+
+            font-weight: 800;
+        }
+
+        .reported {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .verified {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .progress {
+            background: #ede9fe;
+            color: #6d28d9;
+        }
+
+        .resolved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* =========================
+           EMPTY / ERROR
+        ========================= */
+
+        .empty {
+            background: white;
+
+            padding: 60px 20px;
+
+            text-align: center;
+
+            border:
+                1px dashed #cbd5e1;
+
+            border-radius: 15px;
+
+            color: #667085;
+        }
+
+        .empty-icon {
+            font-size: 45px;
+
+            margin-bottom: 10px;
+        }
+
+        .error {
+            background: #fff1f2;
+
+            border:
+                1px solid #fecdd3;
+
+            color: #be123c;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            margin-bottom: 20px;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media(max-width: 850px) {
+
+            .stats {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .report {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media(max-width: 550px) {
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                padding: 13px 15px;
+            }
+
+            .dashboard-title h1 {
+                font-size: 28px;
+            }
+
+            .brand-subtitle {
+                display: none;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     LOGIN PAGE
+===================================================== -->
+
+<section id="loginPage">
+
+    <div class="login-card">
+
+        <div class="logo">
+            C
+        </div>
+
+        <h1>
+            C.A.R.E. Admin
+        </h1>
+
+        <p>
+            Sign in to manage civic reports.
+        </p>
+
+
+        <div id="loginError"></div>
+
+
+        <form id="loginForm">
+
+            <div class="form-group">
+
+                <label for="email">
+                    Admin Email
+                </label>
+
+                <input
+                    id="email"
+                    type="email"
+                    placeholder="Enter admin email"
+                    autocomplete="username"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    id="password"
+                    type="password"
+                    placeholder="Enter password"
+                    autocomplete="current-password"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                id="loginButton"
+                type="submit"
+            >
+                <i class="fa-solid fa-lock"></i> Sign In
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     ADMIN APPLICATION
+===================================================== -->
+
+<section id="adminApp">
+
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-logo">
+                C
+            </div>
+
+            <div>
+
+                <div class="brand-title">
+                    C.A.R.E.
+                </div>
+
+                <div class="brand-subtitle">
+                    Civic Action and Reporting Engine
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="logout-button"
+            id="logoutButton"
+        >
+            Logout
+        </button>
+
+    </header>
+
+
+    <main class="dashboard">
+
+        <div class="container">
+
+
+            <div class="dashboard-title">
+
+                <small>
+                    CIVIC MANAGEMENT
+                </small>
+
+                <h1>
+                    Issue Dashboard
+                </h1>
+
+                <p>
+                    Monitor and manage citizen-reported civic issues.
+                </p>
+
+            </div>
+
+
+            <!-- STATS -->
+
+            <div class="stats">
+
+                <div class="stat">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-chart-column"></i>
+                    </div>
+
+                    <span
+                        id="total"
+                        class="stat-number"
+                    >
+                        0
+                    </span>
+
+                    <span class="stat-label">
+                        Total Reports
+                    </span>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-circle-dot"></i>
+                    </div>
+
+                    <span
+                        id="potholes"
+                        class="stat-number"
+                    >
+                        0
+                    </span>
+
+                    <span class="stat-label">
+                        Potholes
+                    </span>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </div>
+
+                    <span
+                        id="garbage"
+                        class="stat-number"
+                    >
+                        0
+                    </span>
+
+                    <span class="stat-label">
+                        Garbage
+                    </span>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <span
+                        id="resolved"
+                        class="stat-number"
+                    >
+                        0
+                    </span>
+
+                    <span class="stat-label">
+                        Resolved
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILTERS -->
+
+            <div class="toolbar">
+
+                <input
+                    id="search"
+                    type="search"
+                    placeholder="Search reports..."
+                >
+
+
+                <select id="categoryFilter">
+
+                    <option value="">
+                        All Categories
+                    </option>
+
+                    <option value="Pothole">
+                        Potholes
+                    </option>
+
+                    <option value="Garbage">
+                        Garbage
+                    </option>
+
+                    <option value="Street Light">
+                        Street Lights
+                    </option>
+
+                    <option value="Drainage">
+                        Drainage
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+
+                <select id="statusFilter">
+
+                    <option value="">
+                        All Status
+                    </option>
+
+                    <option value="Reported">
+                        Reported
+                    </option>
+
+                    <option value="Verified">
+                        Verified
+                    </option>
+
+                    <option value="In Progress">
+                        In Progress
+                    </option>
+
+                    <option value="Resolved">
+                        Resolved
+                    </option>
+
+                </select>
+
+
+                <button
+                    class="refresh-button"
+                    id="refreshButton"
+                >
+                    <i class="fa-solid fa-arrows-rotate"></i> Refresh
+                </button>
+
+            </div>
+
+
+            <div id="errorBox"></div>
+
+
+            <div id="reports">
+
+                <div class="empty">
+
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+
+                    Loading reports...
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</section>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+    "https://wcocovvkzxgxqbscyuuj.supabase.co";
+
+
+/*
+   IMPORTANT:
+
+   Put ONLY your Supabase PUBLISHABLE/ANON key here.
+
+   NEVER put:
+   - admin password
+   - service_role key
+   - secret key
+
+   The admin password is handled by
+   Supabase Authentication.
+*/
+
+const SUPABASE_KEY =
+    "sb_publishable_DaY-2qm2HWCUuLfhaXwFFg_Eg05_MX3";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+let allReports = [];
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const loginPage =
+    document.getElementById("loginPage");
+
+const adminApp =
+    document.getElementById("adminApp");
+
+const loginForm =
+    document.getElementById("loginForm");
+
+const loginButton =
+    document.getElementById("loginButton");
+
+const loginError =
+    document.getElementById("loginError");
+
+const logoutButton =
+    document.getElementById("logoutButton");
+
+const reportsContainer =
+    document.getElementById("reports");
+
+const errorBox =
+    document.getElementById("errorBox");
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+loginForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim();
+
+
+        const password =
+            document
+                .getElementById("password")
+                .value;
+
+
+        loginError.style.display =
+            "none";
+
+        loginError.textContent =
+            "";
+
+
+        loginButton.disabled =
+            true;
+
+        loginButton.textContent =
+            "Signing in...";
+
+
+        try {
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .auth
+                    .signInWithPassword({
+
+                        email: email,
+
+                        password: password
+
+                    });
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            if (
+                !data ||
+                !data.session
+            ) {
+
+                throw new Error(
+                    "Login failed."
+                );
+
+            }
+
+
+            showAdmin();
+
+
+        } catch (error) {
+
+            console.error(
+                "Login error:",
+                error
+            );
+
+
+            loginError.textContent =
+                error.message ||
+                "Invalid email or password.";
+
+
+            loginError.style.display =
+                "block";
+
+
+        } finally {
+
+            loginButton.disabled =
+                false;
+
+            loginButton.innerHTML =
+                '<i class="fa-solid fa-lock"></i> Sign In';
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   SHOW ADMIN
+===================================================== */
+
+function showAdmin() {
+
+    loginPage.style.display =
+        "none";
+
+    adminApp.style.display =
+        "block";
+
+    loadReports();
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+logoutButton.addEventListener(
+    "click",
+    async function() {
+
+        await supabaseClient
+            .auth
+            .signOut();
+
+    }
+);
+
+
+/* =====================================================
+   SESSION CHECK
+===================================================== */
+
+async function checkSession() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .auth
+            .getSession();
+
+
+    if (error) {
+
+        console.error(
+            "Session error:",
+            error
+        );
+
+        return;
+
+    }
+
+
+    if (
+        data &&
+        data.session
+    ) {
+
+        showAdmin();
+
+    }
+
+}
+
+
+/* =====================================================
+   AUTH STATE
+===================================================== */
+
+supabaseClient
+    .auth
+    .onAuthStateChange(
+        function(event, session) {
+
+            if (
+                event === "SIGNED_IN" &&
+                session
+            ) {
+
+                showAdmin();
+
+            }
+
+
+            if (
+                event === "SIGNED_OUT"
+            ) {
+
+                adminApp.style.display =
+                    "none";
+
+                loginPage.style.display =
+                    "flex";
+
+            }
+
+        }
+    );
+
+
+/* =====================================================
+   LOAD REPORTS
+===================================================== */
+
+async function loadReports() {
+
+    reportsContainer.innerHTML = `
+        <div class="empty">
+            <div class="empty-icon">
+                <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            Loading reports...
+        </div>
+    `;
+
+
+    errorBox.innerHTML =
+        "";
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("issues")
+                .select("*")
+                .order(
+                    "created_at",
+                    {
+                        ascending: false
+                    }
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        allReports =
+            data || [];
+
+
+        updateStats(
+            allReports
+        );
+
+
+        renderReports(
+            allReports
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Reports error:",
+            error
+        );
+
+
+        errorBox.innerHTML = `
+            <div class="error">
+                <i class="fa-solid fa-triangle-exclamation"></i> ${escapeHTML(
+                    error.message
+                )}
+            </div>
+        `;
+
+
+        reportsContainer.innerHTML =
+            "";
+
+    }
+
+}
+
+
+/* =====================================================
+   UPDATE STATS
+===================================================== */
+
+function updateStats(
+    reports
+) {
+
+    document
+        .getElementById("total")
+        .textContent =
+        reports.length;
+
+
+    document
+        .getElementById("potholes")
+        .textContent =
+        reports.filter(
+            report =>
+                String(
+                    report.category || ""
+                ).toLowerCase()
+                === "pothole"
+        ).length;
+
+
+    document
+        .getElementById("garbage")
+        .textContent =
+        reports.filter(
+            report =>
+                String(
+                    report.category || ""
+                ).toLowerCase()
+                === "garbage"
+        ).length;
+
+
+    document
+        .getElementById("resolved")
+        .textContent =
+        reports.filter(
+            report =>
+                String(
+                    report.status || ""
+                ).toLowerCase()
+                === "resolved"
+        ).length;
+
+}
+
+
+/* =====================================================
+   RENDER REPORTS
+===================================================== */
+
+function renderReports(
+    reports
+) {
+
+    if (!reports.length) {
+
+        reportsContainer.innerHTML = `
+            <div class="empty">
+
+                <div class="empty-icon">
+                    <i class="fa-solid fa-inbox"></i>
+                </div>
+
+                <strong>
+                    No reports found
+                </strong>
+
+                <p>
+                    There are no civic reports matching your filters.
+                </p>
+
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    reportsContainer.innerHTML =
+        reports
+            .map(
+                report =>
+                    createReportHTML(
+                    report
+                )
+            )
+            .join("");
+
+}
+
+
+/* =====================================================
+   REPORT HTML
+===================================================== */
+
+function createReportHTML(
+    report
+) {
+
+    const title =
+        report.title ||
+        report.category ||
+        "Civic Issue";
+
+
+    const description =
+        report.description ||
+        "No description provided.";
+
+
+    const category =
+        report.category ||
+        "Other";
+
+
+    const status =
+        report.status ||
+        "Reported";
+
+
+    const location =
+        report.location ||
+        report.address ||
+        "Location unavailable";
+
+
+    const id =
+        report.id ||
+        "N/A";
+
+
+    const image =
+        report.image_url ||
+        report.photo_url ||
+        report.image;
+
+
+    const safeTitle =
+        escapeHTML(title);
+
+
+    const safeDescription =
+        escapeHTML(description);
+
+
+    const safeCategory =
+        escapeHTML(category);
+
+
+    const safeStatus =
+        escapeHTML(status);
+
+
+    const safeLocation =
+        escapeHTML(location);
+
+
+    const safeId =
+        escapeHTML(id);
+
+
+    const imageHTML =
+        image
+            ? `
+                <img
+                    src="${escapeHTML(image)}"
+                    alt="Reported civic issue"
+                    loading="lazy"
+                >
+              `
+            : '<i class="fa-solid fa-location-dot" style="font-size:28px;color:#94a3b8;"></i>';
+
+
+    const statusClass =
+        status
+            .toLowerCase()
+            .replace(
+                /\s+/g,
+                "-"
+            );
+
+
+    const mapURL =
+        report.latitude &&
+        report.longitude
+
+            ? `https://www.google.com/maps?q=${encodeURIComponent(
+                report.latitude
+            )},${encodeURIComponent(
+                report.longitude
+            )}`
+
+            : null;
+
+
+    return `
+
+        <article
+            class="report"
+            data-id="${safeId}"
+        >
+
+            <div class="report-image">
+                ${imageHTML}
+            </div>
+
+
+            <div class="report-content">
+
+                <div class="report-top">
+
+                    <h2>
+                        ${safeTitle}
+                    </h2>
+
+                    <span
+                        class="status ${statusClass}"
+                    >
+                        ${safeStatus}
+                    </span>
+
+                </div>
+
+
+                <div class="report-id">
+                    Report ID: ${safeId}
+                </div>
+
+
+                <div class="description">
+                    ${safeDescription}
+                </div>
+
+
+                <div class="details">
+
+                    <span class="detail">
+                        <i class="fa-solid fa-folder-open"></i> ${safeCategory}
+                    </span>
+
+                    <span class="detail">
+                        <i class="fa-solid fa-location-dot"></i> ${safeLocation}
+                    </span>
+
+                </div>
+
+
+                <div class="actions">
+
+                    <select
+                        onchange="changeStatus(
+                            '${escapeAttribute(id)}',
+                            this.value
+                        )"
+                    >
+
+                        <option
+                            value="Reported"
+                            ${status === "Reported"
+                                ? "selected"
+                                : ""}
+                        >
+                            Reported
+                        </option>
+
+                        <option
+                            value="Verified"
+                            ${status === "Verified"
+                                ? "selected"
+                                : ""}
+                        >
+                            Verified
+                        </option>
+
+                        <option
+                            value="In Progress"
+                            ${status === "In Progress"
+                                ? "selected"
+                                : ""}
+                        >
+                            In Progress
+                        </option>
+
+                        <option
+                            value="Resolved"
+                            ${status === "Resolved"
+                                ? "selected"
+                                : ""}
+                        >
+                            Resolved
+                        </option>
+
+                    </select>
+
+
+                    <button
+                        class="save-button"
+                        onclick="saveStatus(
+                            '${escapeAttribute(id)}'
+                        )"
+                    >
+                        <i class="fa-solid fa-floppy-disk"></i> Save
+                    </button>
+
+
+                    ${
+                        mapURL
+                            ? `
+                                <a
+                                    class="map-button"
+                                    href="${mapURL}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <i class="fa-solid fa-map-location-dot"></i> View Map
+                                </a>
+                              `
+                            : ""
+                    }
+
+                </div>
+
+            </div>
+
+        </article>
+
+    `;
+
+}
+
+
+/* =====================================================
+   TEMPORARY STATUS STORAGE
+===================================================== */
+
+const pendingStatuses = {};
+
+
+function changeStatus(
+    id,
+    status
+) {
+
+    pendingStatuses[id] =
+        status;
+
+}
+
+
+/* =====================================================
+   SAVE STATUS
+===================================================== */
+
+async function saveStatus(
+    id
+) {
+
+    const status =
+        pendingStatuses[id];
+
+
+    if (!status) {
+
+        alert(
+            "Please select a status first."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("issues")
+                .update({
+                    status: status
+                })
+                .eq(
+                    "id",
+                    id
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        delete pendingStatuses[id];
+
+
+        await loadReports();
+
+
+        alert(
+            "Report status updated successfully."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Status update error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to update status."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+document
+    .getElementById("search")
+    .addEventListener(
+        "input",
+        applyFilters
+    );
+
+
+document
+    .getElementById("categoryFilter")
+    .addEventListener(
+        "change",
+        applyFilters
+    );
+
+
+document
+    .getElementById("statusFilter")
+    .addEventListener(
+        "change",
+        applyFilters
+    );
+
+
+document
+    .getElementById("refreshButton")
+    .addEventListener(
+        "click",
+        loadReports
+    );
+
+
+function applyFilters() {
+
+    const search =
+        document
+            .getElementById("search")
+            .value
+            .toLowerCase()
+            .trim();
+
+
+    const category =
+        document
+            .getElementById("categoryFilter")
+            .value;
+
+
+    const status =
+        document
+            .getElementById("statusFilter")
+            .value;
+
+
+    const filtered =
+        allReports.filter(
+            report => {
+
+                const text = `
+                    ${report.title || ""}
+                    ${report.description || ""}
+                    ${report.category || ""}
+                    ${report.location || ""}
+                    ${report.id || ""}
+                `.toLowerCase();
+
+
+                return (
+
+                    (
+                        !search ||
+                        text.includes(search)
+                    )
+
+                    &&
+
+                    (
+                        !category ||
+                        report.category === category
+                    )
+
+                    &&
+
+                    (
+                        !status ||
+                        report.status === status
+                    )
+
+                );
+
+            }
+        );
+
+
+    renderReports(
+        filtered
+    );
+
+}
+
+
+/* =====================================================
+   SECURITY HELPERS
+===================================================== */
+
+function escapeHTML(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+function escapeAttribute(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /\\/g,
+            "\\\\"
+        )
+        .replace(
+            /'/g,
+            "\\'"
+        );
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+checkSession();
+
+</script>
+
+
+</body>
+
+</html>
