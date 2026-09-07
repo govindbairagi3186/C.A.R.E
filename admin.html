@@ -17,6 +17,12 @@
         content="#0b5ed7"
     >
 
+    <!-- FontAwesome 6 Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -1423,7 +1429,7 @@ function renderReports(
             <div class="empty">
 
                 <div class="empty-icon">
-                    📭
+                    <i class="fa-solid fa-inbox text-muted" style="font-size:36px;"></i>
                 </div>
 
                 <strong>
@@ -1491,6 +1497,7 @@ function createReportHTML(
 
 
     const id =
+        report.issue_code ||
         report.id ||
         "N/A";
 
@@ -1532,9 +1539,11 @@ function createReportHTML(
                     src="${escapeHTML(image)}"
                     alt="Reported civic issue"
                     loading="lazy"
+                    style="cursor:pointer;"
+                    onclick="window.open('${escapeHTML(image)}', '_blank')"
                 >
               `
-            : "📍";
+            : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:32px;color:#94a3b8;"><i class="fa-solid fa-image"></i></div>`;
 
 
     const statusClass =
@@ -1589,7 +1598,7 @@ function createReportHTML(
 
 
                 <div class="report-id">
-                    Report ID: ${safeId}
+                    <i class="fa-solid fa-ticket"></i> Report ID: ${safeId}
                 </div>
 
 
@@ -1601,11 +1610,11 @@ function createReportHTML(
                 <div class="details">
 
                     <span class="detail">
-                        📂 ${safeCategory}
+                        <i class="fa-solid fa-folder"></i> ${safeCategory}
                     </span>
 
                     <span class="detail">
-                        📍 ${safeLocation}
+                        <i class="fa-solid fa-location-dot"></i> ${safeLocation}
                     </span>
 
                 </div>
@@ -1615,7 +1624,7 @@ function createReportHTML(
 
                     <select
                         onchange="changeStatus(
-                            '${escapeAttribute(id)}',
+                            '${escapeAttribute(report.id || id)}',
                             this.value
                         )"
                     >
@@ -1662,10 +1671,10 @@ function createReportHTML(
                     <button
                         class="save-button"
                         onclick="saveStatus(
-                            '${escapeAttribute(id)}'
+                            '${escapeAttribute(report.id || id)}'
                         )"
                     >
-                        💾 Save
+                        <i class="fa-solid fa-floppy-disk"></i> Save
                     </button>
 
 
@@ -1678,7 +1687,7 @@ function createReportHTML(
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    🗺️ View Map
+                                    <i class="fa-solid fa-map-location-dot"></i> View Map
                                 </a>
                               `
                             : ""

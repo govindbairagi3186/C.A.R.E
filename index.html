@@ -46,6 +46,12 @@
         rel="stylesheet"
     >
 
+    <!-- FontAwesome 6 Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
     <!-- Supabase -->
     <script
         src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
@@ -184,7 +190,7 @@
             <div class="hero-text">
 
                 <div class="badge">
-                    🌍 Made by GOVIND VAISHNAV AND TEAM 
+                    <i class="fa-solid fa-earth-americas"></i> Made by GOVIND VAISHNAV AND TEAM 
                 </div>
 
                 <h1>
@@ -208,7 +214,7 @@
                         class="primary-button"
                         onclick="showPage('report')"
                     >
-                        📢 Report an Issue
+                        <i class="fa-solid fa-bullhorn"></i> Report an Issue
                     </button>
 
                     <button
@@ -216,7 +222,7 @@
                         class="secondary-button"
                         onclick="showPage('reports')"
                     >
-                        🗺️ View Reports
+                        <i class="fa-solid fa-map-location-dot"></i> View Reports
                     </button>
 
                 </div>
@@ -244,19 +250,19 @@
                     <div class="map-grid">
 
                         <div class="map-pin pin-one">
-                            🕳️
+                            <i class="fa-solid fa-road-barrier"></i>
                         </div>
 
                         <div class="map-pin pin-two">
-                            🗑️
+                            <i class="fa-solid fa-trash-can"></i>
                         </div>
 
                         <div class="map-pin pin-three">
-                            💡
+                            <i class="fa-solid fa-lightbulb"></i>
                         </div>
 
                         <div class="map-pin pin-four">
-                            🚧
+                            <i class="fa-solid fa-triangle-exclamation"></i>
                         </div>
 
                     </div>
@@ -278,7 +284,7 @@
 
                     <div>
                         <strong>
-                            📍
+                            <i class="fa-solid fa-location-dot"></i>
                         </strong>
 
                         <span>
@@ -288,7 +294,7 @@
 
                     <div>
                         <strong>
-                            ⚡
+                            <i class="fa-solid fa-bolt"></i>
                         </strong>
 
                         <span>
@@ -341,7 +347,7 @@
                     onclick="startReport('Pothole')"
                 >
                     <div class="category-icon">
-                        🕳️
+                        <i class="fa-solid fa-road-barrier"></i>
                     </div>
 
                     <h3>
@@ -360,7 +366,7 @@
                     onclick="startReport('Garbage')"
                 >
                     <div class="category-icon">
-                        🗑️
+                        <i class="fa-solid fa-trash-can"></i>
                     </div>
 
                     <h3>
@@ -379,7 +385,7 @@
                     onclick="startReport('Streetlight')"
                 >
                     <div class="category-icon">
-                        💡
+                        <i class="fa-solid fa-lightbulb"></i>
                     </div>
 
                     <h3>
@@ -398,7 +404,7 @@
                     onclick="startReport('Drainage')"
                 >
                     <div class="category-icon">
-                        🌊
+                        <i class="fa-solid fa-water"></i>
                     </div>
 
                     <h3>
@@ -417,7 +423,7 @@
                     onclick="startReport('Road Damage')"
                 >
                     <div class="category-icon">
-                        🚧
+                        <i class="fa-solid fa-triangle-exclamation"></i>
                     </div>
 
                     <h3>
@@ -436,7 +442,7 @@
                     onclick="startReport('Other')"
                 >
                     <div class="category-icon">
-                        📍
+                        <i class="fa-solid fa-location-dot"></i>
                     </div>
 
                     <h3>
@@ -483,7 +489,7 @@
                     </div>
 
                     <div class="step-icon">
-                        📸
+                        <i class="fa-solid fa-camera"></i>
                     </div>
 
                     <h3>
@@ -505,7 +511,7 @@
                     </div>
 
                     <div class="step-icon">
-                        📍
+                        <i class="fa-solid fa-location-dot"></i>
                     </div>
 
                     <h3>
@@ -527,7 +533,7 @@
                     </div>
 
                     <div class="step-icon">
-                        ✅
+                        <i class="fa-solid fa-circle-check"></i>
                     </div>
 
                     <h3>
@@ -602,27 +608,27 @@
                     </option>
 
                     <option value="Pothole">
-                        🕳️ Pothole
+                        Pothole / Road Hole
                     </option>
 
                     <option value="Garbage">
-                        🗑️ Garbage
+                        Garbage / Overflowing Waste
                     </option>
 
                     <option value="Streetlight">
-                        💡 Streetlight
+                        Streetlight Fault / Dark Street
                     </option>
 
                     <option value="Drainage">
-                        🌊 Drainage
+                        Drainage Blockage / Overflow
                     </option>
 
                     <option value="Road Damage">
-                        🚧 Road Damage
+                        Road Damage / Broken Pavement
                     </option>
 
                     <option value="Other">
-                        📍 Other
+                        Other Civic Issue
                     </option>
 
                 </select>
@@ -653,23 +659,27 @@
             </div>
 
 
-            <!-- IMAGE -->
+            <!-- IMAGE & PREVIEW -->
 
             <div class="form-group">
 
                 <label for="image">
-                    Add Photo
+                    <i class="fa-solid fa-camera"></i> Add Photo
                 </label>
 
                 <input
                     id="image"
                     type="file"
                     accept="image/*"
+                    onchange="previewUploadedImage(this)"
                 >
 
-                <small>
-                    A photo helps officials understand
-                    the problem.
+                <div id="imagePreviewContainer" style="display:none; margin-top:12px;">
+                    <img id="imagePreview" src="" alt="Selected Photo Preview" style="max-width:100%; max-height:220px; border-radius:12px; border:2px solid #bfdbfe; box-shadow:0 4px 12px rgba(0,0,0,0.08); object-fit:cover;">
+                </div>
+
+                <small style="display:block; margin-top:6px;">
+                    A photo helps officials locate and fix the issue quickly.
                 </small>
 
             </div>
@@ -682,7 +692,7 @@
                 <div>
 
                     <strong>
-                        📍 Issue Location
+                        <i class="fa-solid fa-location-dot"></i> Issue Location
                     </strong>
 
                     <p id="locationText">
@@ -697,7 +707,7 @@
                     class="location-button"
                     onclick="getLocation()"
                 >
-                    Detect Location
+                    <i class="fa-solid fa-crosshairs"></i> Detect Location
                 </button>
 
             </div>
@@ -720,7 +730,7 @@
                 type="submit"
                 class="submit-button"
             >
-                🚀 Submit Report
+                <i class="fa-solid fa-paper-plane"></i> Submit Report
             </button>
 
         </form>
@@ -826,7 +836,7 @@
             <div class="empty-state">
 
                 <div>
-                    📍
+                    <i class="fa-solid fa-spinner fa-spin text-primary"></i>
                 </div>
 
                 <h3>
@@ -880,7 +890,7 @@
             <div class="about-card">
 
                 <div class="about-icon">
-                    📢
+                    <i class="fa-solid fa-bullhorn"></i>
                 </div>
 
                 <h2>
@@ -899,7 +909,7 @@
             <div class="about-card">
 
                 <div class="about-icon">
-                    📍
+                    <i class="fa-solid fa-location-dot"></i>
                 </div>
 
                 <h2>
@@ -918,7 +928,7 @@
             <div class="about-card">
 
                 <div class="about-icon">
-                    📊
+                    <i class="fa-solid fa-chart-line"></i>
                 </div>
 
                 <h2>
@@ -981,6 +991,59 @@
 
 
 <!-- =====================================================
+     SUBMIT SUCCESS MODAL WITH GOV DISPATCH & AUDIO
+===================================================== -->
+
+<div id="submitSuccessModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+        <div class="modal-header-icon green">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        
+        <h2>Report Filed Successfully!</h2>
+        <p class="modal-subtitle">Your civic issue has been logged and auto-dispatched to the assigned government department.</p>
+
+        <div class="dispatch-info-box">
+            <div class="dispatch-item">
+                <span class="dispatch-label"><i class="fa-solid fa-ticket"></i> Tracking ID:</span>
+                <strong id="modalReportId" class="badge-code">CARE-000000</strong>
+            </div>
+
+            <div class="dispatch-item">
+                <span class="dispatch-label"><i class="fa-solid fa-building-columns"></i> Government Dept:</span>
+                <strong id="modalDeptName">Municipal Authority</strong>
+            </div>
+
+            <div class="dispatch-item">
+                <span class="dispatch-label"><i class="fa-solid fa-envelope"></i> Assigned Email:</span>
+                <strong id="modalDeptEmail">authority@gov.in</strong>
+            </div>
+
+            <div class="dispatch-item">
+                <span class="dispatch-label"><i class="fa-solid fa-phone"></i> Helpline / SMS:</span>
+                <strong id="modalDeptPhone">+91-1800-CIVIC</strong>
+            </div>
+
+            <div class="dispatch-badges">
+                <span class="badge-status green"><i class="fa-solid fa-paper-plane"></i> Auto-Email Dispatched</span>
+                <span class="badge-status blue"><i class="fa-solid fa-comment-sms"></i> SMS Alert Triggered</span>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <a id="modalMailtoLink" href="#" target="_blank" class="primary-button mailto-btn">
+                <i class="fa-solid fa-envelope-open-text"></i> Open Direct Mail Client
+            </a>
+
+            <button type="button" class="secondary-button" onclick="closeSuccessModal()">
+                <i class="fa-solid fa-xmark"></i> Close &amp; View Reports
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- =====================================================
      FOOTER
 ===================================================== -->
 
@@ -1006,7 +1069,7 @@
         <div class="admin-access">
 
             <a href="admin.html">
-                🛡️ Sign in to manage civic reports
+                <i class="fa-solid fa-shield-halved"></i> Sign in to manage civic reports
             </a>
 
         </div>
@@ -1015,11 +1078,11 @@
         <div class="footer-credit">
 
             <p>
-                MADE WITH ❤️ BY
+                MADE WITH <i class="fa-solid fa-heart" style="color: #ef4444;"></i> BY
                 <strong>
-                    GOVIND VAISHNAV 🧿
+                    GOVIND VAISHNAV
                 </strong>
-                &amp; TEAM 💗
+                &amp; TEAM
             </p>
 
             <p>

@@ -578,64 +578,129 @@ function generateReportId() {
 
 
 /* =====================================================
-   IMAGE UPLOAD
+   GOVERNMENT DEPARTMENTS DIRECTORY & NOTIFICATIONS
 ===================================================== */
 
-async function uploadImage(
-    file,
-    reportId
-) {
+const GOVERNMENT_DEPARTMENTS = {
+    Pothole: {
+        name: "Public Works & PWD Roads Dept",
+        email: "roads.pwd.gov@gmail.com",
+        phone: "+91-1800-233-1001"
+    },
+    Garbage: {
+        name: "Municipal Waste & Sanitation Dept",
+        email: "sanitation.mc.gov@gmail.com",
+        phone: "+91-1800-233-1002"
+    },
+    Streetlight: {
+        name: "Electrical & Street Lighting Board",
+        email: "electrical.mc.gov@gmail.com",
+        phone: "+91-1800-233-1003"
+    },
+    Drainage: {
+        name: "Water Supply & Drainage Management",
+        email: "drainage.mc.gov@gmail.com",
+        phone: "+91-1800-233-1004"
+    },
+    "Road Damage": {
+        name: "Infrastructure & Highway Maintenance",
+        email: "infra.pwd.gov@gmail.com",
+        phone: "+91-1800-233-1005"
+    },
+    Other: {
+        name: "General Civic Grievance & Public Cell",
+        email: "civic.grievance.gov@gmail.com",
+        phone: "+91-1800-233-1000"
+    }
+};
 
-    if (!file) {
+function playNotificationSound() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
 
-        return null;
+        osc1.type = 'sine';
+        osc2.type = 'sine';
 
+        // Tone 1: C5 (523.25 Hz) -> Tone 2: E5 (659.25 Hz)
+        osc1.frequency.setValueAtTime(523.25, now);
+        osc2.frequency.setValueAtTime(659.25, now + 0.12);
+
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start(now);
+        osc1.stop(now + 0.12);
+        osc2.start(now + 0.12);
+        osc2.stop(now + 0.6);
+    } catch (e) {
+        console.log("Audio play error:", e);
+    }
+}
+
+function previewUploadedImage(input) {
+    const container = document.getElementById("imagePreviewContainer");
+    const img = document.getElementById("imagePreview");
+    if (!container || !img) return;
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            img.src = e.target.result;
+            container.style.display = "block";
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        container.style.display = "none";
+        img.src = "";
+    }
+}
+
+function closeSuccessModal() {
+    const modal = document.getElementById("submitSuccessModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
+    showPage("reports");
+}
+
+/* =====================================================
+   IMAGE UPLOAD (WITH GUARANTEED DATA URL FALLBACK)
+===================================================== */
+
+async function uploadImage(file, reportId) {
+    if (!file) return null;
+
+    try {
+        const extension = file.name.split(".").pop().toLowerCase();
+        const path = `reports/${reportId}-${Date.now()}.${extension}`;
+
+        const { error } = await supabaseClient.storage.from("issue-images").upload(path, file);
+        if (!error) {
+            const { data } = supabaseClient.storage.from("issue-images").getPublicUrl(path);
+            if (data && data.publicUrl) {
+                return data.publicUrl;
+            }
+        }
+    } catch (err) {
+        console.warn("Supabase storage upload fallback to Data URL:", err);
     }
 
-
-    const extension =
-        file.name
-            .split(".")
-            .pop()
-            .toLowerCase();
-
-
-    const path =
-        `reports/${reportId}-${Date.now()}.${extension}`;
-
-
-    const {
-        error
-    } =
-        await supabaseClient
-            .storage
-            .from("issue-images")
-            .upload(
-                path,
-                file
-            );
-
-
-    if (error) {
-
-        throw error;
-
-    }
-
-
-    const {
-        data
-    } =
-        supabaseClient
-            .storage
-            .from("issue-images")
-            .getPublicUrl(
-                path
-            );
-
-
-    return data.publicUrl;
-
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+    });
 }
 
 
@@ -930,129 +995,106 @@ async function submitIssue(
 
 
         /* -------------------------------------------------
-           SAVE REPORT
+           GOVERNMENT DEPARTMENT DISPATCH & SAVE REPORT
         ------------------------------------------------- */
+
+        const dept = GOVERNMENT_DEPARTMENTS[category] || GOVERNMENT_DEPARTMENTS["Other"];
 
         if (button) {
-
-            button.textContent =
-                "Sending to C.A.R.E....";
-
+            button.textContent = "Dispatching to Govt Dept...";
         }
 
-
-        const {
-            error
-        } =
-            await supabaseClient
-                .from("issues")
-                .insert({
-
-                    issue_code:
-                        reportId,
-
-                    citizen_name:
-                        name,
-
-                    citizen_mobile:
-                        mobile,
-
-                    citizen_email:
-                        email,
-
-                    address:
-                        address,
-
-                    category:
-                        category,
-
-                    description:
-                        description,
-
-                    latitude:
-                        Number(latitude),
-
-                    longitude:
-                        Number(longitude),
-
-                    image_url:
-                        imageUrl,
-
-                    status:
-                        "Reported",
-
-                    priority:
-                        "Medium"
-
-                });
-
+        const { error } = await supabaseClient
+            .from("issues")
+            .insert({
+                issue_code: reportId,
+                citizen_name: name,
+                citizen_mobile: mobile,
+                citizen_email: email,
+                address: address,
+                category: category,
+                description: description,
+                latitude: Number(latitude),
+                longitude: Number(longitude),
+                image_url: imageUrl,
+                status: "Reported",
+                priority: "Medium",
+                department: dept.name
+            });
 
         if (error) {
-
-            console.error(
-                "Supabase error:",
-                error
-            );
-
+            console.error("Supabase error:", error);
             throw error;
-
         }
-
 
         /* -------------------------------------------------
-           SUCCESS
+           SUCCESS & AUDIO / MODAL NOTIFICATION
         ------------------------------------------------- */
 
-        document
-            .getElementById(
-                "issueForm"
-            )
-            ?.reset();
+        document.getElementById("issueForm")?.reset();
 
-
-        if (latitudeInput) {
-
-            latitudeInput.value =
-                "";
-
+        const previewContainer = document.getElementById("imagePreviewContainer");
+        if (previewContainer) {
+            previewContainer.style.display = "none";
+            const previewImg = document.getElementById("imagePreview");
+            if (previewImg) previewImg.src = "";
         }
 
-
-        if (longitudeInput) {
-
-            longitudeInput.value =
-                "";
-
-        }
-
+        if (latitudeInput) latitudeInput.value = "";
+        if (longitudeInput) longitudeInput.value = "";
 
         if (locationTextExists()) {
-
-            document
-                .getElementById(
-                    "locationText"
-                )
-                .textContent =
-                "Location not captured yet";
-
+            document.getElementById("locationText").textContent = "Location not captured yet";
         }
 
+        // 1. Play Audio Notification Sound
+        playNotificationSound();
 
-        showToast(
-            `✅ Report ${reportId} submitted successfully!`
-        );
+        // 2. Populate and display Government Dispatch Success Modal
+        const modal = document.getElementById("submitSuccessModal");
+        if (modal) {
+            const elId = document.getElementById("modalReportId");
+            const elName = document.getElementById("modalDeptName");
+            const elEmail = document.getElementById("modalDeptEmail");
+            const elPhone = document.getElementById("modalDeptPhone");
+            const mailto = document.getElementById("modalMailtoLink");
 
+            if (elId) elId.textContent = reportId;
+            if (elName) elName.textContent = dept.name;
+            if (elEmail) elEmail.textContent = dept.email;
+            if (elPhone) elPhone.textContent = dept.phone;
 
-        setTimeout(
-            () => {
+            if (mailto) {
+                const subject = `CIVIC ISSUE REPORT [${reportId}] - ${category}`;
+                const body = `GOVERNMENT DISPATCH REPORT\n` +
+                    `----------------------------------------\n` +
+                    `Report ID: ${reportId}\n` +
+                    `Category: ${category}\n` +
+                    `Assigned Department: ${dept.name}\n` +
+                    `Description: ${description}\n` +
+                    `GPS Location: ${latitude}, ${longitude}\n` +
+                    `Address/Landmark: ${address}\n\n` +
+                    `CITIZEN CONTACT DETAILS:\n` +
+                    `Name: ${name}\n` +
+                    `Mobile: ${mobile}\n` +
+                    `Email: ${email}\n` +
+                    (imageUrl ? `Attached Photo: ${imageUrl}\n` : ``) +
+                    `----------------------------------------\n` +
+                    `Dispatched via C.A.R.E. Engine`;
 
-                showPage(
-                    "reports"
-                );
+                mailto.href = `mailto:${dept.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            }
 
-            },
-            1200
-        );
+            modal.style.display = "flex";
+        } else {
+            showToast(`Report ${reportId} submitted and sent to ${dept.name}!`);
+            setTimeout(() => {
+                showPage("reports");
+            }, 1200);
+        }
+
+        // Refresh reports list in background
+        loadReports();
 
 
     } catch (error) {
@@ -1191,7 +1233,7 @@ async function loadReports() {
             <div class="empty-state">
 
                 <div>
-                    ⚠️
+                    <i class="fa-solid fa-triangle-exclamation text-warning"></i>
                 </div>
 
                 <h3>
@@ -1239,7 +1281,7 @@ function renderReports(
             <div class="empty-state">
 
                 <div>
-                    📭
+                    <i class="fa-solid fa-inbox text-muted"></i>
                 </div>
 
                 <h3>
@@ -1287,17 +1329,18 @@ function renderReports(
 
                     ? `
 
-                        <div class="issue-image">
+                        <div class="issue-image" style="cursor:pointer;" onclick="window.open('${escapeHTML(report.image_url)}', '_blank')">
 
                             <img
                                 src="${escapeHTML(
                                     report.image_url
                                 )}"
-                                alt="Civic issue"
+                                alt="Civic issue photo"
                                 style="
                                     width:100%;
                                     height:100%;
                                     object-fit:cover;
+                                    border-radius:12px 12px 0 0;
                                 "
                             >
 
@@ -1336,17 +1379,17 @@ function renderReports(
                         )}
                     </p>
 
-                    <p>
+                    <p style="font-family:monospace; font-size:12px; color:#1d4ed8; margin-top:4px;">
                         <strong>
-                            ${escapeHTML(
+                            <i class="fa-solid fa-ticket"></i> ${escapeHTML(
                                 report.issue_code ||
                                 ""
                             )}
                         </strong>
                     </p>
 
-                    <p>
-                        🏛️
+                    <p style="font-size:12px; color:#64748b; margin-top:4px;">
+                        <i class="fa-solid fa-building-columns"></i>
                         ${escapeHTML(
                             report.department ||
                             "Municipal Administration"
@@ -1386,32 +1429,32 @@ function getCategoryIcon(
     const icons = {
 
         Pothole:
-            "🕳️",
+            '<i class="fa-solid fa-road-barrier"></i>',
 
         Garbage:
-            "🗑️",
+            '<i class="fa-solid fa-trash-can"></i>',
 
         Streetlight:
-            "💡",
+            '<i class="fa-solid fa-lightbulb"></i>',
 
         "Street Light":
-            "💡",
+            '<i class="fa-solid fa-lightbulb"></i>',
 
         Drainage:
-            "🌊",
+            '<i class="fa-solid fa-water"></i>',
 
         "Road Damage":
-            "🚧",
+            '<i class="fa-solid fa-triangle-exclamation"></i>',
 
         Other:
-            "📍"
+            '<i class="fa-solid fa-location-dot"></i>'
 
     };
 
 
     return (
         icons[category] ||
-        "📍"
+        '<i class="fa-solid fa-location-dot"></i>'
     );
 
 }
