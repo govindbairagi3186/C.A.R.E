@@ -673,12 +673,21 @@
                     accept="image/*"
                 >
 
+                <div id="imagePreviewContainer" class="image-preview-container" style="display: none;">
+                    <div class="image-preview-box">
+                        <img id="imagePreview" src="" alt="Issue Photo Preview">
+                        <button type="button" id="removeImageBtn" class="remove-image-btn" title="Remove photo">&times;</button>
+                    </div>
+                    <span id="imageFileName" class="image-file-name"></span>
+                </div>
+
                 <small>
                     A photo helps officials understand
                     the problem.
                 </small>
 
             </div>
+
 
 
             <!-- LOCATION -->
@@ -1042,6 +1051,21 @@
 
 </footer>
 
+
+<!-- =====================================================
+     IMAGE LIGHTBOX MODAL
+===================================================== -->
+
+<div id="imageModal" class="image-modal-overlay" style="display: none;">
+    <div class="image-modal-content">
+        <button type="button" class="image-modal-close" onclick="closeImageModal()">&times;</button>
+        <img id="imageModalImg" src="" alt="Full Resolution Issue Photo">
+        <div class="image-modal-info">
+            <h4 id="imageModalTitle">Civic Issue Photo</h4>
+            <p id="imageModalDescription"></p>
+        </div>
+    </div>
+</div>
 
 <!-- =====================================================
      MAIN JAVASCRIPT

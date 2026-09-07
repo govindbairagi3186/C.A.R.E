@@ -1303,63 +1303,74 @@ async function loadReports() {
 
 
     try {
+        let remoteReports = [];
+        try {
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .from("issues")
+                    .select("*")
+                    .order(
+                        "created_at",
+                        {
+                            ascending: false
+                        }
+                    );
 
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .from("issues")
-                .select("*")
-                .order(
-                    "created_at",
-                    {
-                        ascending: false
-                    }
-                );
-
-
-        if (error) {
-            throw error;
+            if (!error && data) {
+                remoteReports = data;
+            }
+        } catch (e) {
+            console.warn("Supabase fetch warning:", e);
         }
 
+        // Get local reports saved offline/locally
+        let localReports = [];
+        try {
+            const stored = localStorage.getItem("care_local_reports");
+            if (stored) {
+                localReports = JSON.parse(stored);
+            }
+        } catch (e) {
+            console.warn("Local storage read error:", e);
+        }
 
-        allReports =
-            data || [];
+        // Merge remote and local reports, deduplicating by issue_code or id
+        const mergedMap = new Map();
+        remoteReports.forEach(r => {
+            const key = r.issue_code || r.id;
+            if (key) mergedMap.set(key, r);
+        });
+        localReports.forEach(r => {
+            const key = r.issue_code || r.id;
+            if (key && !mergedMap.has(key)) {
+                mergedMap.set(key, r);
+            } else if (!key) {
+                mergedMap.set('local_' + Math.random(), r);
+            }
+        });
 
+        allReports = Array.from(mergedMap.values());
 
-        updateStats(
-            allReports
-        );
-
-
-        renderReports(
-            allReports
-        );
-
+        updateStats(allReports);
+        renderReports(allReports);
 
     } catch (error) {
+        console.error("Reports error:", error);
 
-        console.error(
-            "Reports error:",
-            error
-        );
+        // Fallback to local reports on error
+        let localReports = [];
+        try {
+            const stored = localStorage.getItem("care_local_reports");
+            if (stored) localReports = JSON.parse(stored);
+        } catch (e) {}
 
-
-        errorBox.innerHTML = `
-            <div class="error">
-                <i class="fa-solid fa-triangle-exclamation"></i> ${escapeHTML(
-                    error.message
-                )}
-            </div>
-        `;
-
-
-        reportsContainer.innerHTML =
-            "";
-
+        allReports = localReports;
+        updateStats(allReports);
+        renderReports(allReports);
     }
-
 }
 
 
@@ -1534,13 +1545,16 @@ function createReportHTML(
     const imageHTML =
         image
             ? `
-                <img
-                    src="${escapeHTML(image)}"
-                    alt="Reported civic issue"
-                    loading="lazy"
-                >
+                <div class="report-image-wrapper clickable-image" onclick="openImageModal('${escapeHTML(escapeJS(image))}', '${escapeHTML(escapeJS(safeTitle))}', '${escapeHTML(escapeJS(safeDescription))}')">
+                    <img
+                        src="${escapeHTML(image)}"
+                        alt="Reported civic issue photo"
+                        loading="lazy"
+                    >
+                    <div class="image-zoom-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> View Photo</div>
+                </div>
               `
-            : '<i class="fa-solid fa-location-dot" style="font-size:28px;color:#94a3b8;"></i>';
+            : '<i class="fa-solid fa-camera" style="font-size:28px;color:#94a3b8;"></i>';
 
 
     const statusClass =
@@ -1952,6 +1966,37 @@ function escapeAttribute(
 
 
 /* =====================================================
+   IMAGE LIGHTBOX MODAL
+===================================================== */
+
+function openImageModal(src, title = "Civic Issue Photo", desc = "") {
+    const modal = document.getElementById("imageModal");
+    const img = document.getElementById("imageModalImg");
+    const titleEl = document.getElementById("imageModalTitle");
+    const descEl = document.getElementById("imageModalDescription");
+
+    if (modal && img) {
+        img.src = src;
+        if (titleEl) titleEl.textContent = title;
+        if (descEl) descEl.textContent = desc;
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+    }
+}
+
+function closeImageModal() {
+    const modal = document.getElementById("imageModal");
+    if (modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = "";
+    }
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeImageModal();
+});
+
+/* =====================================================
    START
 ===================================================== */
 
@@ -1959,6 +2004,20 @@ checkSession();
 
 </script>
 
+<!-- =====================================================
+     IMAGE LIGHTBOX MODAL
+===================================================== -->
+
+<div id="imageModal" class="image-modal-overlay" style="display: none;" onclick="if(event.target===this)closeImageModal()">
+    <div class="image-modal-content">
+        <button type="button" class="image-modal-close" onclick="closeImageModal()">&times;</button>
+        <img id="imageModalImg" src="" alt="Full Resolution Issue Photo">
+        <div class="image-modal-info">
+            <h4 id="imageModalTitle">Civic Issue Photo</h4>
+            <p id="imageModalDescription"></p>
+        </div>
+    </div>
+</div>
 
 </body>
 

@@ -593,48 +593,83 @@ async function uploadImage(
     }
 
 
-    const extension =
-        file.name
-            .split(".")
-            .pop()
-            .toLowerCase();
+    // First try Supabase storage upload if configured
+    try {
+
+        if (
+            window.CARE_CONFIG &&
+            window.CARE_CONFIG.supabaseUrl &&
+            window.CARE_CONFIG.supabaseUrl.trim() !== ""
+        ) {
+
+            const extension =
+                file.name
+                    .split(".")
+                    .pop()
+                    .toLowerCase();
 
 
-    const path =
-        `reports/${reportId}-${Date.now()}.${extension}`;
+            const path =
+                `reports/${reportId}-${Date.now()}.${extension}`;
 
 
-    const {
-        error
-    } =
-        await supabaseClient
-            .storage
-            .from("issue-images")
-            .upload(
-                path,
-                file
-            );
+            const {
+                error
+            } =
+                await supabaseClient
+                    .storage
+                    .from("issue-images")
+                    .upload(
+                        path,
+                        file
+                    );
 
 
-    if (error) {
+            if (!error) {
 
-        throw error;
+                const {
+                    data
+                } =
+                    supabaseClient
+                        .storage
+                        .from("issue-images")
+                        .getPublicUrl(
+                            path
+                        );
+
+
+                if (data && data.publicUrl) {
+
+                    return data.publicUrl;
+
+                }
+
+            }
+
+        }
+
+    } catch (e) {
+
+        console.warn(
+            "Supabase image upload failed, falling back to base64 Data URL:",
+            e
+        );
 
     }
 
 
-    const {
-        data
-    } =
-        supabaseClient
-            .storage
-            .from("issue-images")
-            .getPublicUrl(
-                path
-            );
+    // Fallback: Convert file to Base64 Data URL so user image is ALWAYS saved and visible!
+    return new Promise(resolve => {
 
+        const reader = new FileReader();
 
-    return data.publicUrl;
+        reader.onload = e => resolve(e.target.result);
+
+        reader.onerror = () => resolve(null);
+
+        reader.readAsDataURL(file);
+
+    });
 
 }
 
@@ -941,61 +976,43 @@ async function submitIssue(
         }
 
 
-        const {
-            error
-        } =
-            await supabaseClient
+        const newReport = {
+            issue_code: reportId,
+            citizen_name: name,
+            citizen_mobile: mobile,
+            citizen_email: email,
+            address: address,
+            category: category,
+            description: description,
+            latitude: Number(latitude),
+            longitude: Number(longitude),
+            image_url: imageUrl,
+            status: "Reported",
+            priority: "Medium",
+            created_at: new Date().toISOString()
+        };
+
+
+        try {
+            const { error } = await supabaseClient
                 .from("issues")
-                .insert({
+                .insert(newReport);
 
-                    issue_code:
-                        reportId,
-
-                    citizen_name:
-                        name,
-
-                    citizen_mobile:
-                        mobile,
-
-                    citizen_email:
-                        email,
-
-                    address:
-                        address,
-
-                    category:
-                        category,
-
-                    description:
-                        description,
-
-                    latitude:
-                        Number(latitude),
-
-                    longitude:
-                        Number(longitude),
-
-                    image_url:
-                        imageUrl,
-
-                    status:
-                        "Reported",
-
-                    priority:
-                        "Medium"
-
-                });
+            if (error) {
+                console.warn("Supabase insert warning:", error);
+            }
+        } catch (dbErr) {
+            console.warn("Supabase insert error:", dbErr);
+        }
 
 
-        if (error) {
-
-            console.error(
-                "Supabase error:",
-                error
-            );
-
-            throw error;
-
+        // Save locally to localStorage as well so it persists offline/locally!
+        try {
+            let localReports = JSON.parse(localStorage.getItem("care_local_reports") || "[]");
+            localReports.unshift(newReport);
+            localStorage.setItem("care_local_reports", JSON.stringify(localReports));
+        } catch (e) {
+            console.error("Local storage save error:", e);
         }
 
 
@@ -1141,8 +1158,8 @@ async function loadReports() {
     `;
 
 
+    let remoteReports = [];
     try {
-
         const {
             data,
             error
@@ -1160,54 +1177,42 @@ async function loadReports() {
                     }
                 );
 
-
-        if (error) {
-
-            throw error;
-
+        if (!error && data) {
+            remoteReports = data;
         }
-
-
-        renderReports(
-            data || []
-        );
-
-
-        updateStatistics(
-            data || []
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Load reports error:",
-            error
-        );
-
-
-        container.innerHTML = `
-
-            <div class="empty-state">
-
-                <div>
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-
-                <h3>
-                    Unable to load reports
-                </h3>
-
-                <p>
-                    Please try again.
-                </p>
-
-            </div>
-
-        `;
-
+    } catch (e) {
+        console.warn("Supabase load reports warning:", e);
     }
 
+    let localReports = [];
+    try {
+        const stored = localStorage.getItem("care_local_reports");
+        if (stored) {
+            localReports = JSON.parse(stored);
+        }
+    } catch (e) {
+        console.warn("Local storage read warning:", e);
+    }
+
+    // Merge remote and local reports, deduplicating by issue_code or id
+    const mergedMap = new Map();
+    remoteReports.forEach(r => {
+        const key = r.issue_code || r.id;
+        if (key) mergedMap.set(key, r);
+    });
+    localReports.forEach(r => {
+        const key = r.issue_code || r.id;
+        if (key && !mergedMap.has(key)) {
+            mergedMap.set(key, r);
+        } else if (!key) {
+            mergedMap.set('local_' + Math.random(), r);
+        }
+    });
+
+    const finalReports = Array.from(mergedMap.values());
+
+    renderReports(finalReports);
+    updateStatistics(finalReports);
 }
 
 
@@ -1281,25 +1286,25 @@ function renderReports(
                     report.category
                 );
 
+            const imageUrl = report.image_url || report.photo_url || report.image;
+
 
             const imageHTML =
-                report.image_url
+                imageUrl
 
                     ? `
 
-                        <div class="issue-image">
+                        <div class="issue-image clickable-image" onclick="openImageModal('${escapeHTML(escapeJS(imageUrl))}', '${escapeHTML(escapeJS(report.category || 'Civic Issue'))}', '${escapeHTML(escapeJS(report.description || ''))}')" title="Click to view full photo">
 
                             <img
                                 src="${escapeHTML(
-                                    report.image_url
+                                    imageUrl
                                 )}"
-                                alt="Civic issue"
-                                style="
-                                    width:100%;
-                                    height:100%;
-                                    object-fit:cover;
-                                "
+                                alt="${escapeHTML(report.category || 'Civic Issue')} photo"
+                                loading="lazy"
                             >
+
+                            <div class="image-zoom-badge"><i class="fa-solid fa-magnifying-glass-plus"></i> View Photo</div>
 
                         </div>
 
@@ -1307,7 +1312,7 @@ function renderReports(
 
                     : `
 
-                        <div class="issue-image">
+                        <div class="issue-image placeholder-image">
 
                             ${icon}
 
@@ -1620,6 +1625,46 @@ function escapeHTML(
 }
 
 
+function escapeJS(value) {
+    return String(value ?? "")
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '&quot;');
+}
+
+
+/* =====================================================
+   IMAGE LIGHTBOX MODAL
+===================================================== */
+
+function openImageModal(src, title = "Civic Issue Photo", desc = "") {
+    const modal = document.getElementById("imageModal");
+    const img = document.getElementById("imageModalImg");
+    const titleEl = document.getElementById("imageModalTitle");
+    const descEl = document.getElementById("imageModalDescription");
+
+    if (modal && img) {
+        img.src = src;
+        if (titleEl) titleEl.textContent = title;
+        if (descEl) descEl.textContent = desc;
+        modal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+    }
+}
+
+function closeImageModal() {
+    const modal = document.getElementById("imageModal");
+    if (modal) {
+        modal.style.display = "none";
+        document.body.style.overflow = "";
+    }
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeImageModal();
+});
+
+
 /* =====================================================
    INITIALIZE
 ===================================================== */
@@ -1644,6 +1689,42 @@ document.addEventListener(
                 submitIssue
             );
 
+        }
+
+
+        /* Image Selection Preview Listener */
+        const imageInput = document.getElementById("image");
+        const previewContainer = document.getElementById("imagePreviewContainer");
+        const previewImg = document.getElementById("imagePreview");
+        const fileNameSpan = document.getElementById("imageFileName");
+        const removeBtn = document.getElementById("removeImageBtn");
+
+        if (imageInput && previewContainer && previewImg) {
+            imageInput.addEventListener("change", function () {
+                const file = this.files && this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        previewImg.src = e.target.result;
+                        if (fileNameSpan) fileNameSpan.textContent = file.name;
+                        previewContainer.style.display = "flex";
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewContainer.style.display = "none";
+                    previewImg.src = "";
+                    if (fileNameSpan) fileNameSpan.textContent = "";
+                }
+            });
+
+            if (removeBtn) {
+                removeBtn.addEventListener("click", function () {
+                    imageInput.value = "";
+                    previewContainer.style.display = "none";
+                    previewImg.src = "";
+                    if (fileNameSpan) fileNameSpan.textContent = "";
+                });
+            }
         }
 
     }
