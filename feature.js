@@ -1806,15 +1806,7 @@
     ================================================= */
 
     function initialize() {
-
-        createDemoReport();
-
-        addNavigation();
-
-        addCitizenCard();
-
-        addAdminLink();
-
+        // Disabled duplicate DOM injections so mobile and laptop UI is 100% unified and seamless
     }
 
 

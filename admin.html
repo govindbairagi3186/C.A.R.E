@@ -616,8 +616,8 @@
     </div>
 </div>
 
-<script src="configure.js?v=CARE_2026_V6"></script>
-<script src="app.js?v=CARE_2026_V6"></script>
+<script src="configure.js?v=CARE_2026_V8"></script>
+<script src="app.js?v=CARE_2026_V8"></script>
 
 <script>
 let adminReports = [];
@@ -662,6 +662,17 @@ function loadAdminReports() {
     updateAdminStats(adminReports);
     renderAdminReports(adminReports);
     if (adminMapInstance) renderAdminMapMarkers(adminReports);
+
+    if (window.CAREStore && typeof window.CAREStore.fetchCloudReports === "function") {
+        window.CAREStore.fetchCloudReports().then(cloudReports => {
+            if (cloudReports) {
+                adminReports = cloudReports;
+                updateAdminStats(adminReports);
+                renderAdminReports(adminReports);
+                if (adminMapInstance) renderAdminMapMarkers(adminReports);
+            }
+        }).catch(err => console.warn("Admin cloud sync catch:", err));
+    }
 }
 
 function updateAdminStats(reports) {

@@ -91,6 +91,65 @@ window.CAREStore = {
         return newReport;
     },
 
+    fetchCloudReports: async function() {
+        if (!supabaseClient) return this.getReports();
+        try {
+            const { data, error } = await supabaseClient
+                .from("issues")
+                .select("*")
+                .order("created_at", { ascending: false });
+
+            if (!error && Array.isArray(data) && data.length > 0) {
+                const localReports = this.getReports();
+                let hasChanges = false;
+
+                data.forEach(cloudItem => {
+                    const id = cloudItem.issue_code || cloudItem.id;
+                    if (id) {
+                        const existing = localReports.find(r => (r.id === id || r.issue_code === id));
+                        if (existing) {
+                            if (cloudItem.status && existing.status !== cloudItem.status) {
+                                existing.status = cloudItem.status;
+                                hasChanges = true;
+                            }
+                        } else {
+                            const normalized = {
+                                id: id,
+                                issue_code: id,
+                                citizen_name: cloudItem.citizen_name || "Citizen Reporter",
+                                citizen_mobile: cloudItem.citizen_mobile || "",
+                                citizen_email: cloudItem.citizen_email || "",
+                                address: cloudItem.address || "City Area",
+                                category: cloudItem.category || "General Issue",
+                                description: cloudItem.description || "",
+                                latitude: Number(cloudItem.latitude || 27.4924),
+                                longitude: Number(cloudItem.longitude || 77.6737),
+                                image_url: cloudItem.image_url || "",
+                                status: cloudItem.status || "Reported",
+                                priority: cloudItem.priority || "Medium",
+                                department: cloudItem.department || "Municipal Grievance Cell",
+                                created_at: cloudItem.created_at || new Date().toISOString(),
+                                timeline: [
+                                    { status: cloudItem.status || "Reported", time: cloudItem.created_at || new Date().toISOString(), note: "Report logged in municipal cloud database." }
+                                ]
+                            };
+                            localReports.push(normalized);
+                            hasChanges = true;
+                        }
+                    }
+                });
+
+                if (hasChanges) {
+                    this.saveReports(localReports);
+                }
+                return localReports;
+            }
+        } catch (err) {
+            console.warn("Supabase fetch notice:", err);
+        }
+        return this.getReports();
+    },
+
     updateStatus: async function(reportId, newStatus, remarks) {
         const reports = this.getReports();
         const item = reports.find(r => r.id === reportId || r.issue_code === reportId);
@@ -121,6 +180,25 @@ window.CAREStore = {
     }
 };
 
+// Real-time Cloud Synchronization across Phone, Laptop, and Admin Console
+function initSupabaseRealtime() {
+    if (!supabaseClient) return;
+    try {
+        supabaseClient
+            .channel('public:issues')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'issues' }, () => {
+                window.CAREStore.fetchCloudReports();
+            })
+            .subscribe();
+    } catch (e) {
+        console.warn("Realtime subscription notice:", e);
+    }
+}
+initSupabaseRealtime();
+setInterval(() => {
+    if (window.CAREStore) window.CAREStore.fetchCloudReports();
+}, 8000);
+
 // --- 3. GLOBAL NAVIGATION & PAGE STATE ---
 window.showPage = function(page) {
     const pages = {
@@ -138,9 +216,10 @@ window.showPage = function(page) {
     const target = document.getElementById(pages[page]);
     if (target) target.classList.add("active-page");
 
-    document.querySelectorAll(".nav-link").forEach((link, idx) => {
+    document.querySelectorAll(".nav-link").forEach((link) => {
         link.classList.remove("active");
-        if ((page === "home" && idx === 0) || (page === "reports" && idx === 1) || (page === "about" && idx === 2)) {
+        const onclickAttr = link.getAttribute("onclick") || "";
+        if (onclickAttr.includes(`'${page}'`)) {
             link.classList.add("active");
         }
     });
@@ -757,6 +836,16 @@ function loadReports() {
     const reports = window.CAREStore.getReports();
     renderReports(reports);
     updateStatistics(reports);
+
+    // Asynchronously sync latest reports from Supabase Cloud
+    if (window.CAREStore && typeof window.CAREStore.fetchCloudReports === "function") {
+        window.CAREStore.fetchCloudReports().then(cloudReports => {
+            if (cloudReports && cloudReports.length !== reports.length) {
+                renderReports(cloudReports);
+                updateStatistics(cloudReports);
+            }
+        }).catch(err => console.warn("Cloud sync catch:", err));
+    }
 }
 
 function renderReports(reports) {
