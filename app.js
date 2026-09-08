@@ -777,70 +777,86 @@ function renderReports(reports) {
     container.innerHTML = "";
 
     reports.forEach(report => {
-        const card = document.createElement("article");
-        card.className = "issue-card";
-        card.setAttribute("data-ticket-id", report.id || report.issue_code);
-        card.style.cssText = "background:white; border-radius:18px; border:1px solid #e2e8f0; overflow:hidden; margin-bottom:20px; box-shadow:0 10px 30px rgba(0,0,0,0.04); display:grid; grid-template-columns:220px 1fr;";
+        try {
+            if (!report || typeof report !== "object") return;
 
-        const iconHTML = getCategoryIcon(report.category);
-        const imageHTML = report.image_url
-            ? `<div class="issue-image" style="cursor:pointer;" onclick="window.open('${escapeHTML(report.image_url)}', '_blank')">
-                 <img src="${escapeHTML(report.image_url)}" alt="Issue Photo" style="width:100%; height:100%; object-fit:cover; min-height:180px;">
-               </div>`
-            : `<div class="issue-image" style="display:grid; place-items:center; background:#eff6ff; color:#0b5ed7; font-size:36px; min-height:180px;">${iconHTML}</div>`;
+            const ticketId = report.id || report.issue_code || `CARE-${Math.floor(100000 + Math.random()*900000)}`;
+            const category = report.category || "General Civic Issue";
+            const description = report.description || "No description provided.";
+            const priority = report.priority || "Medium";
+            const status = report.status || "Reported";
+            const department = report.department || "Municipal Grievance Cell";
+            const address = report.address || "Location Tagged";
+            const imageUrl = report.image_url || "";
 
-        const priorityClass = `priority-${report.priority || 'Medium'}`;
-        const mapUrl = report.latitude && report.longitude ? `https://www.google.com/maps?q=${report.latitude},${report.longitude}` : "#";
+            const card = document.createElement("article");
+            card.className = "issue-card";
+            card.setAttribute("data-ticket-id", ticketId);
 
-        card.innerHTML = `
-            ${imageHTML}
-            <div class="issue-content" style="padding:20px; display:flex; flex-direction:column; justify-content:space-between;">
-                <div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <span style="font-family:monospace; font-weight:800; color:#0b5ed7; background:#eff6ff; padding:3px 10px; border-radius:6px; font-size:13px;">
-                            <i class="fa-solid fa-ticket"></i> ${escapeHTML(report.id || report.issue_code)}
+            const iconHTML = getCategoryIcon(category);
+            const imageHTML = imageUrl
+                ? `<div class="issue-image" style="cursor:pointer; min-height:180px;" onclick="window.open('${escapeHTML(imageUrl)}', '_blank')">
+                     <img src="${escapeHTML(imageUrl)}" alt="Issue Photo" style="width:100%; height:100%; object-fit:cover; min-height:180px;">
+                   </div>`
+                : `<div class="issue-image" style="display:grid; place-items:center; background:#eff6ff; color:#0b5ed7; font-size:36px; min-height:180px;">${iconHTML}</div>`;
+
+            const priorityClass = `priority-${priority}`;
+            const mapUrl = report.latitude && report.longitude ? `https://www.google.com/maps?q=${report.latitude},${report.longitude}` : "#";
+
+            card.innerHTML = `
+                ${imageHTML}
+                <div class="issue-content" style="padding:20px; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <span style="font-family:monospace; font-weight:800; color:#0b5ed7; background:#eff6ff; padding:3px 10px; border-radius:6px; font-size:13px;">
+                                <i class="fa-solid fa-ticket"></i> ${escapeHTML(ticketId)}
+                            </span>
+                            <span class="priority-badge ${priorityClass}">${escapeHTML(priority)}</span>
+                        </div>
+
+                        <h3 style="font-size:18px; font-weight:800; color:#0f172a; margin-bottom:6px;">
+                            ${iconHTML} ${escapeHTML(category)}
+                        </h3>
+
+                        <p style="color:#475467; font-size:14px; margin-bottom:12px; line-height:1.5;">
+                            ${escapeHTML(description)}
+                        </p>
+
+                        <div style="font-size:12px; color:#64748b; margin-bottom:8px; display:flex; gap:16px; flex-wrap:wrap;">
+                            <span><i class="fa-solid fa-building-columns" style="color:#0b5ed7;"></i> ${escapeHTML(department)}</span>
+                            <span><i class="fa-solid fa-location-dot" style="color:#ef4444;"></i> ${escapeHTML(address)}</span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid #f1f5f9; margin-top:12px;">
+                        <span class="badge-status ${getStatusBadgeColor(status)}">
+                            <i class="fa-solid fa-circle-dot"></i> ${escapeHTML(status)}
                         </span>
-                        <span class="priority-badge ${priorityClass}">${escapeHTML(report.priority || 'Medium')}</span>
-                    </div>
 
-                    <h3 style="font-size:18px; font-weight:800; color:#0f172a; margin-bottom:6px;">
-                        ${iconHTML} ${escapeHTML(report.category)}
-                    </h3>
-
-                    <p style="color:#475467; font-size:14px; margin-bottom:12px; line-height:1.5;">
-                        ${escapeHTML(report.description)}
-                    </p>
-
-                    <div style="font-size:12px; color:#64748b; margin-bottom:8px; display:flex; gap:16px; flex-wrap:wrap;">
-                        <span><i class="fa-solid fa-building-columns" style="color:#0b5ed7;"></i> ${escapeHTML(report.department || 'Municipal Dept')}</span>
-                        <span><i class="fa-solid fa-location-dot" style="color:#ef4444;"></i> ${escapeHTML(report.address || 'GPS Tagged')}</span>
+                        <div style="display:flex; gap:8px;">
+                            <a href="${mapUrl}" target="_blank" style="padding:7px 12px; background:#1e293b; color:white; border-radius:8px; font-size:12px; font-weight:700; text-decoration:none;">
+                                <i class="fa-solid fa-map-location-dot"></i> Map
+                            </a>
+                            <button type="button" onclick="openReportTimeline('${escapeHTML(ticketId)}')" style="padding:7px 12px; background:#eff6ff; color:#0b5ed7; border:1px solid #bfdbfe; border-radius:8px; font-size:12px; font-weight:700;">
+                                <i class="fa-solid fa-timeline"></i> Timeline
+                            </button>
+                        </div>
                     </div>
                 </div>
+            `;
 
-                <div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid #f1f5f9; margin-top:12px;">
-                    <span class="badge-status ${getStatusBadgeColor(report.status)}">
-                        <i class="fa-solid fa-circle-dot"></i> ${escapeHTML(report.status || 'Reported')}
-                    </span>
-
-                    <div style="display:flex; gap:8px;">
-                        <a href="${mapUrl}" target="_blank" style="padding:7px 12px; background:#1e293b; color:white; border-radius:8px; font-size:12px; font-weight:700; text-decoration:none;">
-                            <i class="fa-solid fa-map-location-dot"></i> Map
-                        </a>
-                        <button type="button" onclick="openReportTimeline('${report.id || report.issue_code}')" style="padding:7px 12px; background:#eff6ff; color:#0b5ed7; border:1px solid #bfdbfe; border-radius:8px; font-size:12px; font-weight:700;">
-                            <i class="fa-solid fa-timeline"></i> Timeline
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        container.appendChild(card);
+            container.appendChild(card);
+        } catch (cardErr) {
+            console.error("Single report card render notice:", cardErr, report);
+        }
     });
 }
 
 function getStatusBadgeColor(status) {
+    if (!status) return "yellow";
     if (status === "Resolved") return "green";
-    if (status === "In Progress" || status === "Verified") return "blue";
+    if (status === "In Progress" || status === "Verified" || status === "Assigned") return "blue";
+    if (status === "Rejected") return "red";
     return "yellow";
 }
 
