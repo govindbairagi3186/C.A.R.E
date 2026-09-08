@@ -1746,7 +1746,7 @@
 
 
         link.href =
-            "care-admin.html";
+            "admin.html";
 
 
         link.dataset.careAdmin =

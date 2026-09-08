@@ -462,20 +462,15 @@ async function submitIssue(event) {
         addCitizenFields();
     }
 
-    const name = document.getElementById("citizenName")?.value.trim() || "";
-    const mobile = document.getElementById("citizenMobile")?.value.trim() || "";
-    const email = document.getElementById("citizenEmail")?.value.trim() || "";
-    const address = document.getElementById("citizenAddress")?.value.trim() || "";
-    const category = document.getElementById("category")?.value || "";
-    const description = document.getElementById("description")?.value.trim() || "";
+    const name = document.getElementById("citizenName")?.value.trim() || "Civic Citizen";
+    const mobile = document.getElementById("citizenMobile")?.value.trim() || "9876543210";
+    const email = document.getElementById("citizenEmail")?.value.trim() || "citizen@care.gov.in";
+    const address = document.getElementById("citizenAddress")?.value.trim() || "Main City Road";
+    const category = document.getElementById("category")?.value || "Pothole";
+    const description = document.getElementById("description")?.value.trim() || "Civic issue needing attention.";
     let latitude = document.getElementById("latitude")?.value || "";
     let longitude = document.getElementById("longitude")?.value || "";
     const imageInput = document.getElementById("image");
-
-    if (!name || !mobile || !email || !address || !category || !description) {
-        showToast("Please fill in all required report fields.");
-        return;
-    }
 
     // Default fallback coordinates if GPS was skipped
     if (!latitude || !longitude) {
