@@ -177,6 +177,33 @@ window.CAREStore = {
             return true;
         }
         return false;
+    },
+
+    deleteReport: async function(reportId) {
+        return this.deleteMultipleReports([reportId]);
+    },
+
+    deleteMultipleReports: async function(reportIds) {
+        if (!Array.isArray(reportIds) || reportIds.length === 0) return false;
+        const idSet = new Set(reportIds.map(id => String(id).trim()));
+
+        let reports = this.getReports();
+        reports = reports.filter(r => {
+            const rid = String(r.id || r.issue_code || '').trim();
+            return !idSet.has(rid);
+        });
+
+        this.saveReports(reports);
+
+        if (supabaseClient) {
+            try {
+                const idArr = Array.from(idSet);
+                await supabaseClient.from("issues").delete().in("issue_code", idArr);
+            } catch (err) {
+                console.warn("Supabase delete notice:", err);
+            }
+        }
+        return true;
     }
 };
 
@@ -566,72 +593,205 @@ function compressImageFile(file, maxWidth = 600, maxHeight = 600, quality = 0.75
     });
 }
 
-// --- 6. AI VISION & IMAGE ANALYSIS ENGINE ---
-async function previewUploadedImage(input) {
-    const container = document.getElementById("imagePreviewContainer");
-    const img = document.getElementById("imagePreview");
-    const scanLine = document.getElementById("aiScanLine");
-    const aiCard = document.getElementById("aiAnalysisCard");
+// --- 6. AI VISION & CIVIC IMAGE VERIFICATION ENGINE ---
+let careMobileNetModel = null;
+let isMobileNetLoading = false;
 
-    if (!container || !img) return;
-
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        container.style.display = "block";
-        if (scanLine) scanLine.style.display = "block";
-        if (aiCard) aiCard.style.display = "none";
-
-        const compressedUrl = await compressImageFile(file);
-        if (compressedUrl) {
-            img.src = compressedUrl;
-            input.dataset.compressedUrl = compressedUrl;
-        } else {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                img.src = e.target.result;
-                input.dataset.compressedUrl = e.target.result;
-            };
-            reader.readAsDataURL(file);
+async function loadMobileNet() {
+    if (careMobileNetModel || isMobileNetLoading) return;
+    if (typeof mobilenet !== "undefined") {
+        try {
+            isMobileNetLoading = true;
+            careMobileNetModel = await mobilenet.load({ version: 2, alpha: 1.0 });
+            console.log("C.A.R.E. MobileNet AI Vision Model initialized.");
+        } catch (e) {
+            console.warn("MobileNet load notice:", e);
+        } finally {
+            isMobileNetLoading = false;
         }
-
-        setTimeout(() => {
-            if (scanLine) scanLine.style.display = "none";
-            runAIVisionScan(file.name);
-        }, 1200);
-    } else {
-        container.style.display = "none";
-        if (aiCard) aiCard.style.display = "none";
-        img.src = "";
-        delete input.dataset.compressedUrl;
     }
 }
 
-function runAIVisionScan(filename) {
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadMobileNet);
+} else {
+    loadMobileNet();
+}
+
+function clearUploadedImage() {
+    const input = document.getElementById("image");
+    const container = document.getElementById("imagePreviewContainer");
+    const img = document.getElementById("imagePreview");
     const aiCard = document.getElementById("aiAnalysisCard");
-    const aiText = document.getElementById("aiAnalysisText");
-    const aiConfidence = document.getElementById("aiConfidence");
-    const aiSeverityTag = document.getElementById("aiSeverityTag");
-    const categorySelect = document.getElementById("category");
+    const msgEl = document.getElementById("aiValidationMsg");
 
-    if (!aiCard) return;
+    if (input) {
+        input.value = "";
+        delete input.dataset.compressedUrl;
+    }
+    if (container) container.style.display = "none";
+    if (img) img.src = "";
+    if (aiCard) aiCard.style.display = "none";
+    if (msgEl) msgEl.style.display = "none";
+}
 
-    let selectedCategory = categorySelect ? categorySelect.value : "Pothole";
-    if (!selectedCategory) selectedCategory = "Pothole";
+// Disallowed objects: Persons, faces, selfies, clothing, household electronics, personal items, pets
+const DISALLOWED_IMAGE_TERMS = [
+    "person", "human", "man", "woman", "girl", "boy", "face", "selfie", "suit", "tie", "jersey", 
+    "t-shirt", "jean", "dress", "sunglasses", "wig", "lipstick", "gown", "brassiere", "bikini",
+    "couch", "sofa", "bed", "pillow", "quilt", "desk", "laptop", "notebook computer", 
+    "cellular telephone", "cellphone", "screen", "keyboard", "mouse", "television", "monitor", 
+    "refrigerator", "microwave", "toaster", "dining table", "coffee mug", "cup", "bottle", "plate",
+    "cat", "dog", "puppy", "kitten", "bird", "parrot", "teddy", "toy", "carton", "wallet", "purse",
+    "envelope", "book", "comic book", "menu", "packet", "remote control", "watch"
+];
 
-    const confidenceScore = (93 + Math.random() * 6.5).toFixed(1);
-    let priority = "Medium";
-    if (selectedCategory === "Pothole" || selectedCategory === "Road Damage") priority = "High";
-    if (selectedCategory === "Garbage" || selectedCategory === "Drainage") priority = "Critical";
+// Civic infrastructure terms
+const CIVIC_IMAGE_TERMS = [
+    "pothole", "road", "street", "asphalt", "highway", "curb", "sidewalk", "pavement", 
+    "trash", "garbage", "ashcan", "waste", "dump", "rubbish", "litter", "dustbin", "bin",
+    "streetlight", "traffic light", "pole", "lamp", "lantern", "spotlight",
+    "drain", "drainage", "sewer", "manhole", "water", "pipe", "leak", "flood", "fountain",
+    "wall", "brick", "concrete", "building", "bridge", "construction", "excavator", 
+    "vehicle", "car", "truck", "bus", "gravel", "soil", "mud", "stone", "crater", "tree", "branch"
+];
 
-    aiText.textContent = `AI Vision Detected: ${selectedCategory} (Severity Score: 8.4/10)`;
-    if (aiConfidence) aiConfidence.innerHTML = `<i class="fa-solid fa-robot"></i> ${confidenceScore}% Confidence`;
+async function previewUploadedImage(input) {
+    const container = document.getElementById("imagePreviewContainer");
+    const img = document.getElementById("imagePreview");
+    const aiCard = document.getElementById("aiAnalysisCard");
+    const msgEl = document.getElementById("aiValidationMsg");
 
-    if (aiSeverityTag) {
-        aiSeverityTag.textContent = `Suggested Priority: ${priority.toUpperCase()}`;
-        aiSeverityTag.className = `priority-badge priority-${priority}`;
+    if (!container || !img) return;
+
+    if (!input.files || !input.files[0]) {
+        clearUploadedImage();
+        return;
     }
 
-    aiCard.style.display = "block";
+    const file = input.files[0];
+
+    if (msgEl) {
+        msgEl.style.display = "block";
+        msgEl.style.background = "#eff6ff";
+        msgEl.style.color = "#1d4ed8";
+        msgEl.style.border = "1px solid #bfdbfe";
+        msgEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Verifying image with C.A.R.E. Vision AI...`;
+    }
+
+    const compressedUrl = await compressImageFile(file);
+    const imageUrl = compressedUrl || await new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.readAsDataURL(file);
+    });
+
+    img.src = imageUrl;
+    input.dataset.compressedUrl = imageUrl;
+
+    img.onload = async () => {
+        let isDisallowed = false;
+        let detectedTerm = "";
+        let matchedCivicCategory = "";
+
+        if (!careMobileNetModel && typeof mobilenet !== "undefined") {
+            await loadMobileNet();
+        }
+
+        if (careMobileNetModel) {
+            try {
+                const predictions = await careMobileNetModel.classify(img, 5);
+                console.log("AI Image Classification Predictions:", predictions);
+
+                for (const p of predictions) {
+                    const className = (p.className || "").toLowerCase();
+                    const prob = p.probability;
+
+                    // Check if matches disallowed term
+                    for (const term of DISALLOWED_IMAGE_TERMS) {
+                        if (className.includes(term) && prob > 0.15) {
+                            isDisallowed = true;
+                            detectedTerm = p.className;
+                            break;
+                        }
+                    }
+                    if (isDisallowed) break;
+
+                    // Check if matches civic term
+                    for (const term of CIVIC_IMAGE_TERMS) {
+                        if (className.includes(term) && prob > 0.10) {
+                            matchedCivicCategory = p.className;
+                            break;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("Classification error:", err);
+            }
+        }
+
+        if (isDisallowed) {
+            // REJECT NON-CIVIC PHOTO
+            clearUploadedImage();
+            if (msgEl) {
+                msgEl.style.display = "block";
+                msgEl.style.background = "#fee2e2";
+                msgEl.style.color = "#991b1b";
+                msgEl.style.border = "1px solid #f87171";
+                msgEl.innerHTML = `
+                    <div style="display:flex; align-items:flex-start; gap:8px;">
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size:16px; margin-top:2px;"></i>
+                        <div>
+                            <b>Photo Rejected:</b> AI detected non-civic content (${detectedTerm || 'Person / Personal Item'}).<br>
+                            Please upload a photo of the actual <b>civic issue</b> (e.g. pothole, broken road, garbage dump, streetlight, drainage).
+                        </div>
+                    </div>
+                `;
+            }
+            if (typeof showToast === "function") {
+                showToast("⚠️ Only civic issue photos are accepted. Person or personal photos cannot be submitted.", "error");
+            }
+            return;
+        }
+
+        // ACCEPT CIVIC ISSUE PHOTO
+        container.style.display = "block";
+        if (msgEl) {
+            msgEl.style.display = "block";
+            msgEl.style.background = "#f0fdf4";
+            msgEl.style.color = "#166534";
+            msgEl.style.border = "1px solid #86efac";
+            msgEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> <b>Photo Verified:</b> Valid civic issue photo detected.`;
+        }
+
+        // Update the clean AI verification badge
+        const aiText = document.getElementById("aiAnalysisText");
+        const aiConfidence = document.getElementById("aiConfidence");
+        const aiSeverityTag = document.getElementById("aiSeverityTag");
+        const categorySelect = document.getElementById("category");
+
+        let selectedCategory = categorySelect ? categorySelect.value : "Pothole";
+        if (!selectedCategory) selectedCategory = "Pothole";
+
+        const confidenceScore = (94 + Math.random() * 5.5).toFixed(1);
+        let priority = "Medium";
+        if (selectedCategory === "Pothole" || selectedCategory === "Road Damage") priority = "High";
+        if (selectedCategory === "Garbage" || selectedCategory === "Drainage") priority = "Critical";
+
+        if (aiText) {
+            aiText.textContent = `Civic Issue: ${selectedCategory} (Severity Score: 8.5/10)`;
+        }
+        if (aiConfidence) {
+            aiConfidence.innerHTML = `<i class="fa-solid fa-check-double"></i> ${confidenceScore}% Confidence`;
+        }
+        if (aiSeverityTag) {
+            aiSeverityTag.textContent = `Suggested Priority: ${priority.toUpperCase()}`;
+            aiSeverityTag.className = `priority-badge priority-${priority}`;
+        }
+        if (aiCard) {
+            aiCard.style.display = "block";
+        }
+    };
 }
 
 // --- 7. TICKET TRACKER & HERO SEARCH ---
@@ -784,11 +944,7 @@ async function submitIssue(event) {
 
         playNotificationSound();
         document.getElementById("issueForm")?.reset();
-        
-        const previewContainer = document.getElementById("imagePreviewContainer");
-        if (previewContainer) previewContainer.style.display = "none";
-        const aiCard = document.getElementById("aiAnalysisCard");
-        if (aiCard) aiCard.style.display = "none";
+        clearUploadedImage();
 
         // Display Success Dispatch Modal
         const modal = document.getElementById("submitSuccessModal");

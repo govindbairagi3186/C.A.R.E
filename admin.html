@@ -564,6 +564,16 @@
                     <option value="Resolved">Resolved</option>
                 </select>
 
+                <div style="display:flex; align-items:center; gap:8px; background:#f8fafc; padding:8px 12px; border-radius:10px; border:1px solid #e2e8f0;">
+                    <label style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer; color:#334155;">
+                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllReports(this)" style="width:16px; height:16px; accent-color:#0b5ed7; cursor:pointer;"> Select All
+                    </label>
+                </div>
+
+                <button id="deleteSelectedBtn" type="button" onclick="deleteSelectedReports()" disabled style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; padding:11px 16px; border-radius:10px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; opacity:0.5; transition:0.2s;">
+                    <i class="fa-solid fa-trash-can"></i> Delete Selected (<span id="selectedCount">0</span>)
+                </button>
+
                 <button class="btn-action" onclick="loadAdminReports()">
                     <i class="fa-solid fa-rotate-right"></i> Refresh
                 </button>
@@ -688,6 +698,7 @@ function renderAdminReports(reports) {
 
     if (!reports.length) {
         list.innerHTML = `<div style="background:white; padding:40px; text-align:center; border-radius:16px; color:#64748b;">No complaints match the current filter.</div>`;
+        updateReportSelectionCount();
         return;
     }
 
@@ -704,7 +715,10 @@ function renderAdminReports(reports) {
                 <div class="report-body">
                     <div>
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <span style="font-family:monospace; font-weight:800; color:#0b5ed7;">${id}</span>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <input type="checkbox" class="report-cb" value="${id}" onchange="updateReportSelectionCount()" style="width:18px; height:18px; accent-color:#0b5ed7; cursor:pointer;" title="Select for deletion">
+                                <span style="font-family:monospace; font-weight:800; color:#0b5ed7; font-size:15px;">${id}</span>
+                            </div>
                             <div>
                                 <span class="priority-pill priority-${r.priority || 'Medium'}">${r.priority || 'Medium'}</span>
                                 <span class="status-badge ${statusClass}">${r.status}</span>
@@ -722,10 +736,13 @@ function renderAdminReports(reports) {
 
                     <div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid #f1f5f9;">
                         <span style="font-size:11px; color:#94a3b8;">Log: ${new Date(r.created_at || Date.now()).toLocaleDateString('en-IN')}</span>
-                        <div style="display:flex; gap:8px;">
+                        <div style="display:flex; gap:8px; align-items:center;">
                             <a href="${mapUrl}" target="_blank" class="btn-secondary" style="text-decoration:none; padding:7px 12px;">🗺️ Map</a>
                             <button type="button" class="btn-action" style="padding:7px 14px;" onclick="openStatusModal('${id}', '${r.status}')">
                                 ✏️ Update Status
+                            </button>
+                            <button type="button" onclick="deleteSingleAdminReport('${id}')" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; padding:7px 12px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px;" title="Delete this report permanently">
+                                <i class="fa-solid fa-trash-can"></i> Delete
                             </button>
                         </div>
                     </div>
@@ -733,6 +750,61 @@ function renderAdminReports(reports) {
             </article>
         `;
     }).join("");
+
+    updateReportSelectionCount();
+}
+
+function updateReportSelectionCount() {
+    const checked = Array.from(document.querySelectorAll(".report-cb:checked")).map(cb => cb.value);
+    const count = checked.length;
+    const countEl = document.getElementById("selectedCount");
+    const btn = document.getElementById("deleteSelectedBtn");
+    const selectAllCb = document.getElementById("selectAllCheckbox");
+    const allCbs = document.querySelectorAll(".report-cb");
+
+    if (countEl) countEl.textContent = count;
+    if (btn) {
+        btn.disabled = count === 0;
+        btn.style.opacity = count > 0 ? "1" : "0.5";
+    }
+    if (selectAllCb && allCbs.length > 0) {
+        selectAllCb.checked = count === allCbs.length;
+        selectAllCb.indeterminate = count > 0 && count < allCbs.length;
+    }
+}
+
+function toggleSelectAllReports(masterCb) {
+    document.querySelectorAll(".report-cb").forEach(cb => {
+        cb.checked = masterCb.checked;
+    });
+    updateReportSelectionCount();
+}
+
+async function deleteSelectedReports() {
+    const checked = Array.from(document.querySelectorAll(".report-cb:checked")).map(cb => cb.value);
+    if (!checked.length) {
+        alert("Please select at least one report to delete.");
+        return;
+    }
+    if (!confirm(`Are you sure you want to permanently delete the ${checked.length} selected report(s)?\nThis will remove them from the admin console and citizen view.`)) {
+        return;
+    }
+    if (window.CAREStore && typeof window.CAREStore.deleteMultipleReports === "function") {
+        await window.CAREStore.deleteMultipleReports(checked);
+    }
+    loadAdminReports();
+    alert(`Successfully deleted ${checked.length} report(s).`);
+}
+
+async function deleteSingleAdminReport(id) {
+    if (!confirm(`Are you sure you want to permanently delete report ${id}?`)) {
+        return;
+    }
+    if (window.CAREStore && typeof window.CAREStore.deleteReport === "function") {
+        await window.CAREStore.deleteReport(id);
+    }
+    loadAdminReports();
+    alert(`Report ${id} deleted successfully.`);
 }
 
 function filterAdminReports() {
