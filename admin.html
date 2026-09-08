@@ -622,6 +622,7 @@
 <script>
 let adminReports = [];
 let adminMapInstance = null;
+let adminMarkerGroup = null;
 
 document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById("loginForm");
@@ -630,6 +631,17 @@ document.addEventListener("DOMContentLoaded", function() {
             e.preventDefault();
             showAdminDashboard();
         });
+    }
+});
+
+window.addEventListener("care:reports-updated", function() {
+    if (document.getElementById("adminApp") && document.getElementById("adminApp").style.display !== "none") {
+        loadAdminReports();
+    }
+});
+window.addEventListener("storage", function() {
+    if (document.getElementById("adminApp") && document.getElementById("adminApp").style.display !== "none") {
+        loadAdminReports();
     }
 });
 
@@ -747,11 +759,17 @@ function initAdminMap() {
 }
 
 function renderAdminMapMarkers(reports) {
-    if (!adminMapInstance) return;
+    if (!adminMapInstance || typeof L === "undefined") return;
+    if (!adminMarkerGroup) {
+        adminMarkerGroup = L.featureGroup().addTo(adminMapInstance);
+    } else {
+        adminMarkerGroup.clearLayers();
+    }
     reports.forEach(r => {
         if (r.latitude && r.longitude) {
-            const marker = L.marker([r.latitude, r.longitude]).addTo(adminMapInstance);
+            const marker = L.marker([r.latitude, r.longitude]);
             marker.bindPopup(`<b>${r.id}</b><br>${r.category} (${r.status})`);
+            adminMarkerGroup.addLayer(marker);
         }
     });
 }

@@ -514,9 +514,11 @@ async function submitIssue(event) {
         if (category === "Pothole" || category === "Road Damage") priority = "High";
         if (category === "Garbage" || category === "Drainage") priority = "Critical";
 
+        const citizenId = localStorage.getItem("care_citizen_id") || "CIT-GENERAL";
         const newReport = {
             id: reportId,
             issue_code: reportId,
+            citizenId: citizenId,
             citizen_name: name,
             citizen_mobile: mobile,
             citizen_email: email,
@@ -766,6 +768,13 @@ document.addEventListener("DOMContentLoaded", function() {
     loadReports();
     setTimeout(initHeroMap, 300);
     dismissPreloader();
+});
+
+window.addEventListener("care:reports-updated", function() {
+    loadReports();
+});
+window.addEventListener("storage", function() {
+    loadReports();
 });
 
 if (document.readyState === "complete" || document.readyState === "interactive") {

@@ -180,25 +180,25 @@
     ================================================= */
 
     function saveReports(reports) {
+        if (window.CAREStore && typeof window.CAREStore.saveReports === "function") {
+            window.CAREStore.saveReports(reports);
+            return;
+        }
 
         localStorage.setItem(
-
             REPORT_KEY,
-
             JSON.stringify(
                 reports
             )
-
         );
 
-
         window.dispatchEvent(
-
             new CustomEvent(
                 "care:reports-updated"
             )
-
         );
+
+    }
 
     }
 
@@ -567,15 +567,14 @@
 
     function showTracking() {
 
-        const reports =
-            getReports().filter(
-
-                report =>
-                    report.citizenId ===
-                    getCitizenId()
-
-            );
-
+        let reports = getReports();
+        const myId = getCitizenId();
+        const myReports = reports.filter(
+            report => !report.citizenId || report.citizenId === myId
+        );
+        if (myReports.length > 0) {
+            reports = myReports;
+        }
 
         const total =
             reports.length;
