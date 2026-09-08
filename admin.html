@@ -616,8 +616,8 @@
     </div>
 </div>
 
-<script src="configure.js?v=CARE_2026_V4"></script>
-<script src="app.js?v=CARE_2026_V4"></script>
+<script src="configure.js?v=CARE_2026_V5"></script>
+<script src="app.js?v=CARE_2026_V5"></script>
 
 <script>
 let adminReports = [];
@@ -748,7 +748,7 @@ function initAdminMap() {
         return;
     }
 
-    const defaultCoords = (window.CARE_CONFIG && window.CARE_CONFIG.defaultMapCenter) || [28.6139, 77.2090];
+    const defaultCoords = (window.CARE_CONFIG && window.CARE_CONFIG.defaultMapCenter) || [27.4924, 77.6737];
     adminMapInstance = L.map("adminCityMap").setView(defaultCoords, 11);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {

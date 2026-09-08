@@ -21,18 +21,33 @@ const CARE_STORAGE_KEY = "care_reports_clean_v1";
 
 window.CAREStore = {
     getReports: function() {
-        try {
-            const data = localStorage.getItem(CARE_STORAGE_KEY);
-            if (data) {
-                const parsed = JSON.parse(data);
-                if (Array.isArray(parsed)) {
-                    return parsed;
+        const allReports = [];
+        const seenIds = new Set();
+        const storageKeys = [CARE_STORAGE_KEY, "care_reports_v2", "care_reports", "care_citizen_reports"];
+
+        storageKeys.forEach(key => {
+            try {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    if (Array.isArray(parsed)) {
+                        parsed.forEach(item => {
+                            if (item && typeof item === "object") {
+                                const id = item.id || item.issue_code || item.ticket_id;
+                                if (id && !seenIds.has(id)) {
+                                    seenIds.add(id);
+                                    allReports.push(item);
+                                }
+                            }
+                        });
+                    }
                 }
+            } catch (e) {
+                console.warn("Storage key read error:", key, e);
             }
-        } catch (e) {
-            console.error("Local storage error:", e);
-        }
-        return [];
+        });
+
+        return allReports;
     },
 
     saveReports: function(reports) {
@@ -199,7 +214,43 @@ function initHeroMap() {
     }
 }
 
-function initLocationPickerMap() {
+async function fetchRealIPLocation() {
+    try {
+        const res = await fetch("https://ipapi.co/json/");
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.latitude && data.longitude) {
+                return {
+                    lat: parseFloat(data.latitude),
+                    lng: parseFloat(data.longitude),
+                    address: `${data.city || 'Local Area'}, ${data.region || ''}`
+                };
+            }
+        }
+    } catch (e) {
+        console.warn("Primary IP geolocation notice:", e);
+    }
+
+    try {
+        const res = await fetch("https://ip-api.com/json/");
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.lat && data.lon) {
+                return {
+                    lat: parseFloat(data.lat),
+                    lng: parseFloat(data.lon),
+                    address: `${data.city || 'Local Area'}, ${data.regionName || ''}`
+                };
+            }
+        }
+    } catch (e) {
+        console.warn("Secondary IP geolocation notice:", e);
+    }
+
+    return null;
+}
+
+async function initLocationPickerMap() {
     const container = document.getElementById("locationPickerMap");
     if (!container || typeof L === "undefined") return;
 
@@ -211,14 +262,20 @@ function initLocationPickerMap() {
         return;
     }
 
-    const defaultCoords = (window.CARE_CONFIG && window.CARE_CONFIG.defaultMapCenter) || [28.6139, 77.2090];
-    locationPickerMapInstance = L.map("locationPickerMap").setView(defaultCoords, 13);
+    let startCoords = (window.CARE_CONFIG && window.CARE_CONFIG.defaultMapCenter) || [27.4924, 77.6737];
+    const ipLoc = await fetchRealIPLocation();
+    if (ipLoc) {
+        startCoords = [ipLoc.lat, ipLoc.lng];
+    }
+
+    locationPickerMapInstance = L.map("locationPickerMap").setView(startCoords, 13);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap contributors"
     }).addTo(locationPickerMapInstance);
 
-    pickerMarker = L.marker(defaultCoords, { draggable: true }).addTo(locationPickerMapInstance);
+    pickerMarker = L.marker(startCoords, { draggable: true }).addTo(locationPickerMapInstance);
+    updateLocationFields(startCoords[0], startCoords[1]);
 
     pickerMarker.on("dragend", function(e) {
         const coord = pickerMarker.getLatLng();
@@ -315,69 +372,82 @@ function getCategoryMarkerIcon(category) {
     });
 }
 
-// --- 5. GPS LOCATION DETECTION ---
-function getLocation() {
+// --- 5. GPS & IP LOCATION DETECTION ---
+async function getLocation() {
     const locationText = document.getElementById("locationText");
     const addressInput = document.getElementById("citizenAddress");
-    if (!locationText) return;
+    if (locationText) locationText.textContent = "Detecting your real location...";
 
-    if (!navigator.geolocation) {
-        locationText.textContent = "GPS is not supported by this browser.";
-        showToast("GPS is not supported.");
-        return;
-    }
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            async position => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
 
-    locationText.textContent = "Detecting GPS location...";
+                updateLocationFields(lat, lng);
 
-    navigator.geolocation.getCurrentPosition(
-        async position => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
+                if (locationPickerMapInstance && pickerMarker) {
+                    const coords = [lat, lng];
+                    locationPickerMapInstance.setView(coords, 15);
+                    pickerMarker.setLatLng(coords);
+                }
 
-            updateLocationFields(lat, lng);
-
-            if (locationPickerMapInstance && pickerMarker) {
-                const coords = [lat, lng];
-                locationPickerMapInstance.setView(coords, 15);
-                pickerMarker.setLatLng(coords);
-            }
-
-            // Reverse geocode GPS coordinates to capture street address / city
-            try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.display_name) {
-                        if (addressInput && (!addressInput.value.trim() || addressInput.value.trim() === "Main City Road")) {
+                // Reverse geocode GPS coordinates to capture street address / city
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.display_name && addressInput) {
                             addressInput.value = data.display_name;
                         }
                     }
+                } catch (err) {
+                    console.warn("Reverse geocoding notice:", err);
                 }
-            } catch (err) {
-                console.warn("Reverse geocoding notice:", err);
-            }
 
-            showToast("GPS location captured successfully!");
-        },
-        async error => {
-            console.warn("GPS Location permission notice:", error);
-            const typedAddress = addressInput?.value.trim() || "";
-            if (typedAddress) {
-                const coords = await geocodeAddress(typedAddress);
-                if (coords) {
-                    updateLocationFields(coords[0], coords[1]);
-                    if (locationPickerMapInstance && pickerMarker) {
-                        locationPickerMapInstance.setView(coords, 14);
-                        pickerMarker.setLatLng(coords);
-                    }
-                    showToast(`Location set from address: ${typedAddress}`);
-                    return;
+                showToast("GPS location captured successfully!");
+            },
+            async error => {
+                console.warn("Browser GPS unavailable/denied:", error);
+                await resolveRealLocationFallback();
+            },
+            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+        );
+    } else {
+        await resolveRealLocationFallback();
+    }
+
+    async function resolveRealLocationFallback() {
+        const typedAddress = addressInput?.value.trim() || "";
+        if (typedAddress) {
+            const coords = await geocodeAddress(typedAddress);
+            if (coords) {
+                updateLocationFields(coords[0], coords[1]);
+                if (locationPickerMapInstance && pickerMarker) {
+                    locationPickerMapInstance.setView(coords, 14);
+                    pickerMarker.setLatLng(coords);
                 }
+                showToast(`Location set from typed address: ${typedAddress}`);
+                return;
             }
-            showToast("GPS permission denied. Please enter your area / landmark.");
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-    );
+        }
+
+        // Fetch user's real IP Geolocation
+        const ipLoc = await fetchRealIPLocation();
+        if (ipLoc) {
+            updateLocationFields(ipLoc.lat, ipLoc.lng);
+            if (locationPickerMapInstance && pickerMarker) {
+                locationPickerMapInstance.setView([ipLoc.lat, ipLoc.lng], 14);
+                pickerMarker.setLatLng([ipLoc.lat, ipLoc.lng]);
+            }
+            if (addressInput && (!addressInput.value.trim() || addressInput.value.trim() === "Main City Road")) {
+                addressInput.value = ipLoc.address;
+            }
+            showToast(`Real location detected: ${ipLoc.address}`);
+        } else {
+            showToast("Please enter your area or landmark in the address box.");
+        }
+    }
 }
 
 function compressImageFile(file, maxWidth = 600, maxHeight = 600, quality = 0.75) {
@@ -562,18 +632,19 @@ async function submitIssue(event) {
     let longitude = document.getElementById("longitude")?.value || "";
     const imageInput = document.getElementById("image");
 
-    // Geocode typed address if GPS was skipped or location was entered manually
+    // Geocode typed address or fetch real IP location if GPS coordinates were not set
     if (!latitude || !longitude) {
-        const coords = await geocodeAddress(address);
-        if (coords) {
-            latitude = coords[0];
-            longitude = coords[1];
-            updateLocationFields(latitude, longitude);
-        } else {
-            const defaultCoords = (window.CARE_CONFIG && window.CARE_CONFIG.defaultMapCenter) || [28.6139, 77.2090];
-            latitude = defaultCoords[0];
-            longitude = defaultCoords[1];
+        let coords = await geocodeAddress(address);
+        if (!coords) {
+            const ipLoc = await fetchRealIPLocation();
+            if (ipLoc) coords = [ipLoc.lat, ipLoc.lng];
         }
+        if (!coords) {
+            coords = (window.CARE_CONFIG && window.CARE_CONFIG.defaultMapCenter) || [27.4924, 77.6737];
+        }
+        latitude = coords[0];
+        longitude = coords[1];
+        updateLocationFields(latitude, longitude);
     }
 
     const submitBtn = document.querySelector("#issueForm button[type='submit']");

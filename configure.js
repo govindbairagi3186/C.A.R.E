@@ -10,8 +10,8 @@ window.CARE_CONFIG = {
     edition: "Official Enterprise Edition",
     teamName: "GOVIND VAISHNAV & TEAM",
     
-    // Default Map Location (Center of India / Major Municipal Hub)
-    defaultMapCenter: [28.6139, 77.2090], // New Delhi / National Capital Region
+    // Default Map Location (Mathura / Municipal Regional Hub)
+    defaultMapCenter: [27.4924, 77.6737], // Mathura / Municipal Center
     defaultZoom: 13,
     
     // Supabase Credentials
