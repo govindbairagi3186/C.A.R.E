@@ -174,6 +174,7 @@ function initHeroMap() {
 
     // Render markers from active reports
     const reports = window.CAREStore.getReports();
+    const markers = [];
     reports.forEach(report => {
         if (report.latitude && report.longitude) {
             const icon = getCategoryMarkerIcon(report.category);
@@ -185,8 +186,17 @@ function initHeroMap() {
                     <small>${report.address || ''}</small>
                 </div>
             `);
+            markers.push([report.latitude, report.longitude]);
         }
     });
+
+    if (markers.length > 0) {
+        if (markers.length === 1) {
+            heroMapInstance.setView(markers[0], 13);
+        } else {
+            heroMapInstance.fitBounds(markers, { padding: [30, 30], maxZoom: 14 });
+        }
+    }
 }
 
 function initLocationPickerMap() {
@@ -308,6 +318,7 @@ function getCategoryMarkerIcon(category) {
 // --- 5. GPS LOCATION DETECTION ---
 function getLocation() {
     const locationText = document.getElementById("locationText");
+    const addressInput = document.getElementById("citizenAddress");
     if (!locationText) return;
 
     if (!navigator.geolocation) {
@@ -319,7 +330,7 @@ function getLocation() {
     locationText.textContent = "Detecting GPS location...";
 
     navigator.geolocation.getCurrentPosition(
-        position => {
+        async position => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
 
@@ -331,16 +342,41 @@ function getLocation() {
                 pickerMarker.setLatLng(coords);
             }
 
+            // Reverse geocode GPS coordinates to capture street address / city
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.display_name) {
+                        if (addressInput && (!addressInput.value.trim() || addressInput.value.trim() === "Main City Road")) {
+                            addressInput.value = data.display_name;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("Reverse geocoding notice:", err);
+            }
+
             showToast("GPS location captured successfully!");
         },
-        error => {
-            console.warn("GPS Location error fallback:", error);
-            // Fallback to default city center for demo resilience
-            const defaultCoords = (window.CARE_CONFIG && window.CARE_CONFIG.defaultMapCenter) || [28.6139, 77.2090];
-            updateLocationFields(defaultCoords[0], defaultCoords[1]);
-            showToast("Using default city location (GPS permission denied).");
+        async error => {
+            console.warn("GPS Location permission notice:", error);
+            const typedAddress = addressInput?.value.trim() || "";
+            if (typedAddress) {
+                const coords = await geocodeAddress(typedAddress);
+                if (coords) {
+                    updateLocationFields(coords[0], coords[1]);
+                    if (locationPickerMapInstance && pickerMarker) {
+                        locationPickerMapInstance.setView(coords, 14);
+                        pickerMarker.setLatLng(coords);
+                    }
+                    showToast(`Location set from address: ${typedAddress}`);
+                    return;
+                }
+            }
+            showToast("GPS permission denied. Please enter your area / landmark.");
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
 }
 
