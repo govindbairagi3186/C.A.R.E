@@ -236,6 +236,60 @@ function updateLocationFields(lat, lng) {
     if (badgeEl) badgeEl.textContent = `${formattedLat}, ${formattedLng}`;
 }
 
+async function geocodeAddress(addressString) {
+    if (!addressString || typeof addressString !== "string") return null;
+    const query = addressString.trim().toLowerCase();
+
+    // Fast lookup dictionary for Indian cities including Mathura
+    const cityMap = {
+        "mathura": [27.4924, 77.6737],
+        "vrindavan": [27.5804, 77.7006],
+        "agra": [27.1767, 78.0081],
+        "delhi": [28.6139, 77.2090],
+        "new delhi": [28.6139, 77.2090],
+        "noida": [28.5355, 77.3910],
+        "gurugram": [28.4595, 77.0266],
+        "gurgaon": [28.4595, 77.0266],
+        "ghaziabad": [28.6692, 77.4538],
+        "meerut": [28.9845, 77.7064],
+        "aligarh": [27.8974, 78.0880],
+        "lucknow": [26.8467, 80.9462],
+        "kanpur": [26.4499, 80.3319],
+        "jaipur": [26.9124, 75.7873],
+        "mumbai": [19.0760, 72.8777],
+        "bengaluru": [12.9716, 77.5946],
+        "bangalore": [12.9716, 77.5946],
+        "hyderabad": [17.3850, 78.4867],
+        "kolkata": [22.5726, 88.3639],
+        "varanasi": [25.3176, 82.9739]
+    };
+
+    for (const city in cityMap) {
+        if (query.includes(city)) {
+            return cityMap[city];
+        }
+    }
+
+    // Real-time OpenStreetMap Nominatim Geocoding API
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressString)}&limit=1`);
+        if (response.ok) {
+            const results = await response.json();
+            if (results && results.length > 0) {
+                const lat = parseFloat(results[0].lat);
+                const lon = parseFloat(results[0].lon);
+                if (!isNaN(lat) && !isNaN(lon)) {
+                    return [lat, lon];
+                }
+            }
+        }
+    } catch (err) {
+        console.warn("Geocoding fetch notice:", err);
+    }
+
+    return null;
+}
+
 function getCategoryMarkerIcon(category) {
     let color = "#0b5ed7";
     if (category === "Pothole") color = "#e11d48";
@@ -472,11 +526,18 @@ async function submitIssue(event) {
     let longitude = document.getElementById("longitude")?.value || "";
     const imageInput = document.getElementById("image");
 
-    // Default fallback coordinates if GPS was skipped
+    // Geocode typed address if GPS was skipped or location was entered manually
     if (!latitude || !longitude) {
-        const defaultCoords = (window.CARE_CONFIG && window.CARE_CONFIG.defaultMapCenter) || [28.6139, 77.2090];
-        latitude = defaultCoords[0];
-        longitude = defaultCoords[1];
+        const coords = await geocodeAddress(address);
+        if (coords) {
+            latitude = coords[0];
+            longitude = coords[1];
+            updateLocationFields(latitude, longitude);
+        } else {
+            const defaultCoords = (window.CARE_CONFIG && window.CARE_CONFIG.defaultMapCenter) || [28.6139, 77.2090];
+            latitude = defaultCoords[0];
+            longitude = defaultCoords[1];
+        }
     }
 
     const submitBtn = document.querySelector("#issueForm button[type='submit']");
@@ -758,6 +819,23 @@ document.addEventListener("DOMContentLoaded", function() {
     const issueForm = document.getElementById("issueForm");
     if (issueForm) {
         issueForm.addEventListener("submit", submitIssue);
+    }
+
+    const addressInput = document.getElementById("citizenAddress");
+    if (addressInput) {
+        addressInput.addEventListener("change", async function() {
+            const typed = this.value.trim();
+            if (typed) {
+                const coords = await geocodeAddress(typed);
+                if (coords) {
+                    updateLocationFields(coords[0], coords[1]);
+                    if (locationPickerMapInstance && pickerMarker) {
+                        locationPickerMapInstance.setView(coords, 14);
+                        pickerMarker.setLatLng(coords);
+                    }
+                }
+            }
+        });
     }
 
     loadReports();
