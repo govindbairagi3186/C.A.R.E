@@ -57,6 +57,15 @@
         src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     ></script>
 
+    <!-- Leaflet.js OpenStreetMap -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    ></script>
+
     <!-- Main CSS -->
     <link
         rel="stylesheet"
@@ -93,6 +102,25 @@
 
 
 <body>
+
+<!-- FULL SCREEN APP PRELOADER -->
+<div id="appPreloader">
+    <div class="preloader-logo-wrap">
+        <div class="preloader-logo">C</div>
+        <div class="preloader-pulse-ring"></div>
+    </div>
+    <div class="preloader-title">C.A.R.E. ENGINE</div>
+    <div class="preloader-subtitle"><i class="fa-solid fa-shield-halved"></i> Initializing Civic Engine &amp; AI Vision...</div>
+    <div class="preloader-bar-bg">
+        <div class="preloader-bar-fill"></div>
+    </div>
+</div>
+<script>
+    setTimeout(function() {
+        var p = document.getElementById('appPreloader');
+        if (p) p.classList.add('preloader-hidden');
+    }, 800);
+</script>
 
 <!-- =====================================================
      HEADER
@@ -132,7 +160,15 @@
                 class="nav-link active"
                 onclick="showPage('home')"
             >
-                Home
+                <i class="fa-solid fa-house"></i> Home
+            </button>
+
+            <button
+                type="button"
+                class="nav-link"
+                onclick="showPage('report')"
+            >
+                <i class="fa-solid fa-pen-to-square"></i> Report Issue
             </button>
 
             <button
@@ -140,7 +176,7 @@
                 class="nav-link"
                 onclick="showPage('reports')"
             >
-                Reports
+                <i class="fa-solid fa-list-check"></i> Reports
             </button>
 
             <button
@@ -148,19 +184,19 @@
                 class="nav-link"
                 onclick="showPage('about')"
             >
-                About
+                <i class="fa-solid fa-circle-info"></i> About
             </button>
 
         </nav>
 
 
-        <button
-            type="button"
+        <a
+            href="admin.html"
             class="nav-report-button"
-            onclick="showPage('report')"
+            style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;"
         >
-            Report Issue
-        </button>
+            <i class="fa-solid fa-shield-halved"></i> Admin Console
+        </a>
 
     </div>
 
@@ -213,18 +249,34 @@
                         type="button"
                         class="primary-button"
                         onclick="showPage('report')"
+                        style="display:inline-flex; align-items:center; gap:8px; font-size:15px;"
                     >
-                        <i class="fa-solid fa-bullhorn"></i> Report an Issue
+                        <i class="fa-solid fa-rocket"></i> Get Started — Report Issue
                     </button>
 
                     <button
                         type="button"
                         class="secondary-button"
-                        onclick="showPage('reports')"
+                        onclick="showPage('about')"
+                        style="display:inline-flex; align-items:center; gap:8px; font-size:15px;"
                     >
-                        <i class="fa-solid fa-map-location-dot"></i> View Reports
+                        <i class="fa-solid fa-circle-info"></i> About C.A.R.E.
                     </button>
 
+                    <a
+                        href="admin.html"
+                        class="secondary-button"
+                        style="display:inline-flex; align-items:center; gap:8px; font-size:15px; text-decoration:none;"
+                    >
+                        <i class="fa-solid fa-shield-halved"></i> Admin Console
+                    </a>
+
+                </div>
+
+                <!-- TICKET TRACKER LOOKUP BAR -->
+                <div class="hero-tracker-bar">
+                    <input type="text" id="heroTicketInput" placeholder="Enter Ticket Code (e.g. CARE-104928)...">
+                    <button type="button" onclick="trackHeroTicket()"><i class="fa-solid fa-magnifying-glass"></i> Track Status</button>
                 </div>
 
             </div>
@@ -245,28 +297,8 @@
                 </div>
 
 
-                <div class="hero-card-map">
-
-                    <div class="map-grid">
-
-                        <div class="map-pin pin-one">
-                            <i class="fa-solid fa-road-barrier"></i>
-                        </div>
-
-                        <div class="map-pin pin-two">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </div>
-
-                        <div class="map-pin pin-three">
-                            <i class="fa-solid fa-lightbulb"></i>
-                        </div>
-
-                        <div class="map-pin pin-four">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </div>
-
-                    </div>
-
+                <div class="hero-card-map" style="padding:0; position:relative;">
+                    <div id="heroMap"></div>
                 </div>
 
 
@@ -590,6 +622,31 @@
             class="report-form"
         >
 
+            <!-- CITIZEN DETAILS -->
+            <div id="citizenDetails" style="margin-bottom:20px; padding:20px; border-radius:16px; background:#f8fafc; border:1px solid #e2e8f0;">
+                <h3 style="margin-bottom:6px; font-size:17px; font-weight:800; color:#0f172a;"><i class="fa-solid fa-user"></i> Your Contact Details</h3>
+                <p style="color:#64748b; font-size:13px; margin-bottom:16px;">These details help municipal authorities contact you regarding your report.</p>
+
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:15px;">
+                    <div>
+                        <label for="citizenName" style="display:block; font-weight:700; font-size:13px; margin-bottom:6px;">Full Name *</label>
+                        <input id="citizenName" type="text" placeholder="Enter your full name" required style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px;">
+                    </div>
+                    <div>
+                        <label for="citizenMobile" style="display:block; font-weight:700; font-size:13px; margin-bottom:6px;">Mobile Number *</label>
+                        <input id="citizenMobile" type="tel" maxlength="10" placeholder="10-digit mobile number" required style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px;">
+                    </div>
+                    <div>
+                        <label for="citizenEmail" style="display:block; font-weight:700; font-size:13px; margin-bottom:6px;">Email Address *</label>
+                        <input id="citizenEmail" type="email" placeholder="example@gmail.com" required style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px;">
+                    </div>
+                    <div>
+                        <label for="citizenAddress" style="display:block; font-weight:700; font-size:13px; margin-bottom:6px;">Address / Landmark *</label>
+                        <input id="citizenAddress" type="text" placeholder="Area, street, landmark" required style="width:100%; padding:12px; border:1px solid #cbd5e1; border-radius:10px;">
+                    </div>
+                </div>
+            </div>
+
             <!-- CATEGORY -->
 
             <div class="form-group">
@@ -659,12 +716,12 @@
             </div>
 
 
-            <!-- IMAGE & PREVIEW -->
+            <!-- IMAGE & PREVIEW WITH AI SCANNER -->
 
             <div class="form-group">
 
                 <label for="image">
-                    <i class="fa-solid fa-camera"></i> Add Photo
+                    <i class="fa-solid fa-camera"></i> Add Photo &amp; AI Analysis
                 </label>
 
                 <input
@@ -674,12 +731,23 @@
                     onchange="previewUploadedImage(this)"
                 >
 
-                <div id="imagePreviewContainer" style="display:none; margin-top:12px;">
-                    <img id="imagePreview" src="" alt="Selected Photo Preview" style="max-width:100%; max-height:220px; border-radius:12px; border:2px solid #bfdbfe; box-shadow:0 4px 12px rgba(0,0,0,0.08); object-fit:cover;">
+                <div id="imagePreviewContainer" style="display:none; margin-top:12px;" class="ai-scanner-box">
+                    <div id="aiScanLine" class="ai-scan-line" style="display:none;"></div>
+                    <img id="imagePreview" src="" alt="Selected Photo Preview" style="max-width:100%; max-height:240px; border-radius:12px; object-fit:cover; display:block; margin:auto;">
+                </div>
+
+                <!-- AI Category & Severity Inspection Card -->
+                <div id="aiAnalysisCard" class="ai-analysis-card" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <strong><i class="fa-solid fa-robot"></i> C.A.R.E. Vision AI Scanner</strong>
+                        <span id="aiConfidence" class="ai-confidence-pill"><i class="fa-solid fa-check-double"></i> 96.4% Match</span>
+                    </div>
+                    <p id="aiAnalysisText" style="color:#cbd5e1; margin-bottom:4px;">Detected: Pothole / Severe Road Crack</p>
+                    <small id="aiSeverityTag" class="priority-badge priority-High">Suggested Priority: HIGH</small>
                 </div>
 
                 <small style="display:block; margin-top:6px;">
-                    A photo helps officials locate and fix the issue quickly.
+                    A photo triggers automated AI severity scoring &amp; priority assignment.
                 </small>
 
             </div>
@@ -707,9 +775,18 @@
                     class="location-button"
                     onclick="getLocation()"
                 >
-                    <i class="fa-solid fa-crosshairs"></i> Detect Location
+                    <i class="fa-solid fa-crosshairs"></i> Detect GPS Location
                 </button>
 
+            </div>
+
+            <!-- Leaflet Interactive Map Picker -->
+            <div id="locationPickerWrapper" style="margin-top:12px; display:none;" class="map-container-wrapper">
+                <div id="locationPickerMap" style="height:220px; width:100%;"></div>
+                <div style="background:#f8fafc; padding:8px 12px; font-size:12px; color:#64748b; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+                    <span><i class="fa-solid fa-hand-pointer"></i> Drag pin to pinpoint exact location</span>
+                    <strong id="mapCoordBadge" style="color:#0b5ed7;">28.6139, 77.2090</strong>
+                </div>
             </div>
 
 
@@ -1101,9 +1178,11 @@
 
 
 <!-- =====================================================
-     MAIN JAVASCRIPT
+     MAIN JAVASCRIPT & CONFIGURATION
 ===================================================== -->
 
+<script src="configure.js"></script>
+<script src="feature.js"></script>
 <script src="app.js"></script>
 
 </body>

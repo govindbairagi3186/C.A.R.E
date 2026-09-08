@@ -159,25 +159,19 @@
     ================================================= */
 
     function getReports() {
-
+        if (window.CAREStore && typeof window.CAREStore.getReports === "function") {
+            return window.CAREStore.getReports();
+        }
         try {
-
             return JSON.parse(
-
                 localStorage.getItem(
                     REPORT_KEY
                 ) || "[]"
-
             );
-
         }
-
         catch {
-
             return [];
-
         }
-
     }
 
 
@@ -299,13 +293,8 @@
     ================================================= */
 
     function createDemoReport() {
-
-        const reports =
-            getReports();
-
-
-        if (reports.length)
-            return;
+        return;
+    }
 
 
         const now =

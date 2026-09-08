@@ -2064,3 +2064,247 @@ button {
     box-shadow: 0 6px 16px rgba(0,0,0,0.12);
 }
 
+/* =====================================================
+   CIVIC ENGINE ENHANCEMENTS — MAPS, AI & TRACKING
+===================================================== */
+
+/* Leaflet Map Containers */
+#heroMap, #locationPickerMap, #adminCityMap {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    border-radius: 16px;
+    z-index: 1;
+}
+
+.map-container-wrapper {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid #bfdbfe;
+    box-shadow: 0 8px 24px rgba(11, 94, 215, 0.08);
+}
+
+/* AI Image Scanner Animation Overlay */
+.ai-scanner-box {
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px;
+    border: 2px dashed #0b5ed7;
+    background: #f0f7ff;
+}
+
+.ai-scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #22c55e, #0b5ed7, transparent);
+    box-shadow: 0 0 15px #22c55e;
+    animation: scanAnim 2s infinite ease-in-out;
+    z-index: 10;
+}
+
+@keyframes scanAnim {
+    0% { top: 0%; opacity: 0.8; }
+    50% { top: 96%; opacity: 1; }
+    100% { top: 0%; opacity: 0.8; }
+}
+
+.ai-analysis-card {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: white;
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-top: 10px;
+    font-size: 13px;
+    border-left: 4px solid #22c55e;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+}
+
+.ai-confidence-pill {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Hero Ticket Tracker Bar */
+.hero-tracker-bar {
+    display: flex;
+    gap: 8px;
+    background: white;
+    padding: 8px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid #dbeafe;
+    margin-top: 20px;
+    max-width: 540px;
+}
+
+.hero-tracker-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 10px 14px;
+    font-size: 14px;
+    background: transparent;
+}
+
+.hero-tracker-bar button {
+    background: var(--dark);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+.hero-tracker-bar button:hover {
+    background: #1e293b;
+}
+
+/* Priority Badges */
+.priority-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.priority-Critical { background: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; }
+.priority-High { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
+.priority-Medium { background: #fef9c3; color: #a16207; border: 1px solid #fef08a; }
+.priority-Low { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+
+/* Official Receipt Watermark */
+.sih-receipt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+}
+
+.sih-tag {
+    background: #0b5ed7;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+/* =====================================================
+   FULL-SCREEN APP PRELOADER & LOADING ANIMATION
+===================================================== */
+#appPreloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+#appPreloader.preloader-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.preloader-logo-wrap {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.preloader-logo {
+    width: 72px;
+    height: 72px;
+    background: #0b5ed7;
+    color: white;
+    font-size: 36px;
+    font-weight: 800;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 0 35px rgba(11, 94, 215, 0.6);
+    position: relative;
+    z-index: 2;
+}
+
+.preloader-pulse-ring {
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    width: 96px;
+    height: 96px;
+    border: 3px solid rgba(11, 94, 215, 0.5);
+    border-radius: 28px;
+    animation: preloaderPulse 1.8s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    z-index: 1;
+}
+
+@keyframes preloaderPulse {
+    0% { transform: scale(0.9); opacity: 0.9; }
+    50% { transform: scale(1.15); opacity: 0.3; }
+    100% { transform: scale(0.9); opacity: 0.9; }
+}
+
+.preloader-title {
+    color: white;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+
+.preloader-subtitle {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-bottom: 24px;
+}
+
+.preloader-bar-bg {
+    width: 220px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+}
+
+.preloader-bar-fill {
+    position: absolute;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(90deg, #0b5ed7, #22c55e);
+    border-radius: 999px;
+    animation: preloaderFill 1.2s infinite ease-in-out;
+}
+
+@keyframes preloaderFill {
+    0% { left: -40%; width: 30%; }
+    50% { left: 30%; width: 60%; }
+    100% { left: 100%; width: 30%; }
+}
+
+
+
