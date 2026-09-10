@@ -73,8 +73,27 @@
     <!-- Main CSS -->
     <link
         rel="stylesheet"
-        href="style.css?v=CARE_2026_V8"
+        href="style.css?v=CARE_2026_V11"
     >
+    <link
+        rel="stylesheet"
+        href="feature.css?v=CARE_2026_V11"
+    >
+
+    <!-- Theme Initialization Script (prevents FOUC) -->
+    <script>
+        (function() {
+            var theme = localStorage.getItem('care_theme');
+            if (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                theme = 'dark';
+            }
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
 
     <!-- Small admin button styles -->
     <style>
@@ -194,13 +213,27 @@
         </nav>
 
 
-        <a
-            href="admin.html"
-            class="nav-report-button"
-            style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;"
-        >
-            <i class="fa-solid fa-shield-halved"></i> Admin Console
-        </a>
+        <div class="nav-actions" style="display:flex; align-items:center; gap:10px;">
+            <button
+                type="button"
+                id="themeToggleBtn"
+                class="theme-toggle-btn"
+                onclick="toggleCareTheme()"
+                aria-label="Toggle Light / Dark Mode"
+                title="Toggle Theme"
+            >
+                <i class="fa-solid fa-moon theme-icon"></i>
+                <span class="theme-text">Dark Mode</span>
+            </button>
+
+            <a
+                href="admin.html"
+                class="nav-report-button"
+                style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;"
+            >
+                <i class="fa-solid fa-shield-halved"></i> Admin Console
+            </a>
+        </div>
 
     </div>
 
@@ -620,10 +653,10 @@
 
         </div>
 
-
         <form
             id="issueForm"
             class="report-form"
+            onsubmit="submitIssue(event); return false;"
         >
 
             <!-- CITIZEN DETAILS -->
@@ -785,7 +818,7 @@
             </div>
 
             <!-- Leaflet Interactive Map Picker -->
-            <div id="locationPickerWrapper" style="margin-top:12px; display:none;" class="map-container-wrapper">
+            <div id="locationPickerWrapper" style="margin-top:14px; display:block;" class="map-container-wrapper">
                 <div id="locationPickerMap" style="height:220px; width:100%;"></div>
                 <div style="background:#f8fafc; padding:8px 12px; font-size:12px; color:#64748b; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
                     <span><i class="fa-solid fa-hand-pointer"></i> Drag pin to pinpoint exact location</span>
@@ -1185,9 +1218,21 @@
      MAIN JAVASCRIPT & CONFIGURATION
 ===================================================== -->
 
-<script src="configure.js?v=CARE_2026_V8"></script>
-<script src="feature.js?v=CARE_2026_V8"></script>
-<script src="app.js?v=CARE_2026_V8"></script>
+<!-- FLOATING THEME QUICK-TOGGLE -->
+<button
+    type="button"
+    id="floatingThemeToggle"
+    class="floating-theme-btn theme-toggle-btn"
+    onclick="toggleCareTheme()"
+    aria-label="Toggle Light / Dark Mode"
+    title="Toggle Theme (Tap to switch mode)"
+>
+    <i class="fa-solid fa-moon theme-icon"></i>
+</button>
+
+<script src="configure.js?v=CARE_2026_V11"></script>
+<script src="feature.js?v=CARE_2026_V11"></script>
+<script src="app.js?v=CARE_2026_V11"></script>
 
 </body>
 

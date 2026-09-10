@@ -82,3 +82,100 @@ window.CARE_CONFIG = {
         role: "Super Admin Officer"
     }
 };
+
+/* =====================================================
+   C.A.R.E. THEME ENGINE (LIGHT / DARK MODE SYSTEM)
+===================================================== */
+(function () {
+    "use strict";
+
+    function getStoredTheme() {
+        try {
+            var stored = localStorage.getItem("care_theme");
+            if (stored === "dark" || stored === "light") {
+                return stored;
+            }
+            if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                return "dark";
+            }
+        } catch (e) {}
+        return "light";
+    }
+
+    function syncThemeUI(theme) {
+        var isDark = theme === "dark";
+        var toggleBtns = document.querySelectorAll(".theme-toggle-btn");
+        toggleBtns.forEach(function (btn) {
+            var icon = btn.querySelector("i, .theme-icon");
+            var text = btn.querySelector(".theme-text, .theme-toggle-text");
+            if (isDark) {
+                btn.setAttribute("title", "Switch to Light Mode");
+                btn.setAttribute("aria-label", "Switch to Light Mode");
+                if (icon) {
+                    icon.className = "fa-solid fa-sun theme-icon";
+                }
+                if (text) {
+                    text.textContent = "Light Mode";
+                }
+            } else {
+                btn.setAttribute("title", "Switch to Dark Mode");
+                btn.setAttribute("aria-label", "Switch to Dark Mode");
+                if (icon) {
+                    icon.className = "fa-solid fa-moon theme-icon";
+                }
+                if (text) {
+                    text.textContent = "Dark Mode";
+                }
+            }
+        });
+    }
+
+    function applyTheme(theme, save) {
+        if (save === undefined) save = true;
+        var root = document.documentElement;
+        root.setAttribute("data-theme", theme);
+        if (document.body) {
+            if (theme === "dark") {
+                document.body.classList.add("dark-mode");
+            } else {
+                document.body.classList.remove("dark-mode");
+            }
+        }
+        if (save) {
+            try {
+                localStorage.setItem("care_theme", theme);
+            } catch (e) {}
+        }
+        syncThemeUI(theme);
+        window.dispatchEvent(new CustomEvent("care:theme-changed", { detail: { theme: theme } }));
+    }
+
+    window.toggleCareTheme = function () {
+        var current = document.documentElement.getAttribute("data-theme") || getStoredTheme();
+        var next = current === "dark" ? "light" : "dark";
+        applyTheme(next, true);
+        return next;
+    };
+
+    window.setCareTheme = function (theme) {
+        applyTheme(theme, true);
+    };
+
+    window.getCareTheme = function () {
+        return document.documentElement.getAttribute("data-theme") || getStoredTheme();
+    };
+
+    // Apply immediate theme attribute to html tag
+    var initial = getStoredTheme();
+    document.documentElement.setAttribute("data-theme", initial);
+
+    // Sync UI when DOM content is ready
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () {
+            applyTheme(initial, false);
+        });
+    } else {
+        applyTheme(initial, false);
+    }
+})();
+

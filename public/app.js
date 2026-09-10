@@ -929,71 +929,6 @@ function playNotificationSound() {
     }
 }
 
-// --- 8.1 THE AUTOMATED EMAIL ROUTE DISPATCHER (SERVERLESS WEB APPS) ---
-window.CARE_EmailRoute = {
-    dispatchAutomatedEmail: async function(reportData, deptConfig) {
-        const config = (window.CARE_CONFIG && window.CARE_CONFIG.emailRoute) || {};
-        const officialEmail = deptConfig.email || config.primaryOfficialInbox || "commissioner@nagar-nigam.gov.in";
-        const mapUrl = `https://www.openstreetmap.org/?mlat=${reportData.latitude}&mlon=${reportData.longitude}#map=17/${reportData.latitude}/${reportData.longitude}`;
-
-        const emailPayload = {
-            ticket_id: reportData.id || reportData.issue_code,
-            issue_category: reportData.category,
-            priority_level: reportData.priority || "Medium",
-            assigned_department: deptConfig.name,
-            nodal_officer_email: officialEmail,
-            district_magistrate_email: config.districtMagistrateInbox || "dm.office@care.gov.in",
-            municipal_commissioner_email: config.primaryOfficialInbox || "commissioner@nagar-nigam.gov.in",
-            citizen_name: reportData.citizen_name || "Citizen Reporter",
-            citizen_mobile: reportData.citizen_mobile || "Not provided",
-            citizen_email: reportData.citizen_email || "Not provided",
-            issue_address: reportData.address || "Main City Area",
-            gps_coordinates: `${reportData.latitude}, ${reportData.longitude}`,
-            map_view_url: mapUrl,
-            photo_url: reportData.image_url || "Attached with ticket",
-            detailed_description: reportData.description,
-            timestamp: new Date().toLocaleString(),
-            dispatch_channel: "Automated Serverless Route (Formspree / EmailJS / Direct Gateway)"
-        };
-
-        console.log("⚡ [Automated Email Route] Converting complaint report to official government email...", emailPayload);
-
-        // If Formspree endpoint is configured, send via serverless POST request
-        if (config.formspreeEndpoint) {
-            try {
-                await fetch(config.formspreeEndpoint, {
-                    method: "POST",
-                    headers: { "Accept": "application/json", "Content-Type": "application/json" },
-                    body: JSON.stringify(emailPayload)
-                });
-                console.log("✅ Formspree automated dispatch succeeded.");
-            } catch (err) {
-                console.warn("Formspree dispatch catch:", err);
-            }
-        }
-
-        // If EmailJS is loaded and configured, send through EmailJS
-        if (window.emailjs && config.emailjsConfig && config.emailjsConfig.publicKey) {
-            try {
-                await window.emailjs.send(
-                    config.emailjsConfig.serviceId,
-                    config.emailjsConfig.templateId,
-                    emailPayload
-                );
-                console.log("✅ EmailJS automated dispatch succeeded.");
-            } catch (err) {
-                console.warn("EmailJS dispatch catch:", err);
-            }
-        }
-
-        return {
-            status: "DISPATCHED_TO_INBOX",
-            targetOfficial: officialEmail,
-            payload: emailPayload
-        };
-    }
-};
-
 // --- 9. SUBMIT ISSUE & GOVT AUTO-ROUTING ---
 async function submitIssue(event) {
     if (event) event.preventDefault();
@@ -1064,7 +999,7 @@ async function submitIssue(event) {
 
         const deptConfig = (window.CARE_CONFIG && window.CARE_CONFIG.departments && window.CARE_CONFIG.departments[category]) || {
             name: "Central Civic Grievance & Public Redressal Cell",
-            email: "commissioner@nagar-nigam.gov.in",
+            email: "grievance.helpdesk@care.gov.in",
             phone: "+91-1800-11-700"
         };
 
@@ -1098,24 +1033,18 @@ async function submitIssue(event) {
             department: deptConfig.name,
             created_at: new Date().toISOString(),
             ai_confidence: "97.4%",
-            email_route_dispatched: true,
             timeline: [
-                { status: "Reported", time: new Date().toISOString(), note: `Logged & auto-dispatched via Automated Email Route to ${deptConfig.email}` }
+                { status: "Reported", time: new Date().toISOString(), note: `Logged & auto-dispatched to ${deptConfig.name}` }
             ]
         };
 
         await window.CAREStore.addReport(newReport);
 
-        // ⚡ Trigger 1. The Automated Email Route
-        if (window.CARE_EmailRoute) {
-            await window.CARE_EmailRoute.dispatchAutomatedEmail(newReport, deptConfig);
-        }
-
         playNotificationSound();
         document.getElementById("issueForm")?.reset();
         clearUploadedImage();
 
-        // Display Success Dispatch Modal with Automated Email Route Verification
+        // Display Success Dispatch Modal
         const modal = document.getElementById("submitSuccessModal");
         if (modal) {
             const modalRep = document.getElementById("modalReportId");
@@ -1130,34 +1059,13 @@ async function submitIssue(event) {
 
             const mailto = document.getElementById("modalMailtoLink");
             if (mailto) {
-                const mapLink = `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=17/${latitude}/${longitude}`;
-                const subject = `[URGENT CIVIC GRIEVANCE] Ticket ${reportId} - ${category} (${priority} Priority)`;
-                const supervisorMail = (window.CARE_CONFIG && window.CARE_CONFIG.emailRoute && window.CARE_CONFIG.emailRoute.supervisorEmail) || "admin@care.gov.in";
-                const commissionerMail = (window.CARE_CONFIG && window.CARE_CONFIG.emailRoute && window.CARE_CONFIG.emailRoute.primaryOfficialInbox) || "commissioner@nagar-nigam.gov.in";
-                
-                const ccList = [supervisorMail, commissionerMail, email].filter(Boolean).join(",");
-
-                const body = `OFFICIAL CIVIC ACTION & GRIEVANCE REPORT\n` +
-                             `==========================================\n` +
-                             `TICKET ID: ${reportId}\n` +
-                             `CATEGORY: ${category}\n` +
-                             `PRIORITY: ${priority}\n` +
-                             `ASSIGNED AUTHORITY: ${deptConfig.name}\n` +
-                             `PRIMARY OFFICIAL INBOX: ${deptConfig.email}\n` +
-                             `SUPERVISOR / ADMIN CC: ${supervisorMail}\n` +
-                             `CITIZEN REPORTER: ${name} (Mobile: ${mobile}, Email: ${email})\n` +
-                             `LOCATION ADDRESS: ${address}\n` +
-                             `GPS COORDINATES: ${latitude}, ${longitude}\n` +
-                             `LIVE MAP LINK: ${mapLink}\n` +
-                             `EVIDENCE PHOTO: ${imageUrl.startsWith("data:") ? "[Image Attached with report payload]" : imageUrl}\n\n` +
-                             `ISSUE DESCRIPTION:\n${description}\n\n` +
-                             `==========================================\n` +
-                             `Automated Civic Action and Reporting Engine (C.A.R.E.)`;
-                mailto.href = `mailto:${deptConfig.email}?cc=${encodeURIComponent(ccList)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                const subject = `CIVIC ISSUE DISPATCH [${reportId}] - ${category}`;
+                const body = `GOVERNMENT DISPATCH RECEIPT\n----------------------------\nTicket ID: ${reportId}\nCategory: ${category}\nPriority: ${priority}\nDepartment: ${deptConfig.name}\nDescription: ${description}\nLocation: ${latitude}, ${longitude}\nAddress: ${address}\nCitizen: ${name} (${mobile})`;
+                mailto.href = `mailto:${deptConfig.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             }
             modal.style.display = "flex";
         } else {
-            showToast(`Report ${reportId} submitted and emailed successfully!`);
+            showToast(`Report ${reportId} submitted successfully!`);
             showPage("reports");
         }
 

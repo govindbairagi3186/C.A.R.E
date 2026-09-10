@@ -15,6 +15,21 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+    <!-- Theme Initialization Script (prevents FOUC) -->
+    <script>
+        (function() {
+            var theme = localStorage.getItem('care_theme');
+            if (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                theme = 'dark';
+            }
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -433,7 +448,8 @@
             .admin-report-card { grid-template-columns: 1fr; }
         }
     </style>
-    <link rel="stylesheet" href="style.css?v=CARE_2026_V3">
+    <link rel="stylesheet" href="style.css?v=CARE_2026_V11">
+    <link rel="stylesheet" href="feature.css?v=CARE_2026_V11">
 </head>
 
 <body>
@@ -460,7 +476,19 @@
 <!-- LOGIN PAGE -->
 <section id="loginPage">
     <div class="login-card">
-        <div class="logo">C</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <div class="logo" style="margin-bottom:0;">C</div>
+            <button
+                type="button"
+                class="theme-toggle-btn"
+                onclick="toggleCareTheme()"
+                aria-label="Toggle Light / Dark Mode"
+                title="Toggle Theme"
+            >
+                <i class="fa-solid fa-moon theme-icon"></i>
+                <span class="theme-text">Dark Mode</span>
+            </button>
+        </div>
         <h1>C.A.R.E. Admin Portal</h1>
         <p>Municipal Officer Management Console</p>
 
@@ -496,10 +524,26 @@
             </div>
         </div>
 
-        <div style="display:flex; align-items:center; gap:12px;">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
             <span style="font-size:12px; font-weight:700; color:#15803d; background:#dcfce7; padding:4px 10px; border-radius:999px;">
                 ● LIVE MUNICIPAL NETWORK
             </span>
+
+            <button
+                type="button"
+                class="theme-toggle-btn"
+                onclick="toggleCareTheme()"
+                aria-label="Toggle Light / Dark Mode"
+                title="Toggle Theme"
+            >
+                <i class="fa-solid fa-moon theme-icon"></i>
+                <span class="theme-text">Dark Mode</span>
+            </button>
+
+            <a href="index.html" class="btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; padding:10px 14px; font-size:13px; border-radius:10px;">
+                <i class="fa-solid fa-house"></i> Citizen Portal
+            </a>
+
             <button class="logout-button" id="logoutButton" onclick="logoutAdmin()">
                 <i class="fa-solid fa-right-from-bracket"></i> Logout
             </button>
@@ -626,8 +670,8 @@
     </div>
 </div>
 
-<script src="configure.js?v=CARE_2026_V8"></script>
-<script src="app.js?v=CARE_2026_V8"></script>
+<script src="configure.js?v=CARE_2026_V11"></script>
+<script src="app.js?v=CARE_2026_V11"></script>
 
 <script>
 let adminReports = [];
@@ -900,5 +944,18 @@ function exportReportsCSV() {
     a.click();
 }
 </script>
+
+<!-- FLOATING THEME QUICK-TOGGLE -->
+<button
+    type="button"
+    id="floatingThemeToggle"
+    class="floating-theme-btn theme-toggle-btn"
+    onclick="toggleCareTheme()"
+    aria-label="Toggle Light / Dark Mode"
+    title="Toggle Theme (Tap to switch mode)"
+>
+    <i class="fa-solid fa-moon theme-icon"></i>
+</button>
+
 </body>
 </html>

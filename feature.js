@@ -1,4 +1,4 @@
-/* =====================================================
+﻿/* =====================================================
    C.A.R.E.
    Civic Action and Reporting Engine
 
@@ -200,8 +200,6 @@
 
     }
 
-    }
-
 
     /* =================================================
        HTML SECURITY
@@ -293,110 +291,7 @@
     ================================================= */
 
     function createDemoReport() {
-        return;
-    }
-
-
-        const now =
-            Date.now();
-
-
-        const report = {
-
-            id:
-                "CARE-DEMO-001",
-
-            citizenId:
-                getCitizenId(),
-
-            citizenName:
-                "Demo Citizen",
-
-            category:
-                "Pothole",
-
-            description:
-                "Large pothole reported near the main road.",
-
-            latitude:
-                28.9845,
-
-            longitude:
-                77.7064,
-
-            department:
-                "PWD / Roads",
-
-            ward:
-                "Ward 12",
-
-            assignedTo:
-                "Road Maintenance Team",
-
-            status:
-                "In Progress",
-
-            createdAt:
-                new Date(
-                    now - 86400000
-                ).toISOString(),
-
-            updatedAt:
-                new Date(
-                    now - 3600000
-                ).toISOString(),
-
-            timeline: [
-
-                [
-                    "Reported",
-
-                    new Date(
-                        now - 86400000
-                    ).toISOString(),
-
-                    "Citizen submitted report."
-                ],
-
-                [
-                    "Verified",
-
-                    new Date(
-                        now - 82800000
-                    ).toISOString(),
-
-                    "Municipal desk verified the issue."
-                ],
-
-                [
-                    "Assigned",
-
-                    new Date(
-                        now - 72000000
-                    ).toISOString(),
-
-                    "Assigned to PWD / Roads."
-                ],
-
-                [
-                    "In Progress",
-
-                    new Date(
-                        now - 3600000
-                    ).toISOString(),
-
-                    "Repair team started work."
-                ]
-
-            ]
-
-        };
-
-
-        saveReports([
-            report
-        ]);
-
+        // Disabled demo report injection
     }
 
 
@@ -1516,7 +1411,6 @@
             `;
 
         }
-
     }
 
 
@@ -1776,7 +1670,6 @@
             );
 
         }
-
     }
 
 
