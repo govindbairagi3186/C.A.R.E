@@ -687,6 +687,17 @@ let adminReports = [];
 let adminMapInstance = null;
 let adminMarkerGroup = null;
 
+function getSupabase() {
+    if (window.supabaseClient) return window.supabaseClient;
+    if (window.supabase && typeof window.supabase.createClient === "function") {
+        const url = (window.CARE_CONFIG && window.CARE_CONFIG.supabaseUrl) || "https://wcocovvkzxgxqbscyuuj.supabase.co";
+        const key = (window.CARE_CONFIG && window.CARE_CONFIG.supabaseAnonKey) || "sb_publishable_DaY-2qm2HWCUuLfhaXwFFg_Eg05_MX3";
+        window.supabaseClient = window.supabase.createClient(url, key);
+        return window.supabaseClient;
+    }
+    return null;
+}
+
 function getAdminAccounts() {
     const cfg = window.CARE_CONFIG || {};
     const accounts = [];
@@ -713,8 +724,28 @@ function getAdminAccounts() {
     return accounts;
 }
 
-function checkAdminSession() {
+async function checkAdminSession() {
     try {
+        const sb = getSupabase();
+        if (sb && sb.auth) {
+            const { data } = await sb.auth.getSession();
+            if (data && data.session && data.session.user) {
+                const u = data.session.user;
+                const metadata = u.user_metadata || {};
+                const userObj = {
+                    email: u.email,
+                    name: metadata.full_name || metadata.name || u.email.split('@')[0],
+                    role: metadata.role || "Municipal Admin Officer",
+                    id: u.id,
+                    provider: "supabase"
+                };
+                sessionStorage.setItem("care_admin_auth", "true");
+                sessionStorage.setItem("care_admin_user", JSON.stringify(userObj));
+                showAdminDashboard(userObj);
+                return true;
+            }
+        }
+
         const isAuth = sessionStorage.getItem("care_admin_auth");
         if (isAuth === "true") {
             let user = {};
@@ -726,12 +757,14 @@ function checkAdminSession() {
             showAdminDashboard(user);
             return true;
         }
-    } catch (e) {}
+    } catch (e) {
+        console.warn("Admin session verification notice:", e);
+    }
     showLoginPage();
     return false;
 }
 
-function handleAdminLogin(e) {
+async function handleAdminLogin(e) {
     if (e) e.preventDefault();
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
@@ -739,8 +772,8 @@ function handleAdminLogin(e) {
     const loginCard = document.getElementById("loginCard");
     const loginButton = document.getElementById("loginButton");
 
-    const emailVal = (emailInput ? emailInput.value : "").trim().toLowerCase();
-    const passwordVal = (passwordInput ? passwordInput.value : "").trim();
+    const emailVal = (emailInput ? emailInput.value : "").trim();
+    const passwordVal = (passwordInput ? passwordInput.value : "");
 
     if (errorBox) {
         errorBox.style.display = "none";
@@ -752,38 +785,79 @@ function handleAdminLogin(e) {
         return;
     }
 
-    const accounts = getAdminAccounts();
-    const matchedAccount = accounts.find(acc => acc.email === emailVal && acc.password === passwordVal);
+    if (loginButton) {
+        loginButton.disabled = true;
+        loginButton.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...`;
+    }
 
-    if (matchedAccount) {
-        if (loginButton) {
-            loginButton.disabled = true;
-            loginButton.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...`;
+    let authSuccess = false;
+    let authUser = null;
+    let authErrorMessage = "";
+
+    // 1. Authenticate with Supabase Auth
+    const sb = getSupabase();
+    if (sb && sb.auth) {
+        try {
+            const { data, error } = await sb.auth.signInWithPassword({
+                email: emailVal,
+                password: passwordVal
+            });
+
+            if (!error && data && data.user) {
+                authSuccess = true;
+                const metadata = data.user.user_metadata || {};
+                authUser = {
+                    email: data.user.email,
+                    name: metadata.full_name || metadata.name || data.user.email.split('@')[0],
+                    role: metadata.role || "Municipal Admin Officer",
+                    id: data.user.id,
+                    provider: "supabase"
+                };
+            } else if (error) {
+                authErrorMessage = error.message;
+                console.warn("Supabase Auth notice:", error.message);
+            }
+        } catch (err) {
+            console.warn("Supabase Auth catch:", err);
+            authErrorMessage = err.message;
+        }
+    }
+
+    // 2. Fallback: Check local configure.js admin accounts
+    if (!authSuccess) {
+        const accounts = getAdminAccounts();
+        const matchedAccount = accounts.find(acc => acc.email.toLowerCase() === emailVal.toLowerCase() && acc.password === passwordVal);
+        if (matchedAccount) {
+            authSuccess = true;
+            authUser = {
+                email: matchedAccount.email,
+                name: matchedAccount.name,
+                role: matchedAccount.role,
+                provider: "local_admin"
+            };
+        }
+    }
+
+    if (loginButton) {
+        loginButton.disabled = false;
+        loginButton.innerHTML = `🔐 Sign In to Console`;
+    }
+
+    if (authSuccess && authUser) {
+        try {
+            sessionStorage.setItem("care_admin_auth", "true");
+            sessionStorage.setItem("care_admin_user", JSON.stringify({
+                ...authUser,
+                loginTime: new Date().toISOString()
+            }));
+        } catch (err) {
+            console.warn("SessionStorage error:", err);
         }
 
-        setTimeout(() => {
-            try {
-                sessionStorage.setItem("care_admin_auth", "true");
-                sessionStorage.setItem("care_admin_user", JSON.stringify({
-                    email: matchedAccount.email,
-                    name: matchedAccount.name,
-                    role: matchedAccount.role,
-                    loginTime: new Date().toISOString()
-                }));
-            } catch (err) {
-                console.warn("SessionStorage error:", err);
-            }
-
-            if (loginButton) {
-                loginButton.disabled = false;
-                loginButton.innerHTML = `🔐 Sign In to Console`;
-            }
-
-            showAdminDashboard(matchedAccount);
-        }, 300);
+        showAdminDashboard(authUser);
     } else {
-        // Invalid credentials
-        showLoginError("Invalid Email or Password. Please check your credentials and try again.");
+        const displayMsg = authErrorMessage ? `Authentication Failed: ${authErrorMessage}` : "Invalid Email or Password. Please check your credentials and try again.";
+        showLoginError(displayMsg);
         if (loginCard) {
             loginCard.classList.remove("login-shake");
             void loginCard.offsetWidth; // force CSS reflow
@@ -867,7 +941,14 @@ function showLoginPage() {
     if (adminApp) adminApp.style.display = "none";
 }
 
-function logoutAdmin() {
+async function logoutAdmin() {
+    try {
+        const sb = getSupabase();
+        if (sb && sb.auth) {
+            await sb.auth.signOut();
+        }
+    } catch (e) {}
+
     try {
         sessionStorage.removeItem("care_admin_auth");
         sessionStorage.removeItem("care_admin_user");
