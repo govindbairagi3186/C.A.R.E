@@ -156,13 +156,32 @@
 
         #loginError {
             display: none;
-            padding: 12px;
+            padding: 12px 14px;
             margin-bottom: 18px;
             border-radius: 10px;
             background: #fff1f2;
             border: 1px solid #fecdd3;
             color: #be123c;
-            font-size: 13px;
+            font-size: 13.5px;
+            font-weight: 600;
+            line-height: 1.4;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .login-shake {
+            animation: cardShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        @keyframes cardShake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(3px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+            40%, 60% { transform: translate3d(5px, 0, 0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ADMIN CONSOLE */
@@ -475,7 +494,7 @@
 
 <!-- LOGIN PAGE -->
 <section id="loginPage">
-    <div class="login-card">
+    <div class="login-card" id="loginCard">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <div class="logo" style="margin-bottom:0;">C</div>
             <button
@@ -494,19 +513,28 @@
 
         <div id="loginError"></div>
 
-        <form id="loginForm">
+        <form id="loginForm" autocomplete="on">
             <div class="form-group">
-                <label for="email">Admin Email</label>
-                <input id="email" type="email" placeholder="admin@care.gov.in" value="admin@care.gov.in" required>
+                <label for="email"><i class="fa-solid fa-envelope"></i> Admin Email</label>
+                <input id="email" type="email" placeholder="e.g. admin@care.gov.in" required autocomplete="username">
             </div>
 
             <div class="form-group">
-                <label for="password">Password</label>
-                <input id="password" type="password" placeholder="••••••••" value="admin123" required>
+                <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
+                <div style="position:relative; display:flex; align-items:center;">
+                    <input id="password" type="password" placeholder="Enter password" required autocomplete="current-password" style="padding-right:45px;">
+                    <button type="button" id="togglePasswordBtn" onclick="togglePasswordVisibility()" style="position:absolute; right:12px; background:none; border:none; color:#64748b; cursor:pointer; font-size:15px; padding:4px;" title="Show/Hide Password">
+                        <i class="fa-solid fa-eye" id="passwordEyeIcon"></i>
+                    </button>
+                </div>
             </div>
 
             <button id="loginButton" type="submit">
                 🔐 Sign In to Console
+            </button>
+
+            <button type="button" class="demo-login-btn" onclick="fillDemoCredentials()">
+                🔑 Quick Fill Demo Credentials
             </button>
         </form>
     </div>
@@ -525,6 +553,10 @@
         </div>
 
         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <span id="adminOfficerBadge" style="font-size:12px; font-weight:700; color:#0b5ed7; background:#eff6ff; border:1px solid #bfdbfe; padding:4px 10px; border-radius:999px;">
+                <i class="fa-solid fa-user-shield"></i> <span id="adminOfficerRole">Super Admin Officer</span>
+            </span>
+
             <span style="font-size:12px; font-weight:700; color:#15803d; background:#dcfce7; padding:4px 10px; border-radius:999px;">
                 ● LIVE MUNICIPAL NETWORK
             </span>
@@ -678,14 +710,157 @@ let adminReports = [];
 let adminMapInstance = null;
 let adminMarkerGroup = null;
 
+function getAdminAccounts() {
+    const cfg = window.CARE_CONFIG || {};
+    const accounts = [];
+    if (cfg.admin && cfg.admin.email) {
+        accounts.push({
+            email: String(cfg.admin.email).trim().toLowerCase(),
+            password: String(cfg.admin.password || "admin123"),
+            name: cfg.admin.role || "Super Admin Officer",
+            role: cfg.admin.role || "Super Admin"
+        });
+    }
+    if (Array.isArray(cfg.adminAccounts)) {
+        cfg.adminAccounts.forEach(acc => {
+            if (acc && acc.email && !accounts.some(a => a.email === String(acc.email).trim().toLowerCase())) {
+                accounts.push({
+                    email: String(acc.email).trim().toLowerCase(),
+                    password: String(acc.password),
+                    name: acc.name || acc.role || "Admin Officer",
+                    role: acc.role || "Admin Officer"
+                });
+            }
+        });
+    }
+    return accounts;
+}
+
+function checkAdminSession() {
+    try {
+        const isAuth = sessionStorage.getItem("care_admin_auth");
+        if (isAuth === "true") {
+            let user = {};
+            try {
+                user = JSON.parse(sessionStorage.getItem("care_admin_user") || "{}");
+            } catch (err) {
+                user = {};
+            }
+            showAdminDashboard(user);
+            return true;
+        }
+    } catch (e) {}
+    showLoginPage();
+    return false;
+}
+
+function handleAdminLogin(e) {
+    if (e) e.preventDefault();
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const errorBox = document.getElementById("loginError");
+    const loginCard = document.getElementById("loginCard");
+    const loginButton = document.getElementById("loginButton");
+
+    const emailVal = (emailInput ? emailInput.value : "").trim().toLowerCase();
+    const passwordVal = (passwordInput ? passwordInput.value : "").trim();
+
+    if (errorBox) {
+        errorBox.style.display = "none";
+        errorBox.innerHTML = "";
+    }
+
+    if (!emailVal || !passwordVal) {
+        showLoginError("Please enter both email and password.");
+        return;
+    }
+
+    const accounts = getAdminAccounts();
+    const matchedAccount = accounts.find(acc => acc.email === emailVal && acc.password === passwordVal);
+
+    if (matchedAccount) {
+        if (loginButton) {
+            loginButton.disabled = true;
+            loginButton.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...`;
+        }
+
+        setTimeout(() => {
+            try {
+                sessionStorage.setItem("care_admin_auth", "true");
+                sessionStorage.setItem("care_admin_user", JSON.stringify({
+                    email: matchedAccount.email,
+                    name: matchedAccount.name,
+                    role: matchedAccount.role,
+                    loginTime: new Date().toISOString()
+                }));
+            } catch (err) {
+                console.warn("SessionStorage error:", err);
+            }
+
+            if (loginButton) {
+                loginButton.disabled = false;
+                loginButton.innerHTML = `🔐 Sign In to Console`;
+            }
+
+            showAdminDashboard(matchedAccount);
+        }, 300);
+    } else {
+        // Invalid credentials
+        showLoginError("Invalid Email or Password. Please check your credentials and try again.");
+        if (loginCard) {
+            loginCard.classList.remove("login-shake");
+            void loginCard.offsetWidth; // force CSS reflow
+            loginCard.classList.add("login-shake");
+        }
+        if (passwordInput) {
+            passwordInput.value = "";
+            passwordInput.focus();
+        }
+    }
+}
+
+function showLoginError(msg) {
+    const errorBox = document.getElementById("loginError");
+    if (errorBox) {
+        errorBox.style.display = "block";
+        errorBox.innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-triangle-exclamation"></i> <span>${msg}</span></div>`;
+    }
+}
+
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById("password");
+    const icon = document.getElementById("passwordEyeIcon");
+    if (!passwordInput) return;
+
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        if (icon) icon.className = "fa-solid fa-eye-slash";
+    } else {
+        passwordInput.type = "password";
+        if (icon) icon.className = "fa-solid fa-eye";
+    }
+}
+
+function fillDemoCredentials() {
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const errorBox = document.getElementById("loginError");
+    if (errorBox) {
+        errorBox.style.display = "none";
+        errorBox.innerHTML = "";
+    }
+
+    const cfg = (window.CARE_CONFIG && window.CARE_CONFIG.admin) || { email: "admin@care.gov.in", password: "admin123" };
+    if (emailInput) emailInput.value = cfg.email || "admin@care.gov.in";
+    if (passwordInput) passwordInput.value = cfg.password || "admin123";
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById("loginForm");
     if (form) {
-        form.addEventListener("submit", function(e) {
-            e.preventDefault();
-            showAdminDashboard();
-        });
+        form.addEventListener("submit", handleAdminLogin);
     }
+    checkAdminSession();
 });
 
 window.addEventListener("care:reports-updated", function() {
@@ -699,16 +874,50 @@ window.addEventListener("storage", function() {
     }
 });
 
-function showAdminDashboard() {
-    document.getElementById("loginPage").style.display = "none";
-    document.getElementById("adminApp").style.display = "block";
+function showAdminDashboard(user) {
+    const loginPage = document.getElementById("loginPage");
+    const adminApp = document.getElementById("adminApp");
+    if (loginPage) loginPage.style.display = "none";
+    if (adminApp) adminApp.style.display = "block";
+
+    if (!user) {
+        try {
+            user = JSON.parse(sessionStorage.getItem("care_admin_user") || "{}");
+        } catch (e) {
+            user = {};
+        }
+    }
+
+    const roleEl = document.getElementById("adminOfficerRole");
+    if (roleEl && user && (user.role || user.name)) {
+        roleEl.textContent = user.name || user.role;
+    }
+
     loadAdminReports();
     setTimeout(initAdminMap, 200);
 }
 
+function showLoginPage() {
+    const loginPage = document.getElementById("loginPage");
+    const adminApp = document.getElementById("adminApp");
+    if (loginPage) loginPage.style.display = "flex";
+    if (adminApp) adminApp.style.display = "none";
+}
+
 function logoutAdmin() {
-    document.getElementById("adminApp").style.display = "none";
-    document.getElementById("loginPage").style.display = "flex";
+    try {
+        sessionStorage.removeItem("care_admin_auth");
+        sessionStorage.removeItem("care_admin_user");
+    } catch (e) {}
+
+    const passwordInput = document.getElementById("password");
+    if (passwordInput) passwordInput.value = "";
+    const errorBox = document.getElementById("loginError");
+    if (errorBox) {
+        errorBox.style.display = "none";
+        errorBox.innerHTML = "";
+    }
+    showLoginPage();
 }
 
 function loadAdminReports() {
