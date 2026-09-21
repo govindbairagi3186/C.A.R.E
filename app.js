@@ -11,6 +11,7 @@ let supabaseClient = null;
 try {
     if (window.supabase && window.supabase.createClient) {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        window.supabaseClient = supabaseClient;
     }
 } catch (err) {
     console.warn("Supabase initialization deferred:", err);
