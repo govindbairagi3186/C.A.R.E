@@ -79,8 +79,23 @@ window.CARE_CONFIG = {
     // Admin Credentials
     admin: {
         email: "admin@care.gov.in",
+        password: "admin123",
         role: "Super Admin Officer"
-    }
+    },
+    adminAccounts: [
+        {
+            email: "admin@care.gov.in",
+            password: "admin123",
+            name: "Super Admin Officer",
+            role: "Super Admin"
+        },
+        {
+            email: "officer@care.gov.in",
+            password: "care2026",
+            name: "Municipal Grievance Officer",
+            role: "Municipal Officer"
+        }
+    ]
 };
 
 /* =====================================================
