@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0b5ed7"
+    >
+
+    <title>CivicSutra | Make Your City Better</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+<body>
+
+<!-- =========================
+     NAVBAR
+========================= -->
+
+<header class="navbar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            🏙️
+        </div>
+
+        <div>
+            <h2>CivicSutra</h2>
+            <span>Citizen • Report • Resolve</span>
+        </div>
+
+    </div>
+
+
+    <nav>
+
+        <button
+            class="nav-link active"
+            onclick="showPage('home')"
+        >
+            Home
+        </button>
+
+        <button
+            class="nav-link"
+            onclick="showPage('reports')"
+        >
+            Reports
+        </button>
+
+        <button
+            class="nav-link"
+            onclick="showPage('about')"
+        >
+            About
+        </button>
+
+    </nav>
+
+
+    <button
+        class="nav-report-btn"
+        onclick="showPage('report')"
+    >
+        + Report Issue
+    </button>
+
+</header>
+
+
+<!-- =========================
+     HOME PAGE
+========================= -->
+
+<main id="homePage" class="page active-page">
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <div class="badge">
+                🇮🇳 Powered by Citizens
+            </div>
+
+            <h1>
+                Your City.
+                <br>
+                <span>Your Voice.</span>
+                <br>
+                Your Action.
+            </h1>
+
+            <p>
+
+                Report potholes, garbage,
+                broken streetlights and other
+                civic problems directly from
+                your phone.
+
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <button
+                    class="primary-btn"
+                    onclick="showPage('report')"
+                >
+                    🚨 Report an Issue
+                </button>
+
+
+                <button
+                    class="secondary-btn"
+                    onclick="showPage('reports')"
+                >
+                    🗺️ Explore Reports
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-card">
+
+            <div class="floating-card card-one">
+
+                <span>🕳️</span>
+
+                <div>
+                    <strong>Pothole</strong>
+                    <small>Reported nearby</small>
+                </div>
+
+                <b>NEW</b>
+
+            </div>
+
+
+            <div class="floating-card card-two">
+
+                <span>🗑️</span>
+
+                <div>
+                    <strong>Garbage</strong>
+                    <small>Being resolved</small>
+                </div>
+
+                <b>72%</b>
+
+            </div>
+
+
+            <div class="city-preview">
+
+                <div class="map-grid">
+
+                    <span>📍</span>
+                    <span>📍</span>
+                    <span>📍</span>
+                    <span>📍</span>
+
+                </div>
+
+                <div class="city-label">
+                    Community Issue Map
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         STATISTICS
+    ========================= -->
+
+    <section class="statistics">
+
+        <div class="stat">
+
+            <span>📋</span>
+
+            <div>
+                <strong id="totalIssues">
+                    0
+                </strong>
+
+                <p>Total Reports</p>
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <span>🔎</span>
+
+            <div>
+                <strong id="verifiedIssues">
+                    0
+                </strong>
+
+                <p>Verified</p>
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <span>🔧</span>
+
+            <div>
+                <strong id="progressIssues">
+                    0
+                </strong>
+
+                <p>In Progress</p>
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <span>✅</span>
+
+            <div>
+                <strong id="resolvedIssues">
+                    0
+                </strong>
+
+                <p>Resolved</p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         CATEGORIES
+    ========================= -->
+
+    <section class="section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-label">
+                    WHAT CAN YOU REPORT?
+                </span>
+
+                <h2>
+                    Help improve your neighborhood
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="category-grid">
+
+            <button
+                class="category-card"
+                onclick="startReport('Pothole')"
+            >
+
+                <div class="category-icon">
+                    🕳️
+                </div>
+
+                <h3>Potholes</h3>
+
+                <p>
+                    Damaged roads and potholes
+                </p>
+
+            </button>
+
+
+            <button
+                class="category-card"
+                onclick="startReport('Garbage')"
+            >
+
+                <div class="category-icon">
+                    🗑️
+                </div>
+
+                <h3>Garbage</h3>
+
+                <p>
+                    Uncollected waste and dumping
+                </p>
+
+            </button>
+
+
+            <button
+                class="category-card"
+                onclick="startReport('Streetlight')"
+            >
+
+                <div class="category-icon">
+                    💡
+                </div>
+
+                <h3>Streetlights</h3>
+
+                <p>
+                    Broken or non-working lights
+                </p>
+
+            </button>
+
+
+            <button
+                class="category-card"
+                onclick="startReport('Drainage')"
+            >
+
+                <div class="category-icon">
+                    🌊
+                </div>
+
+                <h3>Drainage</h3>
+
+                <p>
+                    Blocked drains and waterlogging
+                </p>
+
+            </button>
+
+
+            <button
+                class="category-card"
+                onclick="startReport('Road Damage')"
+            >
+
+                <div class="category-icon">
+                    🚧
+                </div>
+
+                <h3>Road Damage</h3>
+
+                <p>
+                    Damaged roads and infrastructure
+                </p>
+
+            </button>
+
+
+            <button
+                class="category-card"
+                onclick="startReport('Other')"
+            >
+
+                <div class="category-icon">
+                    📍
+                </div>
+
+                <h3>Other</h3>
+
+                <p>
+                    Any other civic issue
+                </p>
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         HOW IT WORKS
+    ========================= -->
+
+    <section class="how-section">
+
+        <div class="section-heading center">
+
+            <span class="section-label">
+                SIMPLE PROCESS
+            </span>
+
+            <h2>
+                Report. Track. Resolve.
+            </h2>
+
+        </div>
+
+
+        <div class="steps">
+
+            <div class="step">
+
+                <div class="step-number">
+                    01
+                </div>
+
+                <div class="step-icon">
+                    📸
+                </div>
+
+                <h3>Report</h3>
+
+                <p>
+                    Take a photo and describe
+                    the civic problem.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    02
+                </div>
+
+                <div class="step-icon">
+                    📍
+                </div>
+
+                <h3>Locate</h3>
+
+                <p>
+                    GPS automatically identifies
+                    where the problem exists.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    03
+                </div>
+
+                <div class="step-icon">
+                    🏛️
+                </div>
+
+                <h3>Verify</h3>
+
+                <p>
+                    The issue reaches the
+                    appropriate authority.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    04
+                </div>
+
+                <div class="step-icon">
+                    ✅
+                </div>
+
+                <h3>Resolve</h3>
+
+                <p>
+                    Track progress until the
+                    problem is resolved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================
+     REPORT PAGE
+========================= -->
+
+<main
+    id="reportPage"
+    class="page"
+>
+
+    <section class="form-section">
+
+        <div class="form-header">
+
+            <span class="section-label">
+                CIVIC REPORT
+            </span>
+
+            <h1>
+                Report a Problem
+            </h1>
+
+            <p>
+                Give your community the information
+                needed to fix the issue.
+            </p>
+
+        </div>
+
+
+        <form id="issueForm">
+
+
+            <div class="form-group">
+
+                <label>
+                    Issue Category
+                </label>
+
+                <select
+                    id="category"
+                    required
+                >
+
+                    <option value="">
+                        Select a category
+                    </option>
+
+                    <option value="Pothole">
+                        🕳️ Pothole
+                    </option>
+
+                    <option value="Garbage">
+                        🗑️ Garbage
+                    </option>
+
+                    <option value="Streetlight">
+                        💡 Broken Streetlight
+                    </option>
+
+                    <option value="Drainage">
+                        🌊 Drainage
+                    </option>
+
+                    <option value="Road Damage">
+                        🚧 Road Damage
+                    </option>
+
+                    <option value="Other">
+                        📍 Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Describe the problem
+                </label>
+
+                <textarea
+                    id="description"
+                    placeholder="Example: Large pothole near the college gate..."
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Photo Evidence
+                </label>
+
+                <div class="upload-box">
+
+                    <div class="upload-icon">
+                        📸
+                    </div>
+
+                    <strong>
+                        Upload a photo
+                    </strong>
+
+                    <p>
+                        JPG, PNG or WEBP
+                    </p>
+
+                    <input
+                        type="file"
+                        id="image"
+                        accept="image/*"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Location
+                </label>
+
+                <div class="location-box">
+
+                    <div>
+
+                        <span class="location-icon">
+                            📍
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Your current location
+                            </strong>
+
+                            <p id="locationText">
+                                Location not captured yet
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="location-btn"
+                        onclick="getLocation()"
+                    >
+                        Detect Location
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <input
+                type="hidden"
+                id="latitude"
+            >
+
+            <input
+                type="hidden"
+                id="longitude"
+            >
+
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="showPage('home')"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                >
+                    Submit Report →
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<!-- =========================
+     REPORTS PAGE
+========================= -->
+
+<main
+    id="reportsPage"
+    class="page"
+>
+
+    <section class="section reports-page">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-label">
+                    COMMUNITY
+                </span>
+
+                <h1>
+                    Recent Civic Reports
+                </h1>
+
+                <p>
+                    See issues reported by the community.
+                </p>
+
+            </div>
+
+            <button
+                class="primary-btn"
+                onclick="showPage('report')"
+            >
+                + Report Issue
+            </button>
+
+        </div>
+
+
+        <div
+            id="issuesContainer"
+            class="issues-grid"
+        >
+
+            <!-- Reports loaded by JavaScript -->
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================
+     ABOUT PAGE
+========================= -->
+
+<main
+    id="aboutPage"
+    class="page"
+>
+
+    <section class="about-section">
+
+        <div class="about-card">
+
+            <div class="about-logo">
+                🏙️
+            </div>
+
+            <span class="section-label">
+                ABOUT CIVICSUTRA
+            </span>
+
+            <h1>
+                Technology for
+                better communities.
+            </h1>
+
+            <p>
+
+                CivicSutra connects citizens
+                and civic authorities through
+                a transparent issue-reporting
+                platform.
+
+            </p>
+
+
+            <div class="about-features">
+
+                <div>
+                    📍
+                    <strong>Location Based</strong>
+                </div>
+
+                <div>
+                    📸
+                    <strong>Photo Evidence</strong>
+                </div>
+
+                <div>
+                    🏛️
+                    <strong>Authority Workflow</strong>
+                </div>
+
+                <div>
+                    📊
+                    <strong>Data Driven</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================
+     TOAST
+========================= -->
+
+<div
+    id="toast"
+    class="toast"
+>
+    <span id="toastMessage"></span>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="app.js"></script>
+
+</body>
+
+</html>

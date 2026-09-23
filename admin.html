@@ -20,6 +20,24 @@
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Leaflet Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Theme Initialization Script (prevents FOUC) -->
+    <script>
+        (function() {
+            var theme = localStorage.getItem('care_theme');
+            if (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                theme = 'dark';
+            }
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
 
     <style>
         :root {
@@ -85,6 +103,7 @@
             font-size: 26px;
             font-weight: 800;
             margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(11, 94, 215, 0.3);
         }
 
         .form-group {
@@ -108,6 +127,7 @@
             color: white;
             font-size: 14px;
             outline: none;
+            transition: 0.2s;
         }
 
         .form-group input:focus {
