@@ -2,68 +2,30 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        C.A.R.E. — Civic Action and Reporting Engine
-    </title>
-
-    <meta
-        name="description"
-        content="C.A.R.E. — Civic Action and Reporting Engine. Report, track and resolve local civic issues."
-    >
-
-    <meta
-        name="application-name"
-        content="C.A.R.E."
-    >
-
-    <meta
-        name="theme-color"
-        content="#0b5ed7"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C.A.R.E. — Civic Action and Reporting Engine</title>
+    <meta name="description" content="C.A.R.E. — Civic Action and Reporting Engine. Report, track and resolve local civic issues.">
+    <meta name="application-name" content="C.A.R.E.">
+    <meta name="theme-color" content="#0b5ed7">
 
     <!-- Google Font -->
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
+    <!-- Leaflet GIS Map Library -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-    <!-- Supabase -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    ></script>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- Font Awesome Icons -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Main CSS -->
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <link rel="stylesheet" href="style.css">
 
-    <!-- Small admin button styles -->
     <style>
         .admin-access {
             text-align: center;
@@ -88,991 +50,500 @@
             transform: translateY(-1px);
         }
     </style>
-
 </head>
-
 
 <body>
 
 <!-- =====================================================
      HEADER
 ===================================================== -->
-
 <header class="header">
-
     <div class="container nav-container">
-
-        <a
-            href="#"
-            class="logo"
-            onclick="showPage('home'); return false;"
-        >
-
-            <div class="logo-icon">
-                C
-            </div>
-
+        <a href="#" class="logo" onclick="showPage('home'); return false;">
+            <div class="logo-icon">C</div>
             <div class="logo-text">
-
                 <strong>C.A.R.E.</strong>
-
-                <span>
-                    Civic Action &amp; Reporting Engine
-                </span>
-
+                <span>Civic Action &amp; Reporting Engine</span>
             </div>
-
         </a>
 
-
         <nav class="nav">
-
-            <button
-                type="button"
-                class="nav-link active"
-                onclick="showPage('home')"
-            >
-                Home
-            </button>
-
-            <button
-                type="button"
-                class="nav-link"
-                onclick="showPage('reports')"
-            >
-                Reports
-            </button>
-
-            <button
-                type="button"
-                class="nav-link"
-                onclick="showPage('about')"
-            >
-                About
-            </button>
-
+            <button type="button" class="nav-link active" onclick="showPage('home')">Home</button>
+            <button type="button" class="nav-link" onclick="showPage('reports')">Reports</button>
+            <button type="button" class="nav-link" onclick="showPage('about')">About</button>
         </nav>
 
-
-        <button
-            type="button"
-            class="nav-report-button"
-            onclick="showPage('report')"
-        >
-            Report Issue
-        </button>
-
+        <div style="display:flex; align-items:center; gap:12px;">
+            <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark/Light Theme">
+                <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
+            </button>
+            <button type="button" class="nav-report-button" onclick="showPage('report')">
+                <i class="fa-solid fa-plus"></i> Report Issue
+            </button>
+        </div>
     </div>
-
 </header>
-
 
 <!-- =====================================================
      MAIN
 ===================================================== -->
-
 <main>
-
 
 <!-- =====================================================
      HOME PAGE
 ===================================================== -->
-
-<section
-    id="homePage"
-    class="page active-page"
->
-
+<section id="homePage" class="page active-page">
     <div class="hero">
-
         <div class="container hero-content">
-
             <div class="hero-text">
-
                 <div class="badge">
                     <i class="fa-solid fa-earth-americas"></i> Made by GOVIND VAISHNAV AND TEAM 
                 </div>
 
                 <h1>
                     Report Civic Issues.
-                    <span>
-                        Make Your City Better.
-                    </span>
+                    <span>Make Your City Better.</span>
                 </h1>
 
                 <p class="hero-description">
-                    C.A.R.E. makes it simple for citizens
-                    to report potholes, garbage, damaged roads,
-                    drainage problems, broken streetlights and
-                    other civic issues.
+                    C.A.R.E. connects citizens directly with municipal departments to report, track, upvote, and resolve potholes, garbage overflow, streetlights, drainage, and road hazards.
                 </p>
 
                 <div class="hero-buttons">
-
-                    <button
-                        type="button"
-                        class="primary-button"
-                        onclick="showPage('report')"
-                    >
+                    <button type="button" class="primary-button" onclick="showPage('report')">
                         <i class="fa-solid fa-bullhorn"></i> Report an Issue
                     </button>
 
-                    <button
-                        type="button"
-                        class="secondary-button"
-                        onclick="showPage('reports')"
-                    >
-                        <i class="fa-solid fa-map-location-dot"></i> View Reports
+                    <button type="button" class="secondary-button" onclick="showPage('reports')">
+                        <i class="fa-solid fa-map-location-dot"></i> Explore GIS Map
                     </button>
-
                 </div>
-
             </div>
-
 
             <div class="hero-card">
-
                 <div class="hero-card-header">
-
-                    <span>
-                        C.A.R.E.
-                    </span>
-
-                    <span class="live-dot">
-                        ● LIVE
-                    </span>
-
+                    <span>C.A.R.E. ENGINE</span>
+                    <span class="live-dot">● LIVE SYNC</span>
                 </div>
-
 
                 <div class="hero-card-map">
-
                     <div class="map-grid">
-
-                        <div class="map-pin pin-one">
-                            <i class="fa-solid fa-circle-dot"></i>
-                        </div>
-
-                        <div class="map-pin pin-two">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </div>
-
-                        <div class="map-pin pin-three">
-                            <i class="fa-solid fa-lightbulb"></i>
-                        </div>
-
-                        <div class="map-pin pin-four">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </div>
-
+                        <div class="map-pin pin-one"><i class="fa-solid fa-circle-dot"></i></div>
+                        <div class="map-pin pin-two"><i class="fa-solid fa-trash-can"></i></div>
+                        <div class="map-pin pin-three"><i class="fa-solid fa-lightbulb"></i></div>
+                        <div class="map-pin pin-four"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     </div>
-
                 </div>
-
 
                 <div class="hero-card-footer">
-
                     <div>
-                        <strong id="heroReportCount">
-                            0
-                        </strong>
-
-                        <span>
-                            Reports
-                        </span>
+                        <strong id="heroReportCount">0</strong>
+                        <span>Active Reports</span>
                     </div>
 
                     <div>
-                        <strong>
-                            <i class="fa-solid fa-location-dot"></i>
-                        </strong>
-
-                        <span>
-                            Location Based
-                        </span>
+                        <strong><i class="fa-solid fa-location-dot"></i></strong>
+                        <span>GPS Geotagged</span>
                     </div>
 
                     <div>
-                        <strong>
-                            <i class="fa-solid fa-bolt"></i>
-                        </strong>
-
-                        <span>
-                            Fast Reporting
-                        </span>
+                        <strong><i class="fa-solid fa-bolt"></i></strong>
+                        <span>AI Classifier</span>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 
     <!-- ISSUE CATEGORIES -->
-
     <section class="section">
-
         <div class="container">
-
             <div class="section-heading">
-
                 <div>
-
-                    <span class="section-label">
-                        REPORT ANYTHING
-                    </span>
-
-                    <h2>
-                        What needs attention?
-                    </h2>
-
+                    <span class="section-label">REPORT ANYTHING</span>
+                    <h2>What needs attention?</h2>
                 </div>
-
-                <p>
-                    Select an issue category to start
-                    your report.
-                </p>
-
+                <p>Select a category to auto-assign the responsible municipal department.</p>
             </div>
-
 
             <div class="category-grid">
-
-                <button
-                    type="button"
-                    class="category-card"
-                    onclick="startReport('Pothole')"
-                >
-                    <div class="category-icon">
-                        <i class="fa-solid fa-circle-dot"></i>
-                    </div>
-
-                    <h3>
-                        Potholes
-                    </h3>
-
-                    <p>
-                        Damaged roads and potholes
-                    </p>
+                <button type="button" class="category-card" onclick="startReport('Pothole')">
+                    <div class="category-icon"><i class="fa-solid fa-circle-dot"></i></div>
+                    <h3>Potholes</h3>
+                    <p>Damaged roads and dangerous potholes</p>
                 </button>
 
-
-                <button
-                    type="button"
-                    class="category-card"
-                    onclick="startReport('Garbage')"
-                >
-                    <div class="category-icon">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </div>
-
-                    <h3>
-                        Garbage
-                    </h3>
-
-                    <p>
-                        Waste and overflowing bins
-                    </p>
+                <button type="button" class="category-card" onclick="startReport('Garbage')">
+                    <div class="category-icon"><i class="fa-solid fa-trash-can"></i></div>
+                    <h3>Garbage</h3>
+                    <p>Overflowing dumpsters and uncollected waste</p>
                 </button>
 
-
-                <button
-                    type="button"
-                    class="category-card"
-                    onclick="startReport('Streetlight')"
-                >
-                    <div class="category-icon">
-                        <i class="fa-solid fa-lightbulb"></i>
-                    </div>
-
-                    <h3>
-                        Streetlights
-                    </h3>
-
-                    <p>
-                        Broken or non-working lights
-                    </p>
+                <button type="button" class="category-card" onclick="startReport('Streetlight')">
+                    <div class="category-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                    <h3>Streetlights</h3>
+                    <p>Broken or dark streetlights</p>
                 </button>
 
-
-                <button
-                    type="button"
-                    class="category-card"
-                    onclick="startReport('Drainage')"
-                >
-                    <div class="category-icon">
-                        <i class="fa-solid fa-water"></i>
-                    </div>
-
-                    <h3>
-                        Drainage
-                    </h3>
-
-                    <p>
-                        Blocked drains and flooding
-                    </p>
+                <button type="button" class="category-card" onclick="startReport('Drainage')">
+                    <div class="category-icon"><i class="fa-solid fa-water"></i></div>
+                    <h3>Drainage</h3>
+                    <p>Blocked storm drains and waterlogging</p>
                 </button>
 
-
-                <button
-                    type="button"
-                    class="category-card"
-                    onclick="startReport('Road Damage')"
-                >
-                    <div class="category-icon">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-
-                    <h3>
-                        Road Damage
-                    </h3>
-
-                    <p>
-                        Broken or unsafe roads
-                    </p>
+                <button type="button" class="category-card" onclick="startReport('Road Damage')">
+                    <div class="category-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <h3>Road Damage</h3>
+                    <p>Broken curbs and road hazards</p>
                 </button>
 
-
-                <button
-                    type="button"
-                    class="category-card"
-                    onclick="startReport('Other')"
-                >
-                    <div class="category-icon">
-                        <i class="fa-solid fa-location-dot"></i>
-                    </div>
-
-                    <h3>
-                        Other
-                    </h3>
-
-                    <p>
-                        Any other civic issue
-                    </p>
+                <button type="button" class="category-card" onclick="startReport('Other')">
+                    <div class="category-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <h3>Other</h3>
+                    <p>Any other civic issue needing repair</p>
                 </button>
-
             </div>
-
         </div>
-
     </section>
-
 
     <!-- HOW IT WORKS -->
-
     <section class="section section-light">
-
         <div class="container">
-
             <div class="section-heading centered">
-
-                <span class="section-label">
-                    HOW IT WORKS
-                </span>
-
-                <h2>
-                    Report in three simple steps
-                </h2>
-
+                <span class="section-label">HOW IT WORKS</span>
+                <h2>Report in three simple steps</h2>
             </div>
-
 
             <div class="steps">
-
                 <div class="step">
-
-                    <div class="step-number">
-                        01
-                    </div>
-
-                    <div class="step-icon">
-                        <i class="fa-solid fa-camera"></i>
-                    </div>
-
-                    <h3>
-                        Capture
-                    </h3>
-
-                    <p>
-                        Take a photo of the civic issue
-                        and describe what needs attention.
-                    </p>
-
+                    <div class="step-number">01</div>
+                    <div class="step-icon"><i class="fa-solid fa-camera"></i></div>
+                    <h3>Capture</h3>
+                    <p>Upload a photo of the civic issue with optional details.</p>
                 </div>
 
-
                 <div class="step">
-
-                    <div class="step-number">
-                        02
-                    </div>
-
-                    <div class="step-icon">
-                        <i class="fa-solid fa-location-dot"></i>
-                    </div>
-
-                    <h3>
-                        Locate
-                    </h3>
-
-                    <p>
-                        Allow C.A.R.E. to capture the
-                        issue's location using GPS.
-                    </p>
-
+                    <div class="step-number">02</div>
+                    <div class="step-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <h3>Geotag</h3>
+                    <p>Draggable map pin or GPS auto-detects exact location address.</p>
                 </div>
 
-
                 <div class="step">
-
-                    <div class="step-number">
-                        03
-                    </div>
-
-                    <div class="step-icon">
-                        <i class="fa-solid fa-circle-check"></i>
-                    </div>
-
-                    <h3>
-                        Track
-                    </h3>
-
-                    <p>
-                        Submit your report and track
-                        its progress.
-                    </p>
-
+                    <div class="step-number">03</div>
+                    <div class="step-icon"><div class="step-icon"><i class="fa-solid fa-circle-check"></i></div></div>
+                    <h3>Track &amp; Resolve</h3>
+                    <p>Monitor real-time workflow status and before/after proof.</p>
                 </div>
-
             </div>
-
         </div>
-
     </section>
-
 </section>
-
 
 <!-- =====================================================
-     REPORT PAGE
+     REPORT ISSUE PAGE
 ===================================================== -->
-
-<section
-    id="reportPage"
-    class="page"
->
-
+<section id="reportPage" class="page">
     <div class="container page-container">
-
         <div class="page-header">
-
-            <span class="section-label">
-                C.A.R.E. REPORTING
-            </span>
-
-            <h1>
-                Report a Civic Issue
-            </h1>
-
-            <p>
-                Help improve your community by reporting
-                a problem.
-            </p>
-
+            <span class="section-label">C.A.R.E. REPORTING</span>
+            <h1>Report a Civic Issue</h1>
+            <p>Help improve your community by submitting a geotagged problem report.</p>
         </div>
 
-
-        <form
-            id="issueForm"
-            class="report-form"
-        >
-
+        <form id="issueForm" class="report-form">
             <!-- CATEGORY -->
-
             <div class="form-group">
-
-                <label for="category">
-                    Issue Category
-                </label>
-
-                <select
-                    id="category"
-                    required
-                >
-
-                    <option value="">
-                        Select an issue
-                    </option>
-
-                    <option value="Pothole">
-                        Pothole
-                    </option>
-
-                    <option value="Garbage">
-                        Garbage
-                    </option>
-
-                    <option value="Streetlight">
-                        Streetlight
-                    </option>
-
-                    <option value="Drainage">
-                        Drainage
-                    </option>
-
-                    <option value="Road Damage">
-                        Road Damage
-                    </option>
-
-                    <option value="Other">
-                        Other
-                    </option>
-
+                <label for="category">Issue Category *</label>
+                <select id="category" required>
+                    <option value="">Select an issue category</option>
+                    <option value="Pothole">Pothole</option>
+                    <option value="Garbage">Garbage</option>
+                    <option value="Streetlight">Streetlight</option>
+                    <option value="Drainage">Drainage</option>
+                    <option value="Road Damage">Road Damage</option>
+                    <option value="Water">Water Supply Leak</option>
+                    <option value="Other">Other Civic Issue</option>
                 </select>
-
             </div>
-
 
             <!-- DESCRIPTION -->
-
             <div class="form-group">
-
-                <label for="description">
-                    Describe the Issue
-                </label>
-
-                <textarea
-                    id="description"
-                    rows="5"
-                    maxlength="1000"
-                    placeholder="Describe the problem and its location..."
-                    required
-                ></textarea>
-
-                <small>
-                    Please provide useful details.
-                </small>
-
+                <label for="description">Describe the Issue *</label>
+                <textarea id="description" rows="4" maxlength="1000" placeholder="Provide details such as size, severity, landmarks..." required></textarea>
             </div>
 
+            <!-- AI SMART CLASSIFIER BOX -->
+            <div id="aiSmartCard" class="ai-smart-card" style="display: none;">
+                <div class="ai-header">
+                    <span class="ai-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Smart Classifier</span>
+                    <span style="font-size:12px; font-weight:700; color:var(--primary);">Auto-Assigned</span>
+                </div>
+                <div class="ai-metrics-grid">
+                    <div class="ai-metric-item">
+                        <div class="ai-metric-label">Assigned Department</div>
+                        <div id="aiDeptVal" class="ai-metric-val">PWD / Roads</div>
+                    </div>
+                    <div class="ai-metric-item">
+                        <div class="ai-metric-label">Priority Rating</div>
+                        <div id="aiUrgencyVal" class="ai-metric-val badge-urgency urgency-medium">Medium</div>
+                    </div>
+                    <div class="ai-metric-item">
+                        <div class="ai-metric-label">Target Resolution SLA</div>
+                        <div id="aiSlaVal" class="ai-metric-val">48 Hours</div>
+                    </div>
+                    <div class="ai-metric-item">
+                        <div class="ai-metric-label">Detection Confidence</div>
+                        <div id="aiScoreVal" class="ai-metric-val">88%</div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- IMAGE -->
+            <!-- CITIZEN DETAILS -->
+            <div style="margin:20px 0; padding:18px; border-radius:14px; background:var(--bg-body); border:1px solid var(--card-border);">
+                <h3 style="font-size:16px; margin-bottom:12px;"><i class="fa-solid fa-user"></i> Citizen Reporter Details</h3>
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+                    <div>
+                        <label for="citizenName" style="font-size:12px; font-weight:700;">Full Name</label>
+                        <input id="citizenName" type="text" placeholder="Your name" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--card-border);">
+                    </div>
+                    <div>
+                        <label for="citizenMobile" style="font-size:12px; font-weight:700;">Mobile Number</label>
+                        <input id="citizenMobile" type="tel" placeholder="10-digit number" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--card-border);">
+                    </div>
+                    <div>
+                        <label for="citizenEmail" style="font-size:12px; font-weight:700;">Email Address</label>
+                        <input id="citizenEmail" type="email" placeholder="example@gmail.com" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--card-border);">
+                    </div>
+                    <div>
+                        <label for="citizenAddress" style="font-size:12px; font-weight:700;">Landmark / Area</label>
+                        <input id="citizenAddress" type="text" placeholder="Street or Area" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--card-border);">
+                    </div>
+                </div>
+            </div>
 
+            <!-- IMAGE UPLOAD -->
             <div class="form-group">
-
-                <label for="image">
-                    Add Photo
-                </label>
-
-                <input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                >
-
+                <label for="image">Add Issue Photo</label>
+                <input id="image" type="file" accept="image/*">
                 <div id="imagePreviewContainer" class="image-preview-container" style="display: none;">
                     <div class="image-preview-box">
-                        <img id="imagePreview" src="" alt="Issue Photo Preview">
+                        <img id="imagePreview" src="" alt="Issue Preview">
                         <button type="button" id="removeImageBtn" class="remove-image-btn" title="Remove photo">&times;</button>
                     </div>
-                    <span id="imageFileName" class="image-file-name"></span>
                 </div>
-
-                <small>
-                    A photo helps officials understand
-                    the problem.
-                </small>
-
             </div>
 
-
-
-            <!-- LOCATION -->
-
+            <!-- LOCATION GEO-PICKER -->
             <div class="location-box">
-
-                <div>
-
-                    <strong>
-                        <i class="fa-solid fa-location-dot"></i> Issue Location
-                    </strong>
-
-                    <p id="locationText">
-                        Location not captured yet
-                    </p>
-
+                <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                    <div>
+                        <strong><i class="fa-solid fa-location-dot" style="color:#ef4444;"></i> Geotag Location</strong>
+                        <p id="locationText" style="font-size:13px; color:var(--muted);">Click map or detect GPS location</p>
+                    </div>
+                    <button type="button" class="location-button" onclick="getLocation()">
+                        <i class="fa-solid fa-crosshairs"></i> Detect GPS Location
+                    </button>
                 </div>
-
-
-                <button
-                    type="button"
-                    class="location-button"
-                    onclick="getLocation()"
-                >
-                    <i class="fa-solid fa-crosshairs"></i> Detect Location
-                </button>
-
+                <div id="locationMapPicker" class="location-picker-map"></div>
             </div>
 
+            <input type="hidden" id="latitude" value="28.6139">
+            <input type="hidden" id="longitude" value="77.2090">
 
-            <input
-                type="hidden"
-                id="latitude"
-            >
-
-            <input
-                type="hidden"
-                id="longitude"
-            >
-
-
-            <!-- SUBMIT -->
-
-            <button
-                type="submit"
-                class="submit-button"
-            >
-                <i class="fa-solid fa-paper-plane"></i> Submit Report
+            <button type="submit" class="submit-button" style="margin-top:20px;">
+                <i class="fa-solid fa-paper-plane"></i> Submit Civic Report
             </button>
-
         </form>
-
     </div>
-
 </section>
-
 
 <!-- =====================================================
      REPORTS PAGE
 ===================================================== -->
-
-<section
-    id="reportsPage"
-    class="page"
->
-
+<section id="reportsPage" class="page">
     <div class="container page-container">
-
         <div class="page-header">
-
-            <span class="section-label">
-                COMMUNITY REPORTS
-            </span>
-
-            <h1>
-                Civic Issues
-            </h1>
-
-            <p>
-                See issues reported by citizens through C.A.R.E.
-            </p>
-
+            <span class="section-label">COMMUNITY REPORTS</span>
+            <h1>Civic Issues &amp; Live GIS Feed</h1>
+            <p>Explore, upvote, and track civic issues reported across your city.</p>
         </div>
 
+        <!-- QUICK TICKET LOOKUP -->
+        <div class="ticket-lookup-card">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <i class="fa-solid fa-magnifying-glass" style="font-size:20px; color:#38bdf8;"></i>
+                <h3 style="margin:0; font-size:17px;">Track My Report / Ticket Lookup</h3>
+            </div>
+            <p style="font-size:13px; color:#94a3b8; margin-top:4px;">Enter your Ticket ID (e.g. CARE-849201) or Email address to inspect real-time progress.</p>
+            <form class="ticket-lookup-form" onsubmit="handleTicketLookup(event)">
+                <input type="text" id="ticketLookupInput" placeholder="Enter Ticket ID or Email address...">
+                <button type="submit" class="ticket-lookup-btn">Track Report</button>
+            </form>
+        </div>
 
-        <!-- STATISTICS -->
-
+        <!-- STATISTICS METRICS BAR -->
         <div class="statistics">
-
             <div class="stat-card">
-
-                <strong id="totalIssues">
-                    0
-                </strong>
-
-                <span>
-                    Total Reports
-                </span>
-
+                <strong id="totalIssues">0</strong>
+                <span>Total Reports</span>
             </div>
-
-
             <div class="stat-card">
-
-                <strong id="verifiedIssues">
-                    0
-                </strong>
-
-                <span>
-                    Verified
-                </span>
-
+                <strong id="verifiedIssues">0</strong>
+                <span>Verified</span>
             </div>
-
-
             <div class="stat-card">
-
-                <strong id="progressIssues">
-                    0
-                </strong>
-
-                <span>
-                    In Progress
-                </span>
-
+                <strong id="progressIssues">0</strong>
+                <span>In Progress</span>
             </div>
-
-
             <div class="stat-card">
-
-                <strong id="resolvedIssues">
-                    0
-                </strong>
-
-                <span>
-                    Resolved
-                </span>
-
+                <strong id="resolvedIssues">0</strong>
+                <span>Resolved</span>
             </div>
-
         </div>
 
-
-        <!-- REPORTS -->
-
-        <div
-            id="issuesContainer"
-            class="issues-container"
-        >
-
-            <div class="empty-state">
-
-                <div>
-                    <i class="fa-solid fa-location-dot"></i>
+        <!-- TOOLBAR: SEARCH, FILTERS & VIEW TOGGLE -->
+        <div class="toolbar-container">
+            <div class="search-filter-box">
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search ticket ID, area, or description..." oninput="applyFilters()">
                 </div>
-
-                <h3>
-                    Loading reports...
-                </h3>
-
-                <p>
-                    Please wait.
-                </p>
-
+                <select id="filterCategory" class="filter-select" onchange="applyFilters()">
+                    <option value="ALL">All Categories</option>
+                    <option value="Pothole">Potholes</option>
+                    <option value="Garbage">Garbage</option>
+                    <option value="Streetlight">Streetlights</option>
+                    <option value="Drainage">Drainage</option>
+                    <option value="Road Damage">Road Damage</option>
+                    <option value="Water">Water Leakage</option>
+                    <option value="Other">Other</option>
+                </select>
+                <select id="filterStatus" class="filter-select" onchange="applyFilters()">
+                    <option value="ALL">All Statuses</option>
+                    <option value="Reported">Reported</option>
+                    <option value="Verified">Verified</option>
+                    <option value="Assigned">Assigned</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
             </div>
 
+            <div class="view-toggle-group">
+                <button type="button" id="gridViewBtn" class="view-btn active" onclick="setViewMode('grid')">
+                    <i class="fa-solid fa-grid-2"></i> Grid View
+                </button>
+                <button type="button" id="mapViewBtn" class="view-btn" onclick="setViewMode('map')">
+                    <i class="fa-solid fa-map"></i> GIS Map
+                </button>
+            </div>
         </div>
 
+        <!-- LEAFLET GIS MAP CONTAINER -->
+        <div id="reportsMapContainer" class="gis-map-box" style="display: none;">
+            <div id="reportsMap" style="width:100%; height:100%;"></div>
+        </div>
+
+        <!-- REPORTS GRID CONTAINER -->
+        <div id="issuesContainer" class="issues-container">
+            <div class="empty-state">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size:32px; color:#0b5ed7;"></i>
+                <h3>Loading community reports...</h3>
+            </div>
+        </div>
     </div>
-
 </section>
-
 
 <!-- =====================================================
      ABOUT PAGE
 ===================================================== -->
-
-<section
-    id="aboutPage"
-    class="page"
->
-
+<section id="aboutPage" class="page">
     <div class="container page-container">
-
         <div class="page-header">
-
-            <span class="section-label">
-                ABOUT C.A.R.E.
-            </span>
-
-            <h1>
-                Civic Action and Reporting Engine
-            </h1>
-
-            <p>
-                Technology that helps citizens turn
-                observations into action.
-            </p>
-
+            <span class="section-label">ABOUT C.A.R.E.</span>
+            <h1>Civic Action and Reporting Engine</h1>
+            <p>Empowering citizens and municipal administration with location intelligence.</p>
         </div>
-
 
         <div class="about-grid">
-
             <div class="about-card">
-
-                <div class="about-icon">
-                    <i class="fa-solid fa-bullhorn"></i>
-                </div>
-
-                <h2>
-                    Citizen Powered
-                </h2>
-
-                <p>
-                    C.A.R.E. gives citizens a simple
-                    way to report problems they see
-                    around their communities.
-                </p>
-
+                <div class="about-icon"><i class="fa-solid fa-bullhorn"></i></div>
+                <h2>Citizen Powered</h2>
+                <p>C.A.R.E. provides a seamless bridge for citizens to report civic infrastructure issues directly to local authorities.</p>
             </div>
 
-
             <div class="about-card">
-
-                <div class="about-icon">
-                    <i class="fa-solid fa-location-dot"></i>
-                </div>
-
-                <h2>
-                    Location Based
-                </h2>
-
-                <p>
-                    GPS coordinates help identify
-                    exactly where a civic problem
-                    has been reported.
-                </p>
-
+                <div class="about-icon"><i class="fa-solid fa-location-dot"></i></div>
+                <h2>GIS Geotagging</h2>
+                <p>High-precision coordinates ensure municipal crews reach exact issue sites without delay.</p>
             </div>
 
-
             <div class="about-card">
-
-                <div class="about-icon">
-                    <i class="fa-solid fa-chart-column"></i>
-                </div>
-
-                <h2>
-                    Transparent Tracking
-                </h2>
-
-                <p>
-                    Reports can move through statuses
-                    such as Reported, Verified,
-                    In Progress and Resolved.
-                </p>
-
+                <div class="about-icon"><i class="fa-solid fa-chart-column"></i></div>
+                <h2>Transparent Audit</h2>
+                <p>Every ticket undergoes step-by-step resolution tracking with before &amp; after photo verification.</p>
             </div>
-
         </div>
-
 
         <div class="mission-box">
-
-            <span class="section-label">
-                OUR MISSION
-            </span>
-
-            <h2>
-                Better reporting.
-                Better response.
-                Better communities.
-            </h2>
-
-            <p>
-                C.A.R.E. connects citizens and civic
-                authorities through structured,
-                location-based issue reporting.
-            </p>
-
+            <span class="section-label">OUR MISSION</span>
+            <h2>Better reporting. Faster response. Cleaner cities.</h2>
+            <p>C.A.R.E. brings transparency, speed, and accountability to municipal civic governance.</p>
         </div>
-
     </div>
-
 </section>
-
 
 </main>
 
-
 <!-- =====================================================
-     TOAST
+     TOAST ALERTS
 ===================================================== -->
-
-<div
-    id="toast"
-    class="toast"
->
-
-    <span id="toastMessage">
-        Message
-    </span>
-
+<div id="toast" class="toast">
+    <span id="toastMessage">Message</span>
 </div>
-
 
 <!-- =====================================================
      FOOTER
 ===================================================== -->
-
 <footer class="footer">
-
     <div class="container footer-content">
-
         <div class="footer-brand">
-
-            <strong>
-                C.A.R.E.
-            </strong>
-
-            <p>
-                Civic Action and Reporting Engine
-            </p>
-
+            <strong>C.A.R.E.</strong>
+            <p>Civic Action and Reporting Engine</p>
         </div>
-
-
-        <!-- ADMIN ACCESS -->
 
         <div class="admin-access">
-
             <a href="admin.html">
-                <i class="fa-solid fa-shield-halved"></i> Sign in to manage civic reports
+                <i class="fa-solid fa-shield-halved"></i> Sign in to Official Admin Dashboard
             </a>
-
         </div>
-
 
         <div class="footer-credit">
-
             <p>
                 MADE WITH <i class="fa-solid fa-heart" style="color: #ef4444;"></i> BY
-                <strong>
-                    GOVIND VAISHNAV <i class="fa-solid fa-star" style="color: #3b82f6; font-size: 11px;"></i>
-                </strong>
+                <strong>GOVIND VAISHNAV <i class="fa-solid fa-star" style="color: #3b82f6; font-size: 11px;"></i></strong>
                 &amp; TEAM <i class="fa-solid fa-heart" style="color: #ec4899;"></i>
             </p>
-
-            <p>
-                Report. Track. Resolve.
-            </p>
-
-            <p>
-                © 2026 C.A.R.E. All rights reserved.
-            </p>
-
+            <p>Report. Track. Resolve.</p>
+            <p>&copy; 2026 C.A.R.E. All rights reserved.</p>
         </div>
-
     </div>
-
 </footer>
 
-
 <!-- =====================================================
-     IMAGE LIGHTBOX MODAL
+     ISSUE DETAIL INSPECTION MODAL
 ===================================================== -->
-
-<div id="imageModal" class="image-modal-overlay" style="display: none;">
-    <div class="image-modal-content">
-        <button type="button" class="image-modal-close" onclick="closeImageModal()">&times;</button>
-        <img id="imageModalImg" src="" alt="Full Resolution Issue Photo">
-        <div class="image-modal-info">
-            <h4 id="imageModalTitle">Civic Issue Photo</h4>
-            <p id="imageModalDescription"></p>
-        </div>
+<div id="issueDetailModal" class="image-modal-overlay" style="display: none;" onclick="if(event.target===this)closeIssueDetailModal()">
+    <div class="image-modal-content" style="max-width:850px; width:95%; max-height:90vh; overflow-y:auto; padding:28px; background:var(--card-bg); color:var(--text-main);">
+        <button type="button" class="image-modal-close" onclick="closeIssueDetailModal()">&times;</button>
+        <div id="issueModalContent"></div>
     </div>
 </div>
 
-<!-- =====================================================
-     MAIN JAVASCRIPT
-===================================================== -->
-
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Main Application Script -->
 <script src="app.js"></script>
 
 </body>
-
 </html>
